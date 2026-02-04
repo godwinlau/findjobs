@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { runIngestionBatch } from "@/lib/ingest";
+import { runIngestionBatch, cleanupExpiredJobs } from "@/lib/ingest";
 import { TOTAL_BATCHES } from "@/lib/queries";
 
-// Vercel Cron calls this daily
-// Runs ALL batches each time for maximum job coverage
+// Vercel Cron calls this once daily (Hobby plan limit)
+// Runs ALL ingestion batches then cleans up expired jobs
 // Source: linkedin-jobs-api npm package (free, no API key)
 // Searches LinkedIn guest API with location="Philippines"
 
-// Allow up to 5 minutes for full ingestion
+// Allow up to 5 minutes for full ingestion + cleanup
 export const maxDuration = 300;
 
 export async function GET(req: NextRequest) {
@@ -43,6 +43,9 @@ export async function GET(req: NextRequest) {
       });
     }
 
+    // Run cleanup after ingestion (combines both cron jobs into one)
+    const cleanup = await cleanupExpiredJobs();
+
     return NextResponse.json({
       success: true,
       batchesRun: TOTAL_BATCHES,
@@ -51,6 +54,7 @@ export async function GET(req: NextRequest) {
       totalDuplicates,
       totalErrors,
       batches: batchResults,
+      cleanup: { deactivated: cleanup.deactivated },
     });
   } catch (err) {
     return NextResponse.json(

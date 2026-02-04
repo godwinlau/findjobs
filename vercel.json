@@ -2,11 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/ingest",
-      "schedule": "0 1,8,14,20 * * *"
-    },
-    {
-      "path": "/api/cron/cleanup",
-      "schedule": "0 2 * * *"
+      "schedule": "0 1 * * *"
     }
   ]
 }
