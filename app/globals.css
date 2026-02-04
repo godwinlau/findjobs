@@ -1,26 +1,347 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* HanapBuhay Design System Colors */
+  --hb-bg: #F8F8F6;
+  --hb-surface: #FFFFFF;
+  --hb-surface-alt: #F2F1EE;
+  --hb-border: #E6E5E1;
+  --hb-border-hover: #CDCCC7;
+  --hb-primary: #0073FF;
+  --hb-primary-soft: #3391FF;
+  --hb-primary-bg: #EDF4FF;
+  --hb-primary-border: #B3D4FF;
+  --hb-success: #15803D;
+  --hb-success-soft: #16A34A;
+  --hb-success-bg: #F0FDF4;
+  --hb-success-border: #BBF7D0;
+  --hb-accent: #1D4ED8;
+  --hb-accent-bg: #EEF3FF;
+  --hb-accent-border: #C7D7FE;
+  --hb-warning: #B45309;
+  --hb-warning-bg: #FEF9EC;
+  --hb-warning-border: #FDE68A;
+  --hb-text: #171714;
+  --hb-text-sec: #64645E;
+  --hb-text-muted: #9E9E96;
+  --hb-inv: #FFFFFF;
+  --hb-live: #EF4444;
+
+  --background: var(--hb-bg);
+  --foreground: var(--hb-text);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-plus-jakarta), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+}
+
+/* Animations */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ─── Job description prose styling ─── */
+.job-description p {
+  margin-bottom: 0.75em;
+}
+
+.job-description br + br {
+  display: block;
+  content: "";
+  margin-top: 0.5em;
+}
+
+.job-description ul,
+.job-description ol {
+  padding-left: 1.5em;
+  margin-bottom: 0.75em;
+}
+
+.job-description li {
+  margin-bottom: 0.35em;
+  list-style: disc;
+}
+
+.job-description ol li {
+  list-style: decimal;
+}
+
+.job-description h1,
+.job-description h2,
+.job-description h3,
+.job-description h4 {
+  font-weight: 600;
+  color: var(--hb-text);
+  margin-top: 1.25em;
+  margin-bottom: 0.5em;
+}
+
+.job-description h1 { font-size: 1.15em; }
+.job-description h2 { font-size: 1.1em; }
+.job-description h3,
+.job-description h4 { font-size: 1em; }
+
+.job-description strong,
+.job-description b {
+  font-weight: 600;
+  color: var(--hb-text);
+}
+
+.job-description a {
+  color: var(--hb-primary);
+  text-decoration: underline;
+}
+
+/* Section headers detected from plain text */
+.job-description .desc-section-header {
+  display: block;
+  font-weight: 600;
+  color: var(--hb-text);
+  margin-top: 1.25em;
+  margin-bottom: 0.4em;
+}
+
+/* ─── Mobile menu (dropdown) ─── */
+.mobile-menu-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--hb-surface);
+  border-bottom: 1px solid var(--hb-border);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  z-index: 49;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.25s ease, opacity 0.2s ease;
+}
+
+.mobile-menu-dropdown.open {
+  max-height: 300px;
+  opacity: 1;
+}
+
+.hamburger-line {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: var(--hb-text);
+  border-radius: 1px;
+  transition: all 0.2s ease;
+}
+
+/* ─── Responsive utility classes ─── */
+
+/* ResponsiveContainer */
+.responsive-container { padding: 24px 32px; }
+@media (max-width: 1024px) { .responsive-container { padding: 20px 24px; } }
+@media (max-width: 639px) { .responsive-container { padding: 16px; } }
+
+/* Navbar */
+.nav-padding { padding: 0 32px; }
+.nav-desktop-links { display: flex; }
+.nav-search { display: flex; }
+.nav-hamburger { display: none; }
+.nav-mobile-menu { display: none; }
+.nav-left-gap { gap: 32px; }
+@media (max-width: 1024px) {
+  .nav-padding { padding: 0 20px; }
+  .nav-search { display: none !important; }
+  .nav-left-gap { gap: 16px; }
+}
+@media (max-width: 639px) {
+  .nav-padding { padding: 0 16px; }
+  .nav-desktop-links { display: none !important; }
+  .nav-hamburger { display: flex !important; }
+  .nav-mobile-menu { display: block !important; }
+}
+
+/* Grids that collapse on mobile */
+.responsive-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 639px) { .responsive-grid-2 { grid-template-columns: 1fr; } }
+
+.responsive-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+@media (max-width: 639px) { .responsive-grid-3 { grid-template-columns: 1fr; } }
+
+/* Row → Column on mobile */
+.responsive-row { display: flex; flex-direction: row; align-items: center; }
+@media (max-width: 639px) { .responsive-row { flex-direction: column; align-items: stretch; } }
+
+.responsive-row-reverse { display: flex; flex-direction: row; }
+@media (max-width: 639px) { .responsive-row-reverse { flex-direction: column-reverse; align-items: stretch; } }
+
+/* ViewRow — profile display rows */
+.view-row { display: flex; flex-direction: row; justify-content: space-between; align-items: flex-start; gap: 0; }
+.view-row-value { text-align: right; flex: 1; }
+.view-row-label { min-width: 140px; }
+@media (max-width: 639px) {
+  .view-row { flex-direction: column; gap: 2px; }
+  .view-row-value { text-align: left; flex: unset; }
+  .view-row-label { min-width: unset; }
+}
+
+/* AuthCard inner padding */
+.auth-card-inner { padding: 32px; }
+@media (max-width: 639px) { .auth-card-inner { padding: 24px; } }
+
+/* OnboardingWizard padding */
+.onboarding-outer { padding: 48px 24px; }
+.onboarding-inner { padding: 32px; }
+@media (max-width: 639px) {
+  .onboarding-outer { padding: 24px 16px; }
+  .onboarding-inner { padding: 20px; }
+}
+
+/* ProfileEditor container padding */
+.profile-editor-container { padding: 32px 16px; }
+@media (max-width: 639px) { .profile-editor-container { padding: 20px 12px; } }
+
+/* ProfileCompletion header/footer padding */
+.profile-completion-header { padding: 20px 24px; }
+@media (max-width: 639px) { .profile-completion-header { padding: 16px; } }
+
+.profile-completion-footer { padding: 12px 24px; }
+@media (max-width: 639px) { .profile-completion-footer { padding: 12px 16px; } }
+
+/* JobCard padding */
+.job-card-padding { padding: 22px 24px; }
+@media (max-width: 639px) { .job-card-padding { padding: 16px; } }
+
+/* Gap adjustments */
+.responsive-gap-sm { gap: 14px; }
+@media (max-width: 639px) { .responsive-gap-sm { gap: 8px; } }
+
+.responsive-gap-md { gap: 20px; }
+@media (max-width: 639px) { .responsive-gap-md { gap: 12px; } }
+
+/* HeroJobCard apply button */
+.hero-apply-btn { }
+@media (max-width: 639px) { .hero-apply-btn { flex: 1; } }
+
+/* FilterBar */
+.filter-bar-primary { display: flex; padding: 2px 8px; }
+.filter-bar-divider { display: block; }
+@media (max-width: 639px) {
+  .filter-bar-primary { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 8px; }
+  .filter-bar-divider { display: none; }
+}
+
+/* Onboarding back button */
+.onboarding-back-btn { }
+@media (max-width: 639px) { .onboarding-back-btn { flex: 1; } }
+
+/* JobCard button padding */
+.job-card-apply-btn { padding: 7px 20px; }
+.job-card-details-btn { padding: 7px 14px; }
+@media (max-width: 639px) {
+  .job-card-apply-btn { padding: 7px 14px; }
+  .job-card-details-btn { padding: 7px 10px; }
+}
+
+/* More filters button margin */
+.more-filters-btn { margin-left: auto; }
+@media (max-width: 639px) { .more-filters-btn { margin-left: unset; } }
+
+/* SmartBanner gap */
+.smart-banner-gap { gap: 0; }
+@media (max-width: 639px) { .smart-banner-gap { gap: 12px; } }
+
+/* WeeklyProgress gap */
+.weekly-progress-gap { gap: 0; }
+@media (max-width: 639px) { .weekly-progress-gap { gap: 10px; } }
+
+/* ProfileCompletion footer gap */
+.completion-footer-gap { gap: 0; }
+@media (max-width: 639px) { .completion-footer-gap { gap: 10px; } }
+
+/* HeroJobCard layout gap */
+.hero-card-gap { gap: 0; }
+@media (max-width: 639px) { .hero-card-gap { gap: 16px; } }
+
+.hero-card-actions { margin-top: 4px; }
+@media (max-width: 639px) { .hero-card-actions { margin-top: 0; } }
+
+/* PostedJobsList gap */
+.posted-jobs-gap { gap: 0; }
+@media (max-width: 639px) { .posted-jobs-gap { gap: 12px; } }
+
+.posted-jobs-stats-gap { gap: 16px; }
+@media (max-width: 639px) { .posted-jobs-stats-gap { gap: 10px; } }
+
+.posted-jobs-actions { }
+@media (max-width: 639px) { .posted-jobs-actions { justify-content: flex-end; } }
+
+/* OnboardingWizard footer gap */
+.onboarding-footer-gap { gap: 0; }
+@media (max-width: 639px) { .onboarding-footer-gap { gap: 12px; } }
+
+/* Existing server-component responsive classes */
+@media (max-width: 639px) {
+  .employer-header-row {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 12px;
+  }
+
+  .job-detail-header-card {
+    padding: 20px 16px !important;
+  }
+
+  .job-detail-header-flex {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .job-detail-description-card {
+    padding: 20px 16px !important;
+  }
+
+  .job-detail-skills-card {
+    padding: 16px !important;
+  }
 }

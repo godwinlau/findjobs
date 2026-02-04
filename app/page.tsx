@@ -1,65 +1,112 @@
-import Image from "next/image";
+import { redirect } from "next/navigation";
+import { colors } from "@/lib/constants/colors";
+import { Navbar } from "@/components/layout";
+import { ResponsiveContainer } from "@/components/layout/ResponsiveContainer";
+import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
+import {
+  WeeklyProgress,
+  ProfileCompletion,
+  SmartBanner,
+  ApplicationsTracker,
+  ActivityFeed,
+  TopMatchesPreview,
+  MarketInsight,
+} from "@/components/dashboard";
+import { getTopMatchedJobs } from "@/lib/jobs";
+import { analyzeProfileGaps } from "@/lib/profile";
+import { activities, applications } from "@/lib/data/mockData";
+import { createClient } from "@/lib/supabase/server";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Dashboard() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .single();
+
+  const { jobs: topJobs, totalMatches } = await getTopMatchedJobs({
+    profile,
+    limit: 5,
+  });
+
+  const topJob = topJobs.length > 0 ? topJobs[0] : null;
+  const otherJobs = topJobs.slice(1, 5);
+
+  const profileCompletion = profile?.profile_completion ?? 0;
+  const profileComplete = profileCompletion === 100;
+  const profileGaps = analyzeProfileGaps(profile);
+
+  // Determine SmartBanner variant (priority: interview → new matches)
+  // Interview data is currently hardcoded (mock) — same values as previously in Sidebar
+  const hasInterview = applications.some((a) => a.status === "Interview");
+
+  let bannerProps: React.ComponentProps<typeof SmartBanner>;
+  if (hasInterview) {
+    bannerProps = {
+      type: "interview",
+      company: "Accenture",
+      role: "Customer Support",
+      date: "Feb 6",
+      time: "2:00 PM",
+      format: "Video call",
+      daysUntil: 2,
+    };
+  } else {
+    bannerProps = {
+      type: "new_matches",
+      matchCount: totalMatches,
+    };
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div
+      style={{
+        minHeight: "100vh",
+        background: colors.bg,
+        color: colors.text,
+      }}
+    >
+      <Navbar
+        fullName={profile?.full_name || user.user_metadata?.full_name || ""}
+        email={user.email || ""}
+      />
+
+      <ResponsiveContainer>
+        <WeeklyProgress />
+        <ProfileCompletion
+          percentage={profileCompletion}
+          matchesUnlocked={topJobs.filter((j) => j.match >= 70).length}
+          profileComplete={profileComplete}
+          gaps={profileGaps}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+
+        <SmartBanner {...bannerProps} />
+
+        <DashboardGrid>
+          <ApplicationsTracker applications={applications} />
+          <ActivityFeed activities={activities} />
+        </DashboardGrid>
+
+        <TopMatchesPreview
+          topJob={topJob}
+          otherJobs={otherJobs}
+          totalMatches={totalMatches}
+        />
+
+        <MarketInsight message="Customer Support roles in BGC average ₱19K/mo. You're targeting the right range." />
+      </ResponsiveContainer>
     </div>
   );
 }
