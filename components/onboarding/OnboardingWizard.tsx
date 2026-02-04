@@ -79,7 +79,7 @@ export function OnboardingWizard({ initialProfile }: OnboardingWizardProps) {
           setSaving(false);
           return;
         }
-        router.push(isEmployer ? "/employer" : "/");
+        router.push(isEmployer ? "/employer?welcome=1" : "/?welcome=1");
       }
     } catch {
       setError("Something went wrong. Please try again.");
@@ -108,7 +108,7 @@ export function OnboardingWizard({ initialProfile }: OnboardingWizardProps) {
           setSaving(false);
           return;
         }
-        router.push(isEmployer ? "/employer" : "/");
+        router.push(isEmployer ? "/employer?welcome=1" : "/?welcome=1");
       }
     } catch {
       setError("Something went wrong. Please try again.");

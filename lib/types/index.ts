@@ -7,6 +7,7 @@ export type WorkPreference = "onsite" | "hybrid" | "remote" | "any";
 export type EmploymentType = "full_time" | "part_time" | "contract" | "freelance" | "internship" | "any";
 export type ProfileExperienceLevel = "fresh_graduate" | "junior" | "mid" | "senior";
 export type ProfileEducationLevel = "high_school" | "vocational" | "bachelors" | "masters" | "doctorate";
+export type ActivityType = "job_view" | "job_apply" | "job_save" | "profile_update" | "skill_assessment";
 
 export interface Profile {
   id: string;
@@ -29,6 +30,9 @@ export interface Profile {
   onboarding_completed: boolean;
   onboarding_step: number;
   profile_completion: number;
+  current_streak: number;
+  longest_streak: number;
+  last_activity_date: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -86,9 +90,17 @@ export interface UserProfile {
 
 export interface WeekActivity {
   day: string;
+  date: string;
   actions: number;
   isToday: boolean;
   isFuture: boolean;
+}
+
+export interface WeeklyProgressData {
+  currentStreak: number;
+  longestStreak: number;
+  days: WeekActivity[];
+  totalActions: number;
 }
 
 export interface PaginatedJobs {

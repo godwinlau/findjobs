@@ -3,6 +3,7 @@
 import { Heart } from "@phosphor-icons/react";
 import { colors } from "@/lib/constants/colors";
 import { useSavedJobs } from "@/lib/hooks/useSavedJobs";
+import { logActivity } from "@/lib/actions/activity";
 
 interface JobDetailActionsProps {
   jobId: string;
@@ -19,6 +20,7 @@ export function JobDetailActions({ jobId, applyUrl }: JobDetailActionsProps) {
         href={applyUrl}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => logActivity({ activityType: "job_apply", targetId: jobId })}
         style={{
           padding: "12px 32px",
           borderRadius: 8,
@@ -37,7 +39,12 @@ export function JobDetailActions({ jobId, applyUrl }: JobDetailActionsProps) {
         Apply now →
       </a>
       <button
-        onClick={() => toggleSave(jobId)}
+        onClick={() => {
+          if (!saved) {
+            logActivity({ activityType: "job_save", targetId: jobId });
+          }
+          toggleSave(jobId);
+        }}
         style={{
           width: 44,
           height: 44,

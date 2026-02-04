@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runIngestionBatch, cleanupExpiredJobs } from "@/lib/ingest";
+import { resetStaleStreaks } from "@/lib/streaks";
 import { TOTAL_BATCHES } from "@/lib/queries";
 
 // Vercel Cron calls this once daily (Hobby plan limit)
@@ -46,6 +47,9 @@ export async function GET(req: NextRequest) {
     // Run cleanup after ingestion (combines both cron jobs into one)
     const cleanup = await cleanupExpiredJobs();
 
+    // Reset streaks for users who haven't been active
+    const streaks = await resetStaleStreaks();
+
     return NextResponse.json({
       success: true,
       batchesRun: TOTAL_BATCHES,
@@ -55,6 +59,7 @@ export async function GET(req: NextRequest) {
       totalErrors,
       batches: batchResults,
       cleanup: { deactivated: cleanup.deactivated },
+      streaks: { reset: streaks.reset },
     });
   } catch (err) {
     return NextResponse.json(

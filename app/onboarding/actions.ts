@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { calculateCompletion } from "@/lib/profile";
+import { logActivity } from "@/lib/actions/activity";
 import type { Profile } from "@/lib/types";
 
 export async function saveOnboardingStep(step: number, data: Partial<Profile>) {
@@ -108,6 +109,9 @@ export async function completeOnboarding(data: Partial<Profile>) {
   if (error) {
     return { error: error.message };
   }
+
+  // Fire-and-forget: log onboarding completion as activity
+  logActivity({ activityType: "profile_update", targetId: "onboarding_complete" });
 
   // Set cookies so middleware skips DB checks on redirect
   const cookieStore = await cookies();

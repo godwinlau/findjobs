@@ -53,6 +53,15 @@ body {
 }
 
 /* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+body.walkthrough-active {
+  overflow: hidden;
+}
+
 @keyframes fadeUp {
   from {
     opacity: 0;

@@ -1,12 +1,20 @@
-"use client";
-
 import { colors } from "@/lib/constants/colors";
 import { Card } from "@/components/ui";
-import { weekDays, weekActivity } from "@/lib/data/mockData";
+import type { WeeklyProgressData } from "@/lib/types";
 
-export function WeeklyProgress() {
-  const todayIndex = 3; // Thursday is today in our mock data
-  const totalActions = weekActivity.reduce((sum, a) => sum + a, 0);
+interface WeeklyProgressProps {
+  data: WeeklyProgressData | null;
+}
+
+export function WeeklyProgress({ data }: WeeklyProgressProps) {
+  if (!data) return null;
+
+  const streakText =
+    data.currentStreak === 0
+      ? "No streak"
+      : data.currentStreak === 1
+      ? "1-day streak"
+      : `${data.currentStreak}-day streak`;
 
   return (
     <Card
@@ -20,17 +28,17 @@ export function WeeklyProgress() {
     >
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          <span style={{ fontSize: 16 }}>🔥</span>
+          <span style={{ fontSize: 16 }}>
+            {data.currentStreak > 0 ? "🔥" : "💤"}
+          </span>
           <span style={{ fontSize: 13, fontWeight: 700, color: colors.text }}>
-            3-day streak
+            {streakText}
           </span>
         </div>
         <span style={{ color: colors.border }}>|</span>
         <div style={{ display: "flex", gap: 6, alignItems: "flex-end" }}>
-          {weekDays.map((day, i) => {
-            const isToday = i === todayIndex;
-            const isFuture = i > todayIndex;
-            const level = weekActivity[i];
+          {data.days.map((dayData, i) => {
+            const level = dayData.actions;
 
             return (
               <div
@@ -47,7 +55,7 @@ export function WeeklyProgress() {
                     width: 20,
                     height: 20,
                     borderRadius: 5,
-                    background: isFuture
+                    background: dayData.isFuture
                       ? colors.surfaceAlt
                       : level === 0
                       ? colors.surfaceAlt
@@ -56,15 +64,15 @@ export function WeeklyProgress() {
                       : level >= 2
                       ? colors.primary
                       : colors.surfaceAlt,
-                    border: isToday
+                    border: dayData.isToday
                       ? `2px solid ${colors.primary}`
-                      : `1px solid ${isFuture ? colors.border : level > 0 ? "transparent" : colors.border}`,
+                      : `1px solid ${dayData.isFuture ? colors.border : level > 0 ? "transparent" : colors.border}`,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                   }}
                 >
-                  {level > 0 && !isFuture && (
+                  {level > 0 && !dayData.isFuture && (
                     <span
                       style={{
                         fontSize: 9,
@@ -79,11 +87,11 @@ export function WeeklyProgress() {
                 <span
                   style={{
                     fontSize: 9,
-                    fontWeight: isToday ? 700 : 400,
-                    color: isToday ? colors.text : colors.textMuted,
+                    fontWeight: dayData.isToday ? 700 : 400,
+                    color: dayData.isToday ? colors.text : colors.textMuted,
                   }}
                 >
-                  {day}
+                  {dayData.day}
                 </span>
               </div>
             );
@@ -92,9 +100,9 @@ export function WeeklyProgress() {
       </div>
       <div style={{ fontSize: 12, color: colors.textSec }}>
         <span style={{ fontWeight: 600, color: colors.primary }}>
-          {totalActions} actions
+          {data.totalActions} action{data.totalActions !== 1 ? "s" : ""}
         </span>{" "}
-        this week · Keep it up!
+        this week{data.totalActions > 0 ? " · Keep it up!" : ""}
       </div>
     </Card>
   );

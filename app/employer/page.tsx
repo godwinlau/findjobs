@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { colors } from "@/lib/constants/colors";
@@ -5,6 +6,7 @@ import { Navbar } from "@/components/layout";
 import { ResponsiveContainer } from "@/components/layout/ResponsiveContainer";
 import { StatsRow, PostedJobsList, EmptyState } from "@/components/employer";
 import { Button } from "@/components/ui/Button";
+import { WelcomeWalkthrough } from "@/components/walkthrough/WelcomeWalkthrough";
 import { getEmployerJobs, getEmployerStats } from "@/lib/employer";
 import { createClient } from "@/lib/supabase/server";
 
@@ -68,22 +70,33 @@ export default async function EmployerDashboard() {
               Manage your job postings and track performance
             </div>
           </div>
-          <Link href="/employer/post" style={{ textDecoration: "none" }}>
-            <Button variant="primary" size="lg">
-              Post a Job
-            </Button>
-          </Link>
+          <div data-tour="post-job-button">
+            <Link href="/employer/post" style={{ textDecoration: "none" }}>
+              <Button variant="primary" size="lg">
+                Post a Job
+              </Button>
+            </Link>
+          </div>
         </div>
 
-        <StatsRow stats={stats} />
+        <div data-tour="stats-row">
+          <StatsRow stats={stats} />
+        </div>
 
-        <div style={{ marginBottom: 16 }}>
+        <div data-tour="posted-jobs-list" style={{ marginBottom: 16 }}>
           <div style={{ fontSize: 15, fontWeight: 600, color: colors.text, marginBottom: 12 }}>
             Your Job Postings
           </div>
           {jobs.length > 0 ? <PostedJobsList jobs={jobs} /> : <EmptyState />}
         </div>
       </ResponsiveContainer>
+
+      <Suspense fallback={null}>
+        <WelcomeWalkthrough
+          firstName={profile?.full_name?.split(" ")[0] || ""}
+          isEmployer={true}
+        />
+      </Suspense>
     </div>
   );
 }

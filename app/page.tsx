@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { colors } from "@/lib/constants/colors";
 import { Navbar } from "@/components/layout";
@@ -12,7 +13,9 @@ import {
   TopMatchesPreview,
   MarketInsight,
 } from "@/components/dashboard";
+import { WelcomeWalkthrough } from "@/components/walkthrough/WelcomeWalkthrough";
 import { getTopMatchedJobs } from "@/lib/jobs";
+import { getWeeklyProgress } from "@/lib/actions/weekly-progress";
 import { analyzeProfileGaps } from "@/lib/profile";
 import { activities, applications } from "@/lib/data/mockData";
 import { createClient } from "@/lib/supabase/server";
@@ -36,10 +39,10 @@ export default async function Dashboard() {
     .eq("id", user.id)
     .single();
 
-  const { jobs: topJobs, totalMatches } = await getTopMatchedJobs({
-    profile,
-    limit: 5,
-  });
+  const [{ jobs: topJobs, totalMatches }, weeklyProgress] = await Promise.all([
+    getTopMatchedJobs({ profile, limit: 5 }),
+    getWeeklyProgress(),
+  ]);
 
   const topJob = topJobs.length > 0 ? topJobs[0] : null;
   const otherJobs = topJobs.slice(1, 5);
@@ -84,29 +87,44 @@ export default async function Dashboard() {
       />
 
       <ResponsiveContainer>
-        <WeeklyProgress />
-        <ProfileCompletion
-          percentage={profileCompletion}
-          matchesUnlocked={topJobs.filter((j) => j.match >= 70).length}
-          profileComplete={profileComplete}
-          gaps={profileGaps}
-        />
+        <div data-tour="weekly-progress">
+          <WeeklyProgress data={weeklyProgress} />
+        </div>
+        <div data-tour="profile-completion">
+          <ProfileCompletion
+            percentage={profileCompletion}
+            matchesUnlocked={topJobs.filter((j) => j.match >= 70).length}
+            profileComplete={profileComplete}
+            gaps={profileGaps}
+          />
+        </div>
 
         <SmartBanner {...bannerProps} />
 
         <DashboardGrid>
-          <ApplicationsTracker applications={applications} />
+          <div data-tour="applications-tracker">
+            <ApplicationsTracker applications={applications} />
+          </div>
           <ActivityFeed activities={activities} />
         </DashboardGrid>
 
-        <TopMatchesPreview
-          topJob={topJob}
-          otherJobs={otherJobs}
-          totalMatches={totalMatches}
-        />
+        <div data-tour="top-matches">
+          <TopMatchesPreview
+            topJob={topJob}
+            otherJobs={otherJobs}
+            totalMatches={totalMatches}
+          />
+        </div>
 
         <MarketInsight message="Customer Support roles in BGC average ₱19K/mo. You're targeting the right range." />
       </ResponsiveContainer>
+
+      <Suspense fallback={null}>
+        <WelcomeWalkthrough
+          firstName={profile?.full_name?.split(" ")[0] || ""}
+          isEmployer={false}
+        />
+      </Suspense>
     </div>
   );
 }

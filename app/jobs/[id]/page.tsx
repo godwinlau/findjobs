@@ -6,6 +6,7 @@ import { CompanyLogo, Badge, MatchIndicator } from "@/components/ui";
 import { ResponsiveContainer } from "@/components/layout/ResponsiveContainer";
 import { JobDetailActions } from "./JobDetailActions";
 import { createClient } from "@/lib/supabase/server";
+import { logActivity } from "@/lib/actions/activity";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,11 @@ export default async function JobDetailPage({
   ]);
 
   if (!row) notFound();
+
+  // Fire-and-forget: log job view activity
+  if (user) {
+    logActivity({ activityType: "job_view", targetId: id });
+  }
 
   const profile = profileResult?.data ?? null;
   const job = buildJobDetail(row, profile);

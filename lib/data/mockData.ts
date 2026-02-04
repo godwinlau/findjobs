@@ -138,5 +138,3 @@ export const applications: Application[] = [
   },
 ];
 
-export const weekDays = ["M", "T", "W", "T", "F", "S", "S"];
-export const weekActivity = [2, 1, 3, 0, 0, 0, 0]; // actions taken each day, 0 = today onwards (future)

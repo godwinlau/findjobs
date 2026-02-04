@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { calculateCompletion } from "@/lib/profile";
+import { logActivity } from "@/lib/actions/activity";
 import type { Profile } from "@/lib/types";
 
 const ALLOWED_FIELDS = [
@@ -73,6 +74,9 @@ export async function updateProfile(
   if (error) {
     return { error: error.message };
   }
+
+  // Fire-and-forget: log profile update activity
+  logActivity({ activityType: "profile_update", targetId: "profile" });
 
   return {};
 }
