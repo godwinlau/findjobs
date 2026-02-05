@@ -26,20 +26,23 @@ export async function saveOnboardingStep(step: number, data: Partial<Profile>) {
     if (data.user_role) updateData.user_role = data.user_role;
   }
 
-  // Step 1: Basics (was Step 0)
+  // Step 1: About You (full_name, preferred_city, work_preference)
   if (step === 1) {
     if (data.full_name) updateData.full_name = data.full_name.trim();
-    if (data.headline !== undefined) updateData.headline = data.headline || null;
     if (data.preferred_city !== undefined) updateData.preferred_city = data.preferred_city || null;
     if (data.work_preference) updateData.work_preference = data.work_preference;
   }
 
-  // Step 2: Skills (was Step 1)
+  // Step 2: Your Skills
   if (step === 2) {
     if (data.skills) updateData.skills = data.skills;
+  }
+
+  // Step 3: Background (experience_level, education, school, field_of_study)
+  if (step === 3) {
     if (data.experience_level) updateData.experience_level = data.experience_level;
-    if (data.years_of_experience !== undefined) updateData.years_of_experience = data.years_of_experience;
     if (data.education !== undefined) updateData.education = data.education || null;
+    if (data.school !== undefined) updateData.school = data.school || null;
     if (data.field_of_study !== undefined) updateData.field_of_study = data.field_of_study || null;
   }
 
@@ -80,10 +83,10 @@ export async function completeOnboarding(data: Partial<Profile>) {
   } else {
     // Job seeker: calculate completion from profile data
     const completion = calculateCompletion(data);
-    updateData.onboarding_step = 4;
+    updateData.onboarding_step = 5;
     updateData.profile_completion = completion;
 
-    // Save step 3 fields (Preferences — was step 2)
+    // Save step 4 fields (Preferences)
     if (data.desired_salary_min !== undefined) updateData.desired_salary_min = data.desired_salary_min;
     if (data.desired_salary_max !== undefined) updateData.desired_salary_max = data.desired_salary_max;
     if (data.employment_type) updateData.employment_type = data.employment_type;
@@ -91,13 +94,12 @@ export async function completeOnboarding(data: Partial<Profile>) {
 
     // Also save any earlier step fields that may be present
     if (data.full_name) updateData.full_name = data.full_name.trim();
-    if (data.headline !== undefined) updateData.headline = data.headline || null;
     if (data.preferred_city !== undefined) updateData.preferred_city = data.preferred_city || null;
     if (data.work_preference) updateData.work_preference = data.work_preference;
     if (data.skills) updateData.skills = data.skills;
     if (data.experience_level) updateData.experience_level = data.experience_level;
-    if (data.years_of_experience !== undefined) updateData.years_of_experience = data.years_of_experience;
     if (data.education !== undefined) updateData.education = data.education || null;
+    if (data.school !== undefined) updateData.school = data.school || null;
     if (data.field_of_study !== undefined) updateData.field_of_study = data.field_of_study || null;
   }
 

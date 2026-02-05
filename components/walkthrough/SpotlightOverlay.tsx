@@ -18,7 +18,7 @@ interface Rect {
 
 const PADDING = 8;
 const TOOLTIP_GAP = 12;
-const TRANSITION_DURATION = 400;
+const TRANSITION_DURATION = 150;
 
 export function SpotlightOverlay({ steps, onComplete }: SpotlightOverlayProps) {
   const [currentStep, setCurrentStep] = useState(0);
@@ -132,7 +132,8 @@ export function SpotlightOverlay({ steps, onComplete }: SpotlightOverlayProps) {
           height: spotlightRect.height,
           borderRadius: 12,
           boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.5)",
-          transition: `all ${TRANSITION_DURATION}ms cubic-bezier(0.4, 0, 0.2, 1)`,
+          transition: `all ${TRANSITION_DURATION}ms linear`,
+          willChange: "top, left, width, height",
           pointerEvents: "none",
         }}
       />
@@ -151,7 +152,7 @@ export function SpotlightOverlay({ steps, onComplete }: SpotlightOverlayProps) {
           boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
           pointerEvents: "auto",
           opacity: tooltipVisible ? 1 : 0,
-          transition: `opacity 0.25s ease`,
+          transition: `opacity 0.1s linear`,
         }}
       >
         <div
@@ -193,7 +194,7 @@ export function SpotlightOverlay({ steps, onComplete }: SpotlightOverlayProps) {
                   borderRadius: 3,
                   background:
                     i === currentStep ? colors.primary : colors.border,
-                  transition: "all 0.3s ease",
+                  transition: "all 0.15s linear",
                 }}
               />
             ))}

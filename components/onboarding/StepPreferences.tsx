@@ -40,7 +40,7 @@ export function StepPreferences({ data, onChange }: StepPreferencesProps) {
           marginBottom: 24,
         }}
       >
-        Almost done — tell us what you&apos;re looking for
+        Almost done — set your preferences and we&apos;ll filter the rest
       </p>
 
       <SalaryRangeInput

@@ -7,13 +7,14 @@ import { ProgressBar } from "./ProgressBar";
 import { StepRoleSelect } from "./StepRoleSelect";
 import { StepBasics } from "./StepBasics";
 import { StepSkills } from "./StepSkills";
+import { StepBackground } from "./StepBackground";
 import { StepPreferences } from "./StepPreferences";
 import { StepEmployerComingSoon } from "./StepEmployerComingSoon";
 import { SALARY_PRESETS } from "@/lib/constants/onboarding";
 import { saveOnboardingStep, completeOnboarding } from "@/app/onboarding/actions";
 import type { Profile, UserRole } from "@/lib/types";
 
-const JOB_SEEKER_LABELS = ["Your Role", "About You", "Your Skills", "Job Preferences"];
+const JOB_SEEKER_LABELS = ["Your Role", "About You", "Your Skills", "Background", "Preferences"];
 const EMPLOYER_LABELS = ["Your Role", "Almost There"];
 
 interface OnboardingWizardProps {
@@ -29,7 +30,7 @@ export function OnboardingWizard({ initialProfile }: OnboardingWizardProps) {
 
   const role: UserRole | null = data.user_role || null;
   const isEmployer = role === "employer";
-  const totalSteps = isEmployer ? 2 : 4;
+  const totalSteps = isEmployer ? 2 : 5;
   const labels = isEmployer ? EMPLOYER_LABELS : JOB_SEEKER_LABELS;
 
   function updateData(updates: Partial<Profile>) {
@@ -54,10 +55,32 @@ export function OnboardingWizard({ initialProfile }: OnboardingWizardProps) {
       return;
     }
 
-    // Step 1 (job seeker basics) validation: full name required
-    if (step === 1 && !isEmployer && !data.full_name?.trim()) {
-      setError("Full name is required.");
-      return;
+    // Step 1 (About You): full name + preferred city required
+    if (step === 1 && !isEmployer) {
+      if (!data.full_name?.trim()) {
+        setError("Full name is required.");
+        return;
+      }
+      if (!data.preferred_city) {
+        setError("Please select your preferred city.");
+        return;
+      }
+    }
+
+    // Step 2 (Your Skills): min 3 skills required
+    if (step === 2 && !isEmployer) {
+      if (!data.skills || data.skills.length < 3) {
+        setError("Please select at least 3 skills.");
+        return;
+      }
+    }
+
+    // Step 3 (Background): education required
+    if (step === 3 && !isEmployer) {
+      if (!data.education) {
+        setError("Please select your education level.");
+        return;
+      }
     }
 
     setError("");
@@ -139,16 +162,17 @@ export function OnboardingWizard({ initialProfile }: OnboardingWizardProps) {
       return <StepEmployerComingSoon />;
     }
 
-    // Job seeker steps (shifted by 1)
+    // Job seeker steps
     if (step === 1) return <StepBasics data={data} onChange={updateData} />;
     if (step === 2) return <StepSkills data={data} onChange={updateData} />;
-    if (step === 3) return <StepPreferences data={data} onChange={updateData} />;
+    if (step === 3) return <StepBackground data={data} onChange={updateData} />;
+    if (step === 4) return <StepPreferences data={data} onChange={updateData} />;
 
     return null;
   }
 
-  // Hide skip on step 0 (role is mandatory) and for employers
-  const showSkip = step > 0 && !isEmployer;
+  // Skip button only on Step 4 (Preferences) for job seekers
+  const showSkip = !isEmployer && step === totalSteps - 1;
   // Hide back on step 0 (no previous step)
   const showBack = step > 0;
 

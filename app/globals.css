@@ -329,6 +329,14 @@ body.walkthrough-active {
 .onboarding-footer-gap { gap: 0; }
 @media (max-width: 639px) { .onboarding-footer-gap { gap: 12px; } }
 
+/* Learn page assessments horizontal scroll */
+.learn-assessments-scroll {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.learn-assessments-scroll::-webkit-scrollbar { width: 0; height: 0; }
+
 /* Existing server-component responsive classes */
 @media (max-width: 639px) {
   .employer-header-row {

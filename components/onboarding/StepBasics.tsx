@@ -34,7 +34,7 @@ export function StepBasics({ data, onChange }: StepBasicsProps) {
           marginBottom: 24,
         }}
       >
-        Let&apos;s start with the basics
+        We&apos;ll use this to find jobs near you
       </p>
 
       <AuthInput
@@ -43,13 +43,6 @@ export function StepBasics({ data, onChange }: StepBasicsProps) {
         onChange={(e) => onChange({ full_name: e.currentTarget.value })}
         placeholder="Juan dela Cruz"
         required
-      />
-
-      <AuthInput
-        label="Headline"
-        value={data.headline || ""}
-        onChange={(e) => onChange({ headline: e.currentTarget.value })}
-        placeholder='e.g. "Fresh grad seeking marketing role"'
       />
 
       <div style={{ marginBottom: 16 }}>
@@ -62,7 +55,7 @@ export function StepBasics({ data, onChange }: StepBasicsProps) {
             marginBottom: 6,
           }}
         >
-          Preferred city
+          Preferred city *
         </label>
         <select
           value={data.preferred_city || ""}
