@@ -9,3 +9,7 @@ export { QuickWinsSection } from "./QuickWinsSection";
 export { FreeResourceCard } from "./FreeResourceCard";
 export { FreeResourcesSection } from "./FreeResourcesSection";
 export { LearningActivityFeed } from "./LearningActivityFeed";
+export { SkillROIItem } from "./SkillROIItem";
+export { SkillROISection } from "./SkillROISection";
+export { CourseCard } from "./CourseCard";
+export { RecommendedCoursesSection } from "./RecommendedCoursesSection";

@@ -104,3 +104,65 @@ export interface LearningActivity {
   time: string;
   icon: string;
 }
+
+// ─── Course Recommendation Types ───
+
+export interface Course {
+  id: string;
+  title: string;
+  description: string;
+  provider: string;
+  providerLetter: string;
+  providerLogoBg: string;
+  providerLogoColor: string;
+  url: string;
+  skillsTaught: string[];
+  categoryId: string;
+  difficulty: "beginner" | "intermediate" | "advanced";
+  industries: string[];
+  estimatedHours: number;
+  format: "video" | "interactive" | "reading" | "project";
+  isFree: boolean;
+  icon: string;
+}
+
+export interface ScoredCourse extends Course {
+  relevanceScore: number;
+  reasons: string[];
+  jobsUnlocked: number;
+  skillGapsCovered: string[];
+}
+
+export interface SkillROI {
+  skill: string;
+  category: string;
+  jobsRequiring: number;
+  estimatedNewMatches: number;
+  topIndustries: string[];
+  difficulty: "beginner" | "intermediate" | "advanced";
+  recommendedCourse: Course | null;
+}
+
+export interface RecommendationContext {
+  userSkills: string[];
+  experienceLevel: string;
+  preferredIndustries: string[];
+  snapshot: SkillsSnapshot;
+  assessmentResults: Record<string, { score: number; total: number }>;
+  allSkillsByCategory: Record<string, string[]>;
+}
+
+export interface ScoredLearningPath extends LearningPath {
+  relevanceScore: number;
+  isTopPick: boolean;
+}
+
+export interface ScoredQuickWin extends QuickWin {
+  isTopPick: boolean;
+  relevanceScore: number;
+}
+
+export interface ScoredFreeResource extends FreeResource {
+  relevanceScore: number;
+  isBestForGaps: boolean;
+}

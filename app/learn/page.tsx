@@ -5,12 +5,22 @@ import { Navbar } from "@/components/layout";
 import { ResponsiveContainer } from "@/components/layout/ResponsiveContainer";
 import { buildSkillsSnapshot, selectQuestions } from "@/lib/learn";
 import {
+  buildRecommendationContext,
+  scoreAndRankCourses,
+  computeSkillROI,
+  rankLearningPaths,
+  rankQuickWins,
+  rankFreeResources,
+} from "@/lib/recommendations";
+import {
   SkillsSnapshotHero,
   LearningPathsSection,
   AssessmentsSection,
   QuickWinsSection,
   FreeResourcesSection,
   LearningActivityFeed,
+  SkillROISection,
+  RecommendedCoursesSection,
 } from "@/components/learn";
 import {
   learningPaths,
@@ -20,6 +30,7 @@ import {
   freeResources,
   learningActivities,
 } from "@/lib/data/learnMockData";
+import { courseCatalog } from "@/lib/data/courseCatalog";
 import { getAssessmentResults } from "@/lib/actions/assessments";
 import { createClient } from "@/lib/supabase/server";
 import type { SkillAssessment } from "@/lib/types/learn";
@@ -64,6 +75,33 @@ export default async function LearnPage() {
     return { ...a, questions };
   });
 
+  // Build recommendation context from profile + snapshot + assessment results
+  const assessmentScores: Record<string, { score: number; total: number }> = {};
+  if (assessmentResults) {
+    for (const [categoryId, result] of Object.entries(assessmentResults)) {
+      if (result && typeof result === "object" && "score" in result && "total" in result) {
+        assessmentScores[categoryId] = {
+          score: result.score as number,
+          total: result.total as number,
+        };
+      }
+    }
+  }
+
+  const recContext = buildRecommendationContext(
+    profile,
+    snapshot,
+    assessmentScores,
+    SKILL_CATEGORIES
+  );
+
+  // Compute personalized data
+  const scoredCourses = scoreAndRankCourses(courseCatalog, recContext);
+  const skillROIs = computeSkillROI(recContext, courseCatalog);
+  const rankedPaths = rankLearningPaths(learningPaths, recContext);
+  const rankedWins = rankQuickWins(quickWins, recContext);
+  const rankedResources = rankFreeResources(freeResources, recContext);
+
   return (
     <div
       style={{
@@ -79,13 +117,15 @@ export default async function LearnPage() {
 
       <ResponsiveContainer>
         <SkillsSnapshotHero snapshot={snapshot} />
-        <LearningPathsSection paths={learningPaths} />
+        <SkillROISection skills={skillROIs} />
+        <RecommendedCoursesSection courses={scoredCourses} />
+        <LearningPathsSection paths={rankedPaths} />
         <AssessmentsSection
           assessments={tailoredAssessments}
           initialResults={assessmentResults ?? {}}
         />
-        <QuickWinsSection wins={quickWins} />
-        <FreeResourcesSection resources={freeResources} />
+        <QuickWinsSection wins={rankedWins} />
+        <FreeResourcesSection resources={rankedResources} />
         <LearningActivityFeed activities={learningActivities} />
       </ResponsiveContainer>
     </div>

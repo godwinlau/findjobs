@@ -196,7 +196,7 @@ export function SkillsSnapshotHero({ snapshot }: SkillsSnapshotHeroProps) {
             size="sm"
             onClick={() => {
               document
-                .getElementById("skill-assessments")
+                .getElementById("recommended-courses")
                 ?.scrollIntoView({ behavior: "smooth", block: "start" });
             }}
           >
