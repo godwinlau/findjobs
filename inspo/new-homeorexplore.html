@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Explore</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#F5F5F0;font-family:'Sora',sans-serif;color:#0A0A0A;min-height:100vh}
+  ::selection{background:#0A0A0A;color:#F5F5F0}
+
+  /* ============ NAV ============ */
+  .nav{position:sticky;top:0;z-index:100;background:#0A0A0A;color:#F5F5F0;border-bottom:3px solid #0A0A0A}
+  .nav-inner{max-width:1060px;margin:0 auto;padding:0 20px;display:flex;align-items:stretch;height:60px}
+  .nav-brand{display:flex;align-items:center;gap:10px;padding-right:24px;border-right:2px solid rgba(255,255,255,.1);flex-shrink:0;cursor:pointer;transition:opacity .15s;text-decoration:none;color:#F5F5F0}
+  .nav-brand:hover{opacity:.8}
+  .nav-logo{width:32px;height:32px;background:#FBBF24;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:#0A0A0A}
+  .nav-wordmark{font-size:16px;font-weight:800;letter-spacing:-.03em}
+  .nav-links{display:flex;align-items:stretch;list-style:none;flex:1}
+  .nav-links li{display:flex;align-items:stretch;border-right:1px solid rgba(255,255,255,.06)}
+  .nav-links a{display:flex;align-items:center;padding:0 20px;font-family:'Space Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.4);text-decoration:none;transition:all .15s;position:relative}
+  .nav-links a:hover{color:#F5F5F0;background:rgba(255,255,255,.04)}
+  .nav-links a.active{color:#FBBF24;background:rgba(251,191,36,.05)}
+  .nav-links a.active::after{content:'';position:absolute;bottom:-3px;left:0;width:100%;height:3px;background:#FBBF24}
+  .nav-links .badge{font-size:9px;font-weight:700;background:#FBBF24;color:#0A0A0A;padding:2px 6px;margin-left:8px}
+  .nav-right{display:flex;align-items:stretch;margin-left:auto;border-left:2px solid rgba(255,255,255,.1)}
+  .nav-btn{display:flex;align-items:center;padding:0 16px;background:0;border:0;color:rgba(255,255,255,.4);cursor:pointer;transition:all .15s;border-left:1px solid rgba(255,255,255,.06);position:relative}
+  .nav-btn:hover{color:#F5F5F0;background:rgba(255,255,255,.04)}
+  .nav-btn svg{width:18px;height:18px}
+  .nav-btn .notif-dot{width:6px;height:6px;background:#FBBF24;position:absolute;top:16px;right:14px}
+  .nav-avatar{width:28px;height:28px;background:#FBBF24;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#0A0A0A}
+  @media(max-width:700px){.nav-links a span.full{display:none}.nav-links a span.short{display:inline}.nav-links a{padding:0 12px;font-size:10px}.nav-wordmark{display:none}}
+  @media(min-width:701px){.nav-links a span.short{display:none}}
+
+  /* ============ SEARCH STRIP ============ */
+  .search-strip{border-bottom:2px solid #0A0A0A;background:#F5F5F0}
+  .search-strip-inner{max-width:1060px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:12px}
+  .search-bar{display:flex;border:2px solid #0A0A0A;flex:1;max-width:540px}
+  .search-bar:focus-within{border-color:#FBBF24}
+  .search-icon{width:44px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.02);border-right:1px solid rgba(0,0,0,.06);flex-shrink:0}
+  .search-icon svg{width:16px;height:16px;color:#888}
+  .search-input{flex:1;background:transparent;border:none;outline:none;padding:10px 14px;font-family:'Sora',sans-serif;font-size:13px;color:#0A0A0A}
+  .search-input::placeholder{color:#bbb}
+  .search-btn{padding:0 20px;background:#0A0A0A;border:none;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#F5F5F0;cursor:pointer;transition:all .15s;flex-shrink:0}
+  .search-btn:hover{background:#FBBF24;color:#0A0A0A}
+  .search-chips{display:flex;gap:5px;flex-wrap:wrap}
+  .search-chip{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;padding:5px 10px;border:1.5px solid rgba(0,0,0,.1);text-transform:uppercase;letter-spacing:.04em;color:#888;cursor:pointer;transition:all .15s;background:0}
+  .search-chip:hover{border-color:#0A0A0A;color:#0A0A0A}
+  @media(max-width:700px){.search-strip-inner{flex-wrap:wrap}.search-bar{max-width:100%}}
+
+  /* ============ PAGE ============ */
+  .page{max-width:1060px;margin:0 auto;padding:28px 20px 60px}
+
+  /* Section system */
+  .sec{margin-bottom:32px}
+  .sec-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:14px}
+  .sec-left{display:flex;flex-direction:column;gap:3px}
+  .sec-label{font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#888}
+  .sec-title{font-size:24px;font-weight:800;letter-spacing:-.04em;line-height:1}
+  .sec-link{font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:#888;text-decoration:none;cursor:pointer;background:0;border:0;padding:0;transition:color .15s}
+  .sec-link:hover{color:#0A0A0A}
+
+  /* ============ CATEGORY CHIPS (horizontal scrollable) ============ */
+  .cat-scroll{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+  .cat-scroll::-webkit-scrollbar{display:none}
+  .cat-chip{flex-shrink:0;border:2px solid #0A0A0A;margin-left:-2px;padding:14px 20px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .15s;background:#F5F5F0}
+  .cat-chip:first-child{margin-left:0}
+  .cat-chip:hover{background:#EEEEE8;z-index:2}
+  .cat-chip.active{background:#0A0A0A;color:#F5F5F0}
+  .cat-chip.active .cat-chip-count{color:#FBBF24}
+  .cat-chip-icon{font-size:18px}
+  .cat-chip-text{display:flex;flex-direction:column;gap:1px}
+  .cat-chip-name{font-size:13px;font-weight:700;letter-spacing:-.01em;white-space:nowrap}
+  .cat-chip-count{font-family:'Space Mono',monospace;font-size:9px;color:#888;text-transform:uppercase;letter-spacing:.04em}
+
+  /* ============ TWO-COL LAYOUT ============ */
+  .two-col{display:grid;grid-template-columns:1fr 320px;gap:28px}
+  @media(max-width:800px){.two-col{grid-template-columns:1fr}}
+
+  /* ============ TRENDING ROLES ============ */
+  .trending-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0}
+  @media(max-width:500px){.trending-grid{grid-template-columns:1fr}}
+  .trend-card{border:2px solid #0A0A0A;margin-top:-2px;margin-left:-2px;padding:20px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;cursor:pointer;transition:all .15s}
+  .trend-card:hover{background:#EEEEE8;box-shadow:5px 5px 0 #0A0A0A;transform:translate(-2px,-2px);z-index:2;position:relative}
+  .trend-left{display:flex;flex-direction:column;gap:6px}
+  .trend-title{font-size:15px;font-weight:700;letter-spacing:-.02em;line-height:1.2}
+  .trend-meta{font-family:'Space Mono',monospace;font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.04em}
+  .trend-salary{font-family:'Space Mono',monospace;font-size:11px;color:#555}
+  .trend-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+  .trend-growth{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:4px 10px;background:#FBBF24;color:#0A0A0A}
+  .trend-growth.down{background:#E0DDD8;color:#888}
+  .trend-bar{width:60px;height:24px;display:flex;align-items:flex-end;gap:2px}
+  .trend-bar span{flex:1;background:#0A0A0A;min-height:3px;transition:height .3s}
+
+  /* ============ COMPANIES BROWSE ============ */
+  .co-list{display:flex;flex-direction:column;gap:0}
+  .co-row{border:2px solid #0A0A0A;margin-top:-2px;padding:16px 20px;display:grid;grid-template-columns:44px 1fr auto auto;gap:14px;align-items:center;cursor:pointer;transition:all .15s}
+  .co-row:hover{background:#EEEEE8;box-shadow:4px 4px 0 #0A0A0A;transform:translate(-2px,-2px);z-index:2;position:relative}
+  .co-logo{width:40px;height:40px;border:1.5px solid #0A0A0A;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .co-logo svg{width:18px;height:18px}
+  .co-logo span{font-size:16px;font-weight:800}
+  .co-info{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .co-name{font-size:14px;font-weight:700;letter-spacing:-.01em}
+  .co-meta{font-family:'Space Mono',monospace;font-size:9px;color:#888;text-transform:uppercase;letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .co-jobs-badge{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:4px 10px;border:2px solid #0A0A0A;text-align:center;white-space:nowrap}
+  .co-rating{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px;white-space:nowrap}
+  .co-rating-star{color:#FBBF24;font-size:12px}
+  @media(max-width:500px){.co-row{grid-template-columns:44px 1fr auto;gap:10px}.co-rating{display:none}}
+
+  /* ============ SIDEBAR — RIGHT COL ============ */
+  .sidebar-card{border:2px solid #0A0A0A;margin-bottom:-2px;padding:24px}
+  .sidebar-card:first-child{margin-top:0}
+
+  .sb-title{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:14px}
+
+  /* Your skills match */
+  .match-list{display:flex;flex-direction:column;gap:0}
+  .match-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(0,0,0,.05)}
+  .match-item:last-child{border-bottom:0}
+  .match-skill{font-size:13px;font-weight:600}
+  .match-demand{display:flex;align-items:center;gap:6px}
+  .match-demand-bar{width:40px;height:6px;background:#E0DDD8;overflow:hidden}
+  .match-demand-fill{height:100%;background:#0A0A0A}
+  .match-demand-fill.hot{background:#FBBF24}
+  .match-demand-label{font-family:'Space Mono',monospace;font-size:9px;color:#888;text-transform:uppercase;letter-spacing:.03em;width:32px}
+
+  /* Salary snapshot */
+  .salary-snapshot{display:flex;flex-direction:column;gap:12px}
+  .ss-role{display:flex;flex-direction:column;gap:6px;padding-bottom:12px;border-bottom:1px solid rgba(0,0,0,.05)}
+  .ss-role:last-child{border-bottom:0;padding-bottom:0}
+  .ss-role-name{font-size:12px;font-weight:600}
+  .ss-bar{height:8px;background:#E0DDD8;position:relative}
+  .ss-bar-fill{height:100%;background:#0A0A0A;position:absolute;top:0}
+  .ss-bar-avg{width:3px;height:12px;background:#FBBF24;position:absolute;top:-2px;z-index:1}
+  .ss-range{display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:9px;color:#888}
+
+  /* Recently viewed */
+  .rv-list{display:flex;flex-direction:column;gap:0}
+  .rv-item{padding:10px 0;border-bottom:1px solid rgba(0,0,0,.05);cursor:pointer;transition:opacity .15s}
+  .rv-item:hover{opacity:.7}
+  .rv-item:last-child{border-bottom:0}
+  .rv-title{font-size:12px;font-weight:700;letter-spacing:-.01em}
+  .rv-company{font-family:'Space Mono',monospace;font-size:9px;color:#888;text-transform:uppercase;letter-spacing:.04em}
+
+  /* ============ SALARY EXPLORER FULL ============ */
+  .salary-full{border:3px solid #0A0A0A;display:grid;grid-template-columns:260px 1fr;margin-bottom:32px}
+  @media(max-width:700px){.salary-full{grid-template-columns:1fr}}
+  .sal-left{background:#0A0A0A;color:#F5F5F0;padding:32px;display:flex;flex-direction:column;gap:12px}
+  .sal-left .sec-title{color:#F5F5F0;font-size:22px}
+  .sal-desc{font-size:12px;line-height:1.55;color:rgba(255,255,255,.35)}
+  .sal-big{margin-top:auto}
+  .sal-big-val{font-size:38px;font-weight:800;letter-spacing:-.04em;color:#FBBF24}
+  .sal-big-label{font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,255,255,.25)}
+  .sal-right{padding:24px;display:flex;flex-direction:column;gap:12px}
+  .sal-row{display:flex;align-items:center;gap:12px}
+  .sal-row-label{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;width:110px;flex-shrink:0;color:#555}
+  .sal-row-track{flex:1;height:14px;background:#E0DDD8;position:relative}
+  .sal-row-fill{height:100%;position:absolute;top:0;background:#0A0A0A}
+  .sal-row-avg{width:3px;height:18px;background:#FBBF24;position:absolute;top:-2px;z-index:1}
+  .sal-row-val{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;width:80px;text-align:right;flex-shrink:0;color:#555}
+  @media(max-width:500px){.sal-row-label{width:70px;font-size:8px}}
+
+  /* ============ HEATMAP ============ */
+  .map-section{border:3px solid #0A0A0A;overflow:hidden}
+  .map-header{padding:20px 28px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #0A0A0A;flex-wrap:wrap;gap:10px}
+  .map-header-left{display:flex;align-items:center;gap:12px}
+  .map-header-left .sec-title{font-size:18px}
+  .map-filters{display:flex;gap:4px}
+  .map-filter{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:4px 10px;border:1.5px solid #0A0A0A;background:0;cursor:pointer;transition:all .15s;color:#0A0A0A}
+  .map-filter:hover{background:#0A0A0A;color:#F5F5F0}
+  .map-filter.active{background:#0A0A0A;color:#FBBF24}
+  .map-body{background:#0A0A0A;position:relative;height:240px;overflow:hidden}
+  .map-body::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:28px 28px}
+  .map-dot{position:absolute;border-radius:50%;animation:dotPulse 2.5s ease-in-out infinite}
+  @keyframes dotPulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.4)}}
+  .map-dot::after{content:attr(data-label);position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);font-family:'Space Mono',monospace;font-size:7px;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap}
+  .dot-lg{width:10px;height:10px;background:#FBBF24}
+  .dot-md{width:7px;height:7px;background:#FBBF24;opacity:.5}
+  .dot-sm{width:4px;height:4px;background:rgba(255,255,255,.12)}
+  .map-stats{display:grid;grid-template-columns:repeat(4,1fr)}
+  .map-stat{padding:14px;border-top:2px solid rgba(255,255,255,.04);border-right:1px solid rgba(255,255,255,.04);background:#0A0A0A;text-align:center}
+  .map-stat:last-child{border-right:0}
+  .map-stat-val{font-size:18px;font-weight:800;color:#F5F5F0;letter-spacing:-.02em}
+  .map-stat-val span{color:#FBBF24}
+  .map-stat-label{font-family:'Space Mono',monospace;font-size:8px;color:rgba(255,255,255,.2);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+  @media(max-width:500px){.map-stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav"><div class="nav-inner">
+  <a class="nav-brand" href="#"><div class="nav-logo">JB</div><span class="nav-wordmark">Jobboard</span></a>
+  <ul class="nav-links">
+    <li><a href="#"><span class="full">Jobs</span><span class="short">Jobs</span><span class="badge">32</span></a></li>
+    <li><a href="#" class="active"><span class="full">Explore</span><span class="short">🔍</span></a></li>
+    <li><a href="#"><span class="full">Saved</span><span class="short">★</span></a></li>
+    <li><a href="#"><span class="full">Applications</span><span class="short">Apps</span></a></li>
+    <li><a href="#"><span class="full">Profile</span><span class="short">Me</span></a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></button>
+    <button class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span class="notif-dot"></span></button>
+    <button class="nav-btn"><div class="nav-avatar">GR</div></button>
+  </div>
+</div></nav>
+
+<!-- SEARCH STRIP -->
+<div class="search-strip"><div class="search-strip-inner">
+  <div class="search-bar">
+    <div class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div>
+    <input class="search-input" type="text" placeholder="Search roles, skills, companies…">
+    <button class="search-btn">Go</button>
+  </div>
+  <div class="search-chips">
+    <button class="search-chip">Remote</button>
+    <button class="search-chip">$150K+</button>
+    <button class="search-chip">Series A–C</button>
+    <button class="search-chip">Design + Code</button>
+  </div>
+</div></div>
+
+<div class="page">
+
+  <!-- ===== BROWSE CATEGORIES ===== -->
+  <div class="sec">
+    <div class="sec-header">
+      <div class="sec-left">
+        <span class="sec-label">// browse by category</span>
+      </div>
+    </div>
+    <div class="cat-scroll">
+      <div class="cat-chip active"><span class="cat-chip-icon">🎨</span><div class="cat-chip-text"><span class="cat-chip-name">Design</span><span class="cat-chip-count">248 jobs</span></div></div>
+      <div class="cat-chip"><span class="cat-chip-icon">💻</span><div class="cat-chip-text"><span class="cat-chip-name">Engineering</span><span class="cat-chip-count">512 jobs</span></div></div>
+      <div class="cat-chip"><span class="cat-chip-icon">📦</span><div class="cat-chip-text"><span class="cat-chip-name">Product</span><span class="cat-chip-count">186 jobs</span></div></div>
+      <div class="cat-chip"><span class="cat-chip-icon">📊</span><div class="cat-chip-text"><span class="cat-chip-name">Data</span><span class="cat-chip-count">142 jobs</span></div></div>
+      <div class="cat-chip"><span class="cat-chip-icon">🧠</span><div class="cat-chip-text"><span class="cat-chip-name">AI / ML</span><span class="cat-chip-count">89 jobs</span></div></div>
+      <div class="cat-chip"><span class="cat-chip-icon">📣</span><div class="cat-chip-text"><span class="cat-chip-name">Marketing</span><span class="cat-chip-count">97 jobs</span></div></div>
+      <div class="cat-chip"><span class="cat-chip-icon">🔒</span><div class="cat-chip-text"><span class="cat-chip-name">Security</span><span class="cat-chip-count">64 jobs</span></div></div>
+      <div class="cat-chip"><span class="cat-chip-icon">🤝</span><div class="cat-chip-text"><span class="cat-chip-name">Sales</span><span class="cat-chip-count">134 jobs</span></div></div>
+    </div>
+  </div>
+
+  <!-- ===== TWO-COL: TRENDING + SIDEBAR ===== -->
+  <div class="two-col">
+    <div>
+
+      <!-- Trending roles -->
+      <div class="sec">
+        <div class="sec-header">
+          <div class="sec-left"><span class="sec-label">// trending in design</span><div class="sec-title">Roles Gaining Traction</div></div>
+          <button class="sec-link">View all →</button>
+        </div>
+        <div class="trending-grid">
+          <div class="trend-card">
+            <div class="trend-left">
+              <div class="trend-title">Design Engineer</div>
+              <div class="trend-meta">248 open roles</div>
+              <div class="trend-salary">$120K – $220K</div>
+            </div>
+            <div class="trend-right">
+              <span class="trend-growth">+34%</span>
+              <div class="trend-bar"><span style="height:30%"></span><span style="height:45%"></span><span style="height:40%"></span><span style="height:55%"></span><span style="height:70%"></span><span style="height:85%;background:#FBBF24"></span></div>
+            </div>
+          </div>
+          <div class="trend-card">
+            <div class="trend-left">
+              <div class="trend-title">AI Product Designer</div>
+              <div class="trend-meta">89 open roles</div>
+              <div class="trend-salary">$140K – $250K</div>
+            </div>
+            <div class="trend-right">
+              <span class="trend-growth">+52%</span>
+              <div class="trend-bar"><span style="height:20%"></span><span style="height:30%"></span><span style="height:45%"></span><span style="height:60%"></span><span style="height:80%"></span><span style="height:95%;background:#FBBF24"></span></div>
+            </div>
+          </div>
+          <div class="trend-card">
+            <div class="trend-left">
+              <div class="trend-title">Founding Designer</div>
+              <div class="trend-meta">36 open roles</div>
+              <div class="trend-salary">$130K – $180K + equity</div>
+            </div>
+            <div class="trend-right">
+              <span class="trend-growth">+18%</span>
+              <div class="trend-bar"><span style="height:40%"></span><span style="height:50%"></span><span style="height:45%"></span><span style="height:55%"></span><span style="height:60%"></span><span style="height:68%;background:#FBBF24"></span></div>
+            </div>
+          </div>
+          <div class="trend-card">
+            <div class="trend-left">
+              <div class="trend-title">UX Engineer</div>
+              <div class="trend-meta">142 open roles</div>
+              <div class="trend-salary">$110K – $175K</div>
+            </div>
+            <div class="trend-right">
+              <span class="trend-growth">+22%</span>
+              <div class="trend-bar"><span style="height:35%"></span><span style="height:40%"></span><span style="height:50%"></span><span style="height:55%"></span><span style="height:65%"></span><span style="height:72%;background:#FBBF24"></span></div>
+            </div>
+          </div>
+          <div class="trend-card">
+            <div class="trend-left">
+              <div class="trend-title">Staff Product Designer</div>
+              <div class="trend-meta">64 open roles</div>
+              <div class="trend-salary">$170K – $280K</div>
+            </div>
+            <div class="trend-right">
+              <span class="trend-growth">+12%</span>
+              <div class="trend-bar"><span style="height:50%"></span><span style="height:52%"></span><span style="height:48%"></span><span style="height:54%"></span><span style="height:58%"></span><span style="height:62%;background:#FBBF24"></span></div>
+            </div>
+          </div>
+          <div class="trend-card">
+            <div class="trend-left">
+              <div class="trend-title">Design Systems Lead</div>
+              <div class="trend-meta">28 open roles</div>
+              <div class="trend-salary">$150K – $230K</div>
+            </div>
+            <div class="trend-right">
+              <span class="trend-growth down">−3%</span>
+              <div class="trend-bar"><span style="height:65%"></span><span style="height:60%"></span><span style="height:58%"></span><span style="height:55%"></span><span style="height:50%"></span><span style="height:48%"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Companies -->
+      <div class="sec">
+        <div class="sec-header">
+          <div class="sec-left"><span class="sec-label">// actively hiring designers</span><div class="sec-title">Companies</div></div>
+          <button class="sec-link">View all →</button>
+        </div>
+        <div class="co-list">
+          <div class="co-row">
+            <div class="co-logo" style="background:#E8F7EF"><svg viewBox="0 0 24 24" fill="#1DB954"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.5.4-.8.2-2.2-1.3-5-1.6-8.3-.9-.3.1-.6-.1-.7-.4-.1-.3.1-.6.4-.7 3.6-.8 6.7-.5 9.2 1 .3.2.4.5.2.8z"/></svg></div>
+            <div class="co-info"><div class="co-name">Spotify</div><div class="co-meta">Music & Entertainment · Stockholm · 8,400+</div></div>
+            <div class="co-jobs-badge">79 open</div>
+            <div class="co-rating"><span class="co-rating-star">★</span> 4.2</div>
+          </div>
+          <div class="co-row">
+            <div class="co-logo" style="background:#EEEBFF"><svg viewBox="0 0 24 24" fill="#635BFF"><path d="M13.98 7.87c-1.18 0-1.95.52-2.4 1.05l-.32-1.05H9.1v12.04l2.63-.56.01-2.92c.46.33 1.13.8 2.24.8 2.26 0 4.32-1.82 4.32-5.82-.01-3.66-2.1-5.54-4.32-5.54z"/></svg></div>
+            <div class="co-info"><div class="co-name">Stripe</div><div class="co-meta">Fintech · San Francisco · 10,000+</div></div>
+            <div class="co-jobs-badge">122 open</div>
+            <div class="co-rating"><span class="co-rating-star">★</span> 4.3</div>
+          </div>
+          <div class="co-row">
+            <div class="co-logo" style="background:#ECECEC"><span style="font-weight:800;font-size:16px">▲</span></div>
+            <div class="co-info"><div class="co-name">Vercel</div><div class="co-meta">Dev Tools · Remote · 600+</div></div>
+            <div class="co-jobs-badge">34 open</div>
+            <div class="co-rating"><span class="co-rating-star">★</span> 4.5</div>
+          </div>
+          <div class="co-row">
+            <div class="co-logo" style="background:#FDEAE6"><svg viewBox="0 0 24 24" fill="#F24E1E"><path d="M8 24c2.2 0 4-1.8 4-4v-4H8c-2.2 0-4 1.8-4 4s1.8 4 4 4zm0-20C5.8 4 4 5.8 4 8s1.8 4 4 4h4V4H8z"/></svg></div>
+            <div class="co-info"><div class="co-name">Figma</div><div class="co-meta">Design Tools · San Francisco · 1,500+</div></div>
+            <div class="co-jobs-badge">56 open</div>
+            <div class="co-rating"><span class="co-rating-star">★</span> 4.4</div>
+          </div>
+          <div class="co-row">
+            <div class="co-logo" style="background:#E6ECFB"><svg viewBox="0 0 24 24" fill="#5E6AD2"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg></div>
+            <div class="co-info"><div class="co-name">Linear</div><div class="co-meta">Dev Tools · Remote · 100+</div></div>
+            <div class="co-jobs-badge">18 open</div>
+            <div class="co-rating"><span class="co-rating-star">★</span> 4.7</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SIDEBAR -->
+    <div>
+
+      <!-- Skills demand -->
+      <div class="sidebar-card">
+        <div class="sb-title">Your Skills × Market Demand</div>
+        <div class="match-list">
+          <div class="match-item"><span class="match-skill">Figma</span><div class="match-demand"><div class="match-demand-bar"><div class="match-demand-fill hot" style="width:92%"></div></div><span class="match-demand-label">High</span></div></div>
+          <div class="match-item"><span class="match-skill">React</span><div class="match-demand"><div class="match-demand-bar"><div class="match-demand-fill hot" style="width:88%"></div></div><span class="match-demand-label">High</span></div></div>
+          <div class="match-item"><span class="match-skill">Shopify</span><div class="match-demand"><div class="match-demand-bar"><div class="match-demand-fill" style="width:62%"></div></div><span class="match-demand-label">Med</span></div></div>
+          <div class="match-item"><span class="match-skill">Next.js</span><div class="match-demand"><div class="match-demand-bar"><div class="match-demand-fill hot" style="width:78%"></div></div><span class="match-demand-label">High</span></div></div>
+          <div class="match-item"><span class="match-skill">Design Systems</span><div class="match-demand"><div class="match-demand-bar"><div class="match-demand-fill" style="width:70%"></div></div><span class="match-demand-label">Med</span></div></div>
+          <div class="match-item"><span class="match-skill">UX Research</span><div class="match-demand"><div class="match-demand-bar"><div class="match-demand-fill" style="width:55%"></div></div><span class="match-demand-label">Med</span></div></div>
+        </div>
+      </div>
+
+      <!-- Salary snapshot -->
+      <div class="sidebar-card">
+        <div class="sb-title">Salary Snapshot — Your Roles</div>
+        <div class="salary-snapshot">
+          <div class="ss-role">
+            <div class="ss-role-name">Product Designer</div>
+            <div class="ss-bar">
+              <div class="ss-bar-fill" style="left:18%;width:46%"></div>
+              <div class="ss-bar-avg" style="left:44%"></div>
+            </div>
+            <div class="ss-range"><span>$90K</span><span>$195K</span></div>
+          </div>
+          <div class="ss-role">
+            <div class="ss-role-name">Design Engineer</div>
+            <div class="ss-bar">
+              <div class="ss-bar-fill" style="left:24%;width:50%"></div>
+              <div class="ss-bar-avg" style="left:50%"></div>
+            </div>
+            <div class="ss-range"><span>$110K</span><span>$220K</span></div>
+          </div>
+          <div class="ss-role">
+            <div class="ss-role-name">Frontend Developer</div>
+            <div class="ss-bar">
+              <div class="ss-bar-fill" style="left:20%;width:48%"></div>
+              <div class="ss-bar-avg" style="left:46%"></div>
+            </div>
+            <div class="ss-range"><span>$100K</span><span>$200K</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recently viewed -->
+      <div class="sidebar-card">
+        <div class="sb-title">Recently Viewed</div>
+        <div class="rv-list">
+          <div class="rv-item"><div class="rv-title">Senior Product Designer</div><div class="rv-company">Spotify · 2h ago</div></div>
+          <div class="rv-item"><div class="rv-title">Design Engineer</div><div class="rv-company">Stripe · 5h ago</div></div>
+          <div class="rv-item"><div class="rv-title">Design Technologist</div><div class="rv-company">Figma · 1d ago</div></div>
+          <div class="rv-item"><div class="rv-title">Staff Frontend Developer</div><div class="rv-company">Shopify · 2d ago</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== SALARY EXPLORER ===== -->
+  <div class="salary-full">
+    <div class="sal-left">
+      <span class="sec-label" style="color:rgba(255,255,255,.25)">// market data</span>
+      <div class="sec-title" style="color:#F5F5F0;font-size:22px">Salary Explorer</div>
+      <p class="sal-desc">Median salaries based on 12,000+ data points from the last 90 days.</p>
+      <div class="sal-big">
+        <div class="sal-big-val">$156K</div>
+        <div class="sal-big-label">Median Design Salary</div>
+      </div>
+    </div>
+    <div class="sal-right">
+      <div class="sal-row"><span class="sal-row-label">Product Design</span><div class="sal-row-track"><div class="sal-row-fill" style="left:18%;width:48%"></div><div class="sal-row-avg" style="left:46%"></div></div><span class="sal-row-val">$90 – $195K</span></div>
+      <div class="sal-row"><span class="sal-row-label">Design Engineer</span><div class="sal-row-track"><div class="sal-row-fill" style="left:25%;width:52%"></div><div class="sal-row-avg" style="left:52%"></div></div><span class="sal-row-val">$110 – $220K</span></div>
+      <div class="sal-row"><span class="sal-row-label">UX Engineer</span><div class="sal-row-track"><div class="sal-row-fill" style="left:20%;width:44%"></div><div class="sal-row-avg" style="left:42%"></div></div><span class="sal-row-val">$95 – $175K</span></div>
+      <div class="sal-row"><span class="sal-row-label">Frontend Dev</span><div class="sal-row-track"><div class="sal-row-fill" style="left:22%;width:50%"></div><div class="sal-row-avg" style="left:48%"></div></div><span class="sal-row-val">$100 – $200K</span></div>
+      <div class="sal-row"><span class="sal-row-label">Staff Designer</span><div class="sal-row-track"><div class="sal-row-fill" style="left:35%;width:45%"></div><div class="sal-row-avg" style="left:58%"></div></div><span class="sal-row-val">$150 – $260K</span></div>
+      <div class="sal-row"><span class="sal-row-label">Design Manager</span><div class="sal-row-track"><div class="sal-row-fill" style="left:30%;width:50%"></div><div class="sal-row-avg" style="left:56%"></div></div><span class="sal-row-val">$140 – $240K</span></div>
+    </div>
+  </div>
+
+  <!-- ===== HEATMAP ===== -->
+  <div class="map-section">
+    <div class="map-header">
+      <div class="map-header-left">
+        <div class="sec-title" style="font-size:18px">Remote Job Heatmap</div>
+      </div>
+      <div class="map-filters">
+        <button class="map-filter active">All</button>
+        <button class="map-filter">Design</button>
+        <button class="map-filter">Eng</button>
+        <button class="map-filter">Product</button>
+      </div>
+    </div>
+    <div class="map-body">
+      <div class="map-dot dot-lg" style="top:35%;left:18%" data-label="SF"></div>
+      <div class="map-dot dot-lg" style="top:32%;left:24%" data-label="NYC"></div>
+      <div class="map-dot dot-md" style="top:38%;left:21%"></div>
+      <div class="map-dot dot-sm" style="top:28%;left:16%"></div>
+      <div class="map-dot dot-md" style="top:42%;left:20%" data-label="ATX"></div>
+      <div class="map-dot dot-lg" style="top:28%;left:52%" data-label="LON"></div>
+      <div class="map-dot dot-md" style="top:30%;left:55%" data-label="BER"></div>
+      <div class="map-dot dot-sm" style="top:24%;left:54%"></div>
+      <div class="map-dot dot-sm" style="top:32%;left:50%"></div>
+      <div class="map-dot dot-md" style="top:48%;left:78%" data-label="SIN"></div>
+      <div class="map-dot dot-sm" style="top:35%;left:82%"></div>
+      <div class="map-dot dot-md" style="top:50%;left:74%" data-label="MNL"></div>
+      <div class="map-dot dot-sm" style="top:65%;left:35%"></div>
+      <div class="map-dot dot-sm" style="top:60%;left:68%"></div>
+    </div>
+    <div class="map-stats">
+      <div class="map-stat"><div class="map-stat-val"><span>62%</span></div><div class="map-stat-label">Remote-Friendly</div></div>
+      <div class="map-stat"><div class="map-stat-val">48</div><div class="map-stat-label">Countries</div></div>
+      <div class="map-stat"><div class="map-stat-val"><span>+18%</span></div><div class="map-stat-label">Remote YoY</div></div>
+      <div class="map-stat"><div class="map-stat-val">2,840</div><div class="map-stat-label">Total Remote</div></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

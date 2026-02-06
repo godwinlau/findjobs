@@ -1145,3 +1145,226 @@ export async function getDistinctLocations(): Promise<string[]> {
   _locationCache = { data: sorted, ts: now };
   return sorted;
 }
+
+// ─── Home page data functions ───
+
+import type { TrendingRole, CompanyInfo, RecentlyViewedJob, CategoryCount } from "@/lib/types/home";
+import { CATEGORY_SKILL_MAP } from "@/lib/constants/categorySkillMap";
+
+const CATEGORY_META: Record<string, { name: string; icon: string }> = {
+  tech_it: { name: "Tech & IT", icon: "\uD83D\uDCBB" },
+  design: { name: "Design", icon: "\uD83C\uDFA8" },
+  bpo: { name: "BPO & Support", icon: "\uD83C\uDFA7" },
+  admin: { name: "Virtual Assistant", icon: "\uD83D\uDCCB" },
+  sales: { name: "Sales & Marketing", icon: "\uD83D\uDCC8" },
+  accounting: { name: "Finance", icon: "\uD83D\uDCB0" },
+  healthcare: { name: "Healthcare", icon: "\uD83C\uDFE5" },
+  education: { name: "Education", icon: "\uD83D\uDCDA" },
+  skilled_trade: { name: "Skilled Trades", icon: "\uD83D\uDD27" },
+  other: { name: "Other", icon: "\uD83D\uDCBC" },
+};
+
+/** Classify a job into a category based on skills overlap */
+function classifyJob(skillsRequired: string[]): string {
+  if (!skillsRequired || skillsRequired.length === 0) return "other";
+
+  const lowerSkills = new Set(skillsRequired.map((s) => s.toLowerCase()));
+  let bestCategory = "other";
+  let bestOverlap = 0;
+
+  for (const [category, catSkills] of Object.entries(CATEGORY_SKILL_MAP)) {
+    const overlap = catSkills.filter((s) => lowerSkills.has(s.toLowerCase())).length;
+    if (overlap > bestOverlap) {
+      bestOverlap = overlap;
+      bestCategory = category;
+    }
+  }
+
+  return bestCategory;
+}
+
+/** Get job counts per work category */
+export async function getCategoryJobCounts(): Promise<CategoryCount[]> {
+  const supabase = createServiceClient();
+
+  const { data } = await supabase
+    .from("jobs")
+    .select("skills_required")
+    .eq("is_active", true);
+
+  if (!data || data.length === 0) {
+    return Object.entries(CATEGORY_META).map(([id, meta]) => ({
+      id,
+      name: meta.name,
+      icon: meta.icon,
+      count: 0,
+    }));
+  }
+
+  const counts: Record<string, number> = {};
+  for (const row of data) {
+    const cat = classifyJob((row as { skills_required: string[] }).skills_required);
+    counts[cat] = (counts[cat] || 0) + 1;
+  }
+
+  return Object.entries(CATEGORY_META).map(([id, meta]) => ({
+    id,
+    name: meta.name,
+    icon: meta.icon,
+    count: counts[id] || 0,
+  }));
+}
+
+// Static growth/bar data per role (no historical data yet)
+const STATIC_ROLE_DATA: Record<string, { growth: number; bars: number[] }> = {
+  default: { growth: 12, bars: [35, 40, 50, 55, 65, 72] },
+};
+
+/** Get trending roles — top 6 by open count, optionally filtered by category */
+export async function getTrendingRoles(category?: string): Promise<TrendingRole[]> {
+  const supabase = createServiceClient();
+
+  let builder = supabase
+    .from("jobs")
+    .select("title, salary_min, salary_max, skills_required")
+    .eq("is_active", true);
+
+  const { data } = await builder;
+  if (!data || data.length === 0) return [];
+
+  type RoleRow = { title: string; salary_min: number | null; salary_max: number | null; skills_required: string[] };
+  const rows = data as RoleRow[];
+
+  // Filter by category if specified
+  const filtered = category && category !== "all"
+    ? rows.filter((r) => classifyJob(r.skills_required) === category)
+    : rows;
+
+  // Aggregate by title
+  const roleMap = new Map<string, { count: number; salaryMins: number[]; salaryMaxes: number[] }>();
+  for (const row of filtered) {
+    const title = row.title;
+    const entry = roleMap.get(title) || { count: 0, salaryMins: [], salaryMaxes: [] };
+    entry.count++;
+    if (row.salary_min) entry.salaryMins.push(row.salary_min);
+    if (row.salary_max) entry.salaryMaxes.push(row.salary_max);
+    roleMap.set(title, entry);
+  }
+
+  // Sort by count descending, take top 6
+  const sorted = [...roleMap.entries()]
+    .sort((a, b) => b[1].count - a[1].count)
+    .slice(0, 6);
+
+  return sorted.map(([title, { count, salaryMins, salaryMaxes }]) => {
+    const minSalary = salaryMins.length > 0 ? Math.min(...salaryMins) : null;
+    const maxSalary = salaryMaxes.length > 0 ? Math.max(...salaryMaxes) : null;
+
+    const salaryRange = minSalary && maxSalary
+      ? `\u20B1${Math.round(minSalary / 1000)}K \u2013 \u20B1${Math.round(maxSalary / 1000)}K`
+      : minSalary
+        ? `From \u20B1${Math.round(minSalary / 1000)}K`
+        : maxSalary
+          ? `Up to \u20B1${Math.round(maxSalary / 1000)}K`
+          : "Salary TBD";
+
+    const staticData = STATIC_ROLE_DATA[title] || STATIC_ROLE_DATA.default;
+
+    return {
+      title,
+      openCount: count,
+      salaryRange,
+      growthPercent: staticData.growth,
+      barHeights: staticData.bars,
+    };
+  });
+}
+
+/** Get top hiring companies — top 5 by open jobs, optionally filtered by category */
+export async function getTopHiringCompanies(category?: string): Promise<CompanyInfo[]> {
+  const supabase = createServiceClient();
+
+  const { data } = await supabase
+    .from("jobs")
+    .select("company_name, company_logo_url, location_city, skills_required")
+    .eq("is_active", true);
+
+  if (!data || data.length === 0) return [];
+
+  type CoRow = { company_name: string; company_logo_url: string | null; location_city: string | null; skills_required: string[] };
+  const rows = data as CoRow[];
+
+  const filtered = category && category !== "all"
+    ? rows.filter((r) => classifyJob(r.skills_required) === category)
+    : rows;
+
+  // Aggregate by company
+  const companyMap = new Map<string, { count: number; logoUrl: string | null; location: string }>();
+  for (const row of filtered) {
+    const name = row.company_name;
+    if (!name) continue;
+    const entry = companyMap.get(name) || { count: 0, logoUrl: row.company_logo_url, location: row.location_city || "Philippines" };
+    entry.count++;
+    if (!entry.logoUrl && row.company_logo_url) entry.logoUrl = row.company_logo_url;
+    companyMap.set(name, entry);
+  }
+
+  // Sort by count descending, take top 5
+  const sorted = [...companyMap.entries()]
+    .sort((a, b) => b[1].count - a[1].count)
+    .slice(0, 5);
+
+  return sorted.map(([name, { count, logoUrl, location }]) => ({
+    name,
+    industry: "",
+    location,
+    size: "",
+    logoUrl,
+    openJobs: count,
+    rating: 4.2, // static default
+  }));
+}
+
+/** Get recently viewed jobs for user */
+export async function getRecentlyViewed(userId: string): Promise<RecentlyViewedJob[]> {
+  const supabase = createServiceClient();
+
+  // Get last 4 job_view activities
+  const { data: activities } = await supabase
+    .from("user_activities")
+    .select("target_id, created_at")
+    .eq("user_id", userId)
+    .eq("activity_type", "job_view")
+    .order("created_at", { ascending: false })
+    .limit(4);
+
+  if (!activities || activities.length === 0) return [];
+
+  const jobIds = (activities as { target_id: string; created_at: string }[])
+    .map((a) => a.target_id)
+    .filter(Boolean);
+
+  if (jobIds.length === 0) return [];
+
+  const { data: jobs } = await supabase
+    .from("jobs")
+    .select("id, title, company_name")
+    .in("id", jobIds);
+
+  if (!jobs || jobs.length === 0) return [];
+
+  const jobMap = new Map((jobs as { id: string; title: string; company_name: string }[]).map((j) => [j.id, j]));
+
+  return (activities as { target_id: string; created_at: string }[])
+    .map((a) => {
+      const job = jobMap.get(a.target_id);
+      if (!job) return null;
+      return {
+        jobId: a.target_id,
+        title: job.title,
+        company: job.company_name,
+        viewedAt: formatRelativeTime(a.created_at),
+      };
+    })
+    .filter((r): r is RecentlyViewedJob => r !== null);
+}

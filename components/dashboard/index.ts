@@ -14,4 +14,3 @@ export { ActivityChart } from "./ActivityChart";
 export { QuickActions } from "./QuickActions";
 export { SkillsRecommendationBanner } from "./SkillsRecommendationBanner";
 export { JobDetailDrawer } from "./JobDetailDrawer";
-export { DashboardClient } from "./DashboardClient";

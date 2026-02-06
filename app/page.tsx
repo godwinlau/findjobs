@@ -2,19 +2,50 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { colors } from "@/lib/constants/colors";
 import { Navbar } from "@/components/layout";
-import { ResponsiveContainer } from "@/components/layout/ResponsiveContainer";
-import { DashboardClient } from "@/components/dashboard";
+import { SearchStrip, HomeClient } from "@/components/home";
 import { WelcomeWalkthrough } from "@/components/walkthrough/WelcomeWalkthrough";
-import { getTopMatchedJobs, getJobsLastUpdated } from "@/lib/jobs";
-import { analyzeProfileGaps } from "@/lib/profile";
+import {
+  getCategoryJobCounts,
+  getTrendingRoles,
+  getTopHiringCompanies,
+  getRecentlyViewed,
+} from "@/lib/jobs";
 import { createClient } from "@/lib/supabase/server";
-import { buildSkillsSnapshot } from "@/lib/learn";
-import { buildRecommendationContext, computeSkillROI } from "@/lib/recommendations";
-import { SKILL_CATEGORIES } from "@/lib/constants/onboarding";
-import { getCourseCatalog } from "@/lib/data/learn-data";
-import { getAssessmentResults } from "@/lib/actions/assessments";
+import { industrySkillDemand } from "@/lib/constants/industrySkillDemand";
+import type { SkillDemandItem } from "@/lib/types/home";
+import { fetchCategoryData } from "./actions";
 
 export const dynamic = "force-dynamic";
+
+function computeSkillDemand(userSkills: string[]): SkillDemandItem[] {
+  if (!userSkills || userSkills.length === 0) return [];
+
+  const results: SkillDemandItem[] = [];
+
+  for (const skill of userSkills) {
+    const lowerSkill = skill.toLowerCase();
+    let totalDemand = 0;
+    let industryCount = 0;
+
+    for (const industrySkills of Object.values(industrySkillDemand)) {
+      if (industrySkills[lowerSkill]) {
+        totalDemand += industrySkills[lowerSkill];
+        industryCount++;
+      }
+    }
+
+    if (industryCount > 0) {
+      const avgDemand = Math.round(totalDemand / industryCount);
+      const label: "High" | "Med" | "Low" =
+        avgDemand >= 70 ? "High" : avgDemand >= 40 ? "Med" : "Low";
+      results.push({ skill, demandPercent: avgDemand, label });
+    }
+  }
+
+  // Sort by demand descending, take top 6
+  results.sort((a, b) => b.demandPercent - a.demandPercent);
+  return results.slice(0, 6);
+}
 
 export default async function Dashboard() {
   const supabase = await createClient();
@@ -33,58 +64,19 @@ export default async function Dashboard() {
     .eq("id", user.id)
     .single();
 
-  const [
-    { jobs: topJobs, totalMatches },
-    { lastUpdated },
-    assessmentResults,
-    courseCatalog,
-  ] = await Promise.all([
-    getTopMatchedJobs({ profile, limit: 3 }),
-    getJobsLastUpdated(),
-    getAssessmentResults(),
-    getCourseCatalog(),
+  // Find the first category with jobs to use as default
+  const categories = await getCategoryJobCounts();
+  const firstWithJobs = categories.find((c) => c.count > 0);
+  const defaultCategory = firstWithJobs?.id ?? categories[0]?.id ?? "tech_it";
+
+  const [initialRoles, initialCompanies, recentlyViewed] = await Promise.all([
+    getTrendingRoles(defaultCategory),
+    getTopHiringCompanies(defaultCategory),
+    getRecentlyViewed(user.id),
   ]);
 
-  const topJob = topJobs.length > 0 ? topJobs[0] : null;
-  const otherJobs = topJobs.slice(1, 3);
-
-  const profileCompletion = profile?.profile_completion ?? 0;
-  const profileComplete = profileCompletion === 100;
-  const profileGaps = analyzeProfileGaps(profile);
-
-  // Build skill ROI data
   const userSkills = profile?.skills ?? [];
-  const snapshot = buildSkillsSnapshot(userSkills, SKILL_CATEGORIES);
-
-  // Convert assessment results to the format expected by recommendation context
-  const assessmentScores: Record<string, { score: number; total: number }> = {};
-  if (assessmentResults) {
-    for (const [categoryId, result] of Object.entries(assessmentResults)) {
-      assessmentScores[categoryId] = { score: result.score, total: result.total };
-    }
-  }
-
-  const recommendationContext = buildRecommendationContext(
-    profile,
-    snapshot,
-    assessmentScores,
-    SKILL_CATEGORIES
-  );
-
-  const skillROI = computeSkillROI(recommendationContext, courseCatalog);
-  // Deduplicate by recommended course to avoid showing the same course title twice in the banner
-  const seenCourses = new Set<string>();
-  const topSkills: typeof skillROI = [];
-  for (const s of skillROI) {
-    const key = s.recommendedCourse?.id ?? s.skill;
-    if (seenCourses.has(key)) continue;
-    seenCourses.add(key);
-    topSkills.push(s);
-    if (topSkills.length >= 3) break;
-  }
-
-  const hasAssessments = Object.keys(assessmentScores).length > 0;
-  const highMatchJobCount = topJobs.filter((j) => j.match >= 70).length;
+  const skillDemand = computeSkillDemand(userSkills);
 
   return (
     <div
@@ -99,20 +91,16 @@ export default async function Dashboard() {
         email={user.email || ""}
       />
 
-      <ResponsiveContainer>
-        <DashboardClient
-          topJob={topJob}
-          otherJobs={otherJobs}
-          totalMatches={totalMatches}
-          lastUpdated={lastUpdated}
-          profileComplete={profileComplete}
-          profileCompletion={profileCompletion}
-          profileGaps={profileGaps}
-          hasAssessments={hasAssessments}
-          topSkills={topSkills}
-          highMatchJobCount={highMatchJobCount}
-        />
-      </ResponsiveContainer>
+      <SearchStrip />
+
+      <HomeClient
+        categories={categories}
+        initialRoles={initialRoles}
+        initialCompanies={initialCompanies}
+        recentlyViewed={recentlyViewed}
+        skillDemand={skillDemand}
+        fetchCategoryData={fetchCategoryData}
+      />
 
       <Suspense fallback={null}>
         <WelcomeWalkthrough
