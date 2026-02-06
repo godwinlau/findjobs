@@ -6,6 +6,7 @@ import { FilterBar } from "./FilterBar";
 import { ExploreJobList } from "./ExploreJobList";
 import { Pagination, JobDetailDrawer } from "@/components/dashboard";
 import { getJobDetailForDrawer } from "@/lib/actions/job-detail";
+import { colors } from "@/lib/constants/colors";
 import type { Job } from "@/lib/types";
 import type { JobDetail } from "@/lib/jobs";
 
@@ -40,6 +41,7 @@ export function ExploreClient({
   const [page, setPage] = useState(initialPage);
   const [totalPages, setTotalPages] = useState(initialTotalPages);
   const [locations, setLocations] = useState<string[]>(initialLocations);
+  const [isLoading, setIsLoading] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
   // Drawer state
@@ -86,6 +88,7 @@ export function ExploreClient({
     const controller = new AbortController();
     abortRef.current = controller;
 
+    setIsLoading(true);
     try {
       const res = await fetch(`/api/explore/jobs?${params.toString()}`, {
         signal: controller.signal,
@@ -100,6 +103,8 @@ export function ExploreClient({
     } catch (err: unknown) {
       if (err instanceof Error && err.name === "AbortError") return;
       console.error("Explore fetch error:", err);
+    } finally {
+      if (!controller.signal.aborted) setIsLoading(false);
     }
   }, []);
 
@@ -111,6 +116,9 @@ export function ExploreClient({
       params.delete(key);
     }
     params.delete("page");
+
+    // Mark as already fetched so the useEffect doesn't duplicate
+    prevParamsRef.current = params.toString();
 
     // Update URL without full navigation
     router.replace(`/explore?${params.toString()}`, { scroll: false });
@@ -126,6 +134,9 @@ export function ExploreClient({
     } else {
       params.set("page", String(p));
     }
+
+    // Mark as already fetched so the useEffect doesn't duplicate
+    prevParamsRef.current = params.toString();
 
     router.replace(`/explore?${params.toString()}`, { scroll: false });
     fetchJobs(params);
@@ -150,26 +161,56 @@ export function ExploreClient({
         onFilterChange={handleFilterChange}
       />
 
-      <p
+      {/* Loading progress bar */}
+      <div style={{ position: "relative", height: 2, marginBottom: 12 }}>
+        {isLoading && (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                background: colors.primary,
+                animation: "loadingBar 1.2s ease-in-out infinite",
+              }}
+            />
+          </div>
+        )}
+      </div>
+
+      <div
         style={{
-          fontSize: 11,
-          fontFamily: "var(--font-mono)",
-          textTransform: "uppercase" as const,
-          letterSpacing: "0.04em",
-          color: "#888",
-          marginBottom: 12,
+          opacity: isLoading ? 0.5 : 1,
+          pointerEvents: isLoading ? "none" : "auto",
+          transition: "opacity 150ms ease",
         }}
       >
-        {total} job{total !== 1 ? "s" : ""} found
-      </p>
+        <p
+          style={{
+            fontSize: 11,
+            fontFamily: "var(--font-mono)",
+            textTransform: "uppercase" as const,
+            letterSpacing: "0.04em",
+            color: "#888",
+            marginBottom: 12,
+          }}
+        >
+          {total} job{total !== 1 ? "s" : ""} found
+        </p>
 
-      <ExploreJobList jobs={jobs} onJobSelect={handleJobSelect} />
+        <ExploreJobList jobs={jobs} onJobSelect={handleJobSelect} />
 
-      <Pagination
-        page={page}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      />
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      </div>
 
       <JobDetailDrawer
         job={selectedJob}

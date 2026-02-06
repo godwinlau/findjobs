@@ -10,6 +10,33 @@ import {
   MATCH_SCORE_THRESHOLD,
 } from "@/lib/matching";
 
+// ─── Search helpers ───
+
+/** Strip characters that are unsafe in PostgREST filter values */
+function sanitizeSearchQuery(raw: string): string {
+  return raw.replace(/[\\%_(),:!]/g, "").trim();
+}
+
+/**
+ * Build the `.or()` filter string for a search query.
+ * - >= 3 chars → FTS on search_vector (GIN index) + ILIKE on location cols
+ * - < 3 chars  → ILIKE on title, company_name, location_city, location_area only
+ *                (skips description_plain to avoid full sequential scan)
+ */
+function buildSearchFilter(query: string): string {
+  const sanitized = sanitizeSearchQuery(query);
+  if (!sanitized) return "";
+
+  if (sanitized.length >= 3) {
+    // wfts = websearch_to_tsquery: handles natural language ("react developer" → 'react' & 'developer')
+    return `search_vector.wfts(english).${sanitized},location_city.ilike.%${sanitized}%,location_area.ilike.%${sanitized}%`;
+  }
+
+  // Short queries: ILIKE on short columns only (no description_plain)
+  const pattern = `%${sanitized}%`;
+  return `title.ilike.${pattern},company_name.ilike.${pattern},location_city.ilike.${pattern},location_area.ilike.${pattern}`;
+}
+
 // ─── DB row type ───
 
 interface JobRow {
@@ -106,10 +133,8 @@ export async function getActiveJobs({
     .order("posted_at", { ascending: false });
 
   if (query) {
-    const pattern = `%${query}%`;
-    builder = builder.or(
-      `title.ilike.${pattern},company_name.ilike.${pattern},description_plain.ilike.${pattern},location_city.ilike.${pattern},location_area.ilike.${pattern}`
-    );
+    const filter = buildSearchFilter(query);
+    if (filter) builder = builder.or(filter);
   }
 
   const { data, error, count } = await builder.range(from, to);
@@ -155,10 +180,8 @@ async function getActiveJobsMatchScored(
     .order("posted_at", { ascending: false });
 
   if (query) {
-    const pattern = `%${query}%`;
-    scoringBuilder = scoringBuilder.or(
-      `title.ilike.${pattern},company_name.ilike.${pattern},description_plain.ilike.${pattern},location_city.ilike.${pattern},location_area.ilike.${pattern}`
-    );
+    const filter = buildSearchFilter(query);
+    if (filter) scoringBuilder = scoringBuilder.or(filter);
   }
 
   const { data: scoringData, error, count } = await scoringBuilder;
@@ -917,14 +940,16 @@ function applyExploreFilters(builder: any, filters: {
   const { query, workSetup, jobType, experienceLevel, location, salaryMin, salaryMax, datePosted, verifiedOnly } = filters;
 
   if (query) {
-    const pattern = `%${query}%`;
-    builder = builder.or(
-      `title.ilike.${pattern},company_name.ilike.${pattern},description_plain.ilike.${pattern},location_city.ilike.${pattern},location_area.ilike.${pattern}`
-    );
+    const filter = buildSearchFilter(query);
+    if (filter) builder = builder.or(filter);
   }
   if (workSetup) builder = builder.eq("work_setup", workSetup);
   if (jobType) builder = builder.eq("job_type", jobType);
-  if (experienceLevel) builder = builder.eq("experience_level", experienceLevel);
+  if (experienceLevel) {
+    // "fresh_graduate" is a profile enum value — map it to "entry" for the jobs table
+    const jobLevel = experienceLevel === "fresh_graduate" ? "entry" : experienceLevel;
+    builder = builder.eq("experience_level", jobLevel);
+  }
   if (location) builder = builder.ilike("location_city", `%${location}%`);
   if (salaryMin) builder = builder.gte("salary_max", salaryMin);
   if (salaryMax) builder = builder.lte("salary_min", salaryMax);
@@ -1045,9 +1070,17 @@ export async function getJobsLastUpdated(): Promise<{ lastUpdated: string | null
   };
 }
 
-// ─── Distinct locations for filter dropdown ───
+// ─── Distinct locations for filter dropdown (cached) ───
+
+let _locationCache: { data: string[]; ts: number } | null = null;
+const LOCATION_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 export async function getDistinctLocations(): Promise<string[]> {
+  const now = Date.now();
+  if (_locationCache && now - _locationCache.ts < LOCATION_CACHE_TTL) {
+    return _locationCache.data;
+  }
+
   const supabase = createServiceClient();
 
   const { data, error } = await supabase
@@ -1059,7 +1092,8 @@ export async function getDistinctLocations(): Promise<string[]> {
 
   if (error || !data) {
     console.error("Failed to fetch locations:", error?.message);
-    return [];
+    // Return stale cache if available
+    return _locationCache?.data ?? [];
   }
 
   const unique = [...new Set(
@@ -1068,5 +1102,7 @@ export async function getDistinctLocations(): Promise<string[]> {
       .filter(Boolean)
   )];
 
-  return unique.sort();
+  const sorted = unique.sort();
+  _locationCache = { data: sorted, ts: now };
+  return sorted;
 }
