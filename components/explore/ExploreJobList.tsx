@@ -21,7 +21,6 @@ export function ExploreJobList({ jobs, onJobSelect }: ExploreJobListProps) {
           color: "#888",
           fontSize: 12,
           fontFamily: "var(--font-mono)",
-          textTransform: "uppercase" as const,
           letterSpacing: "0.04em",
           border: "2px solid #0A0A0A",
           background: "#F5F5F0",
@@ -33,7 +32,7 @@ export function ExploreJobList({ jobs, onJobSelect }: ExploreJobListProps) {
   }
 
   return (
-    <div className="responsive-grid-2" style={{ gap: 0 }}>
+    <div className="responsive-grid-2" style={{ gap: 12 }}>
       {jobs.map((job, i) => (
         <JobCard
           key={job.id}

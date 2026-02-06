@@ -218,7 +218,7 @@ export function JobDetailDrawer({
                           marginBottom: 4,
                         }}
                       >
-                        <span style={{ fontSize: 12, color: "#888", fontWeight: 700, fontFamily: "var(--font-mono)", textTransform: "uppercase" as const }}>
+                        <span style={{ fontSize: 12, color: "#888", fontWeight: 700, fontFamily: "var(--font-mono)" }}>
                           {job.company}
                         </span>
                         {job.verified && (

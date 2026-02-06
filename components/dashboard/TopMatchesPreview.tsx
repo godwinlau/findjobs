@@ -64,7 +64,7 @@ export function TopMatchesPreview({
         >
           <Target size={28} weight="fill" color="#FBBF24" />
         </div>
-        <div style={{ fontSize: 16, fontWeight: 800, color: "#0A0A0A", marginBottom: 8, letterSpacing: "-0.02em", textTransform: "uppercase" as const }}>
+        <div style={{ fontSize: 16, fontWeight: 800, color: "#0A0A0A", marginBottom: 8, letterSpacing: "-0.02em" }}>
           No personalized matches yet
         </div>
         <div style={{ fontSize: 13, color: "#888", marginBottom: 24, lineHeight: 1.5 }}>

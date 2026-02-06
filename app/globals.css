@@ -170,7 +170,6 @@ body.walkthrough-active {
   color: var(--hb-text);
   margin-top: 1.25em;
   margin-bottom: 0.5em;
-  text-transform: uppercase;
   letter-spacing: -0.03em;
 }
 
@@ -198,7 +197,6 @@ body.walkthrough-active {
   color: var(--hb-text);
   margin-top: 1.25em;
   margin-bottom: 0.4em;
-  text-transform: uppercase;
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -531,7 +529,6 @@ body.walkthrough-active {
 
 .hero-job-card .jc-title {
   font-size: 32px;
-  text-transform: uppercase;
   letter-spacing: -0.04em;
   line-height: 1;
   color: #F5F5F0;
@@ -866,7 +863,6 @@ body.walkthrough-active {
   font-weight: 800;
   line-height: 1.15;
   letter-spacing: -0.03em;
-  text-transform: uppercase;
   color: var(--jc-text);
 }
 
@@ -1172,7 +1168,6 @@ body.walkthrough-active {
   color: #fff;
   letter-spacing: -0.03em;
   line-height: 1.15;
-  text-transform: uppercase;
 }
 
 .sb-desc {

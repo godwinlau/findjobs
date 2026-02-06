@@ -164,7 +164,6 @@ export function HeroJobCard({ job, isSaved = false, onToggleSave, onViewDetails 
             fontFamily: "var(--font-mono)",
             fontSize: 12,
             color: "rgba(245,245,240,0.4)",
-            textTransform: "uppercase",
             letterSpacing: "0.06em",
           }}
         >
@@ -179,7 +178,6 @@ export function HeroJobCard({ job, isSaved = false, onToggleSave, onViewDetails 
             fontWeight: 800,
             letterSpacing: "-0.04em",
             lineHeight: 1,
-            textTransform: "uppercase",
           }}
         >
           {job.role}

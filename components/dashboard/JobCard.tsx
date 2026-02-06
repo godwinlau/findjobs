@@ -182,7 +182,6 @@ export function JobCard({
           fontFamily: "var(--font-mono)",
           fontSize: 11,
           color: "#888",
-          textTransform: "uppercase",
           letterSpacing: "0.05em",
         }}
       >
@@ -196,7 +195,6 @@ export function JobCard({
           fontWeight: 800,
           lineHeight: 1.15,
           letterSpacing: "-0.03em",
-          textTransform: "uppercase",
           color: "#0A0A0A",
         }}
       >
