@@ -20,9 +20,9 @@ export function Card({
   ...props
 }: CardProps) {
   const variants = {
-    default: { border: colors.border, background: colors.surface },
-    highlighted: { border: colors.borderHover, background: colors.surface },
-    success: { border: colors.successBorder, background: colors.surface },
+    default: { background: colors.surface },
+    highlighted: { background: colors.surface },
+    success: { background: colors.successBg },
   };
 
   const paddings = {
@@ -37,10 +37,9 @@ export function Card({
     <div
       style={{
         background: v.background,
-        borderRadius: 12,
-        border: `1px solid ${v.border}`,
+        border: "2px solid #0A0A0A",
         padding: paddings[padding],
-        animation: animated ? `fadeUp 0.3s ease ${animationDelay}s both` : undefined,
+        animation: animated ? `slam 0.4s cubic-bezier(.22,1,.36,1) ${animationDelay}s both` : undefined,
         ...style,
       }}
       {...props}

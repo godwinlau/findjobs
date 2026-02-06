@@ -205,6 +205,13 @@ export function computeSkillROI(
   const gapSkills = getUserGapSkills(ctx);
   const results: SkillROI[] = [];
 
+  // User's dominant categories (≥20% skill coverage) — used to boost
+  // industry-demanded skills that also sit in a category the user already
+  // has strength in (bridge skills for career transitions).
+  const dominantCategories = ctx.snapshot.scores
+    .filter((s) => s.percentage >= 20)
+    .map((s) => s.category);
+
   for (const skill of gapSkills) {
     // Find which category this skill belongs to
     let category = "";
@@ -217,6 +224,9 @@ export function computeSkillROI(
 
     // Calculate demand across preferred industries
     const demand = getDemandForSkill(skill, ctx.preferredIndustries);
+
+    // Skip skills with no demand in user's industries
+    if (demand === 0 && ctx.preferredIndustries.length > 0) continue;
 
     // Find top industries for this skill
     const topIndustries: { name: string; demand: number }[] = [];
@@ -246,14 +256,16 @@ export function computeSkillROI(
     if (catSnapshot && catSnapshot.percentage > 50) difficulty = "intermediate";
     if (catSnapshot && catSnapshot.percentage > 80) difficulty = "advanced";
 
-    // Skip skills with no demand in user's industries
-    if (demand === 0 && ctx.preferredIndustries.length > 0) continue;
+    // Bridge-skill boost: if this industry-demanded skill also belongs to a
+    // category the user already has strength in, it's a natural bridge between
+    // their background and their target industry — prioritize it.
+    const bridgeBoost = dominantCategories.includes(category) ? 15 : 0;
 
     results.push({
       skill,
       category,
       jobsRequiring: demand,
-      estimatedNewMatches: Math.max(Math.round(demand / 25), 1),
+      estimatedNewMatches: Math.max(Math.round((demand + bridgeBoost) / 25), 1),
       topIndustries: topIndustries.slice(0, 3).map((t) => t.name),
       difficulty,
       recommendedCourse: bestCourse,
@@ -352,10 +364,10 @@ export function rankQuickWins(
 // ─── Free Resources Ranking ───
 
 const RESOURCE_CATEGORY_MAP: Record<string, string[]> = {
-  "General": ["Communication & Soft Skills", "Business Tools", "Domain Skills"],
-  "Tech & Business": ["Tech & Development", "Business Tools", "Data & Analytics"],
-  "Tech & Dev": ["Tech & Development"],
-  "Business": ["Business Tools", "Domain Skills"],
+  "General": ["Virtual Assistance & Admin", "BPO & Customer Service", "Sales & Business Dev"],
+  "Tech & Business": ["Software Development", "Data & Analytics", "Finance & Accounting"],
+  "Tech & Dev": ["Software Development"],
+  "Business": ["Finance & Accounting", "Sales & Business Dev", "Virtual Assistance & Admin"],
   "Design": ["Design & Creative"],
 };
 

@@ -15,12 +15,27 @@ function isScoredResource(r: FreeResource): r is ScoredFreeResource {
 export function FreeResourcesSection({ resources }: FreeResourcesSectionProps) {
   return (
     <div style={{ marginBottom: 20 }}>
-      <div style={{ marginBottom: 12 }}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: colors.text }}>
-          Free Resources
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: colors.text }}>
+            Free Learning Resources
+          </div>
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 600,
+              color: colors.primary,
+              background: colors.primaryBg,
+              padding: "2px 8px",
+              borderRadius: 4,
+            }}
+          >
+            100% Free
+          </span>
         </div>
-        <div style={{ fontSize: 12, color: colors.textMuted, marginTop: 2 }}>
-          Curated free learning platforms relevant for Filipino job seekers
+        <div style={{ fontSize: 12, color: colors.textSec, marginTop: 4, lineHeight: 1.5 }}>
+          We curated these platforms because they offer real certifications recognized by Philippine employers.
+          Start learning today — no credit card required.
         </div>
       </div>
 

@@ -13,12 +13,40 @@ import {
   EXPERIENCE_LEVELS,
   EDUCATION_LEVELS,
   EMPLOYMENT_TYPES,
-  INDUSTRIES,
+  WORK_CATEGORIES,
 } from "@/lib/constants/onboarding";
 import { updateProfile } from "@/app/profile/actions";
-import type { Profile } from "@/lib/types";
+import type { Profile, SkillProficiency } from "@/lib/types";
 
-type SectionKey = "basics" | "skills" | "preferences";
+// Map old INDUSTRIES label strings → new WORK_CATEGORIES slug values.
+// Profiles created before the switch still store labels like "IT / Software".
+const LEGACY_INDUSTRY_MAP: Record<string, string> = {
+  "BPO / Outsourcing": "bpo",
+  "IT / Software": "tech_it",
+  "Banking / Finance": "accounting",
+  "Healthcare": "healthcare",
+  "Education": "education",
+  "Retail / E-commerce": "sales",
+  "Manufacturing": "skilled_trade",
+  "Real Estate": "admin",
+  "Telecommunications": "tech_it",
+  "Media / Advertising": "design",
+  "Government": "admin",
+  "Hospitality / Tourism": "other",
+};
+
+const VALID_CATEGORY_VALUES: Set<string> = new Set(WORK_CATEGORIES.map((c) => c.value));
+
+function normalizeIndustries(industries: string[]): string[] {
+  const mapped = industries.map((i) => {
+    if (VALID_CATEGORY_VALUES.has(i)) return i;
+    return LEGACY_INDUSTRY_MAP[i] ?? null;
+  });
+  // Deduplicate and drop unmapped values
+  return [...new Set(mapped.filter(Boolean))] as string[];
+}
+
+type SectionKey = "work_location" | "skills_proficiency" | "compensation_identity";
 
 interface ProfileEditorProps {
   profile: Profile;
@@ -198,20 +226,20 @@ function SelectInput({
   );
 }
 
-// ─── Industry chip selector ───
+// ─── Work category chip selector ───
 
-function IndustryChipSelector({
+function WorkCategoryChipSelector({
   selected,
   onChange,
 }: {
   selected: string[];
-  onChange: (industries: string[]) => void;
+  onChange: (categories: string[]) => void;
 }) {
-  function toggle(industry: string) {
-    if (selected.includes(industry)) {
-      onChange(selected.filter((i) => i !== industry));
+  function toggle(value: string) {
+    if (selected.includes(value)) {
+      onChange(selected.filter((v) => v !== value));
     } else {
-      onChange([...selected, industry]);
+      onChange([...selected, value]);
     }
   }
 
@@ -226,16 +254,16 @@ function IndustryChipSelector({
           marginBottom: 8,
         }}
       >
-        Preferred industries
+        Work categories
       </label>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-        {INDUSTRIES.map((industry) => {
-          const isSelected = selected.includes(industry);
+        {WORK_CATEGORIES.map((cat) => {
+          const isSelected = selected.includes(cat.value);
           return (
             <button
-              key={industry}
+              key={cat.value}
               type="button"
-              onClick={() => toggle(industry)}
+              onClick={() => toggle(cat.value)}
               style={{
                 padding: "5px 10px",
                 borderRadius: 6,
@@ -248,7 +276,7 @@ function IndustryChipSelector({
                 transition: "all 0.15s ease",
               }}
             >
-              {industry}
+              {cat.icon} {cat.label}
             </button>
           );
         })}
@@ -264,7 +292,10 @@ export function ProfileEditor({ profile, email }: ProfileEditorProps) {
   const [draft, setDraft] = useState<Partial<Profile>>({});
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [currentProfile, setCurrentProfile] = useState<Profile>(profile);
+  const [currentProfile, setCurrentProfile] = useState<Profile>(() => ({
+    ...profile,
+    preferred_industries: normalizeIndustries(profile.preferred_industries || []),
+  }));
 
   const initials = getInitials(currentProfile.full_name);
 
@@ -272,27 +303,30 @@ export function ProfileEditor({ profile, email }: ProfileEditorProps) {
     setError("");
     setEditingSection(section);
 
-    if (section === "basics") {
+    if (section === "work_location") {
       setDraft({
-        full_name: currentProfile.full_name,
-        headline: currentProfile.headline,
+        preferred_industries: currentProfile.preferred_industries || [],
+        employment_type: currentProfile.employment_type,
         preferred_city: currentProfile.preferred_city,
         work_preference: currentProfile.work_preference,
+        willing_to_relocate: currentProfile.willing_to_relocate,
       });
-    } else if (section === "skills") {
+    } else if (section === "skills_proficiency") {
       setDraft({
         skills: currentProfile.skills || [],
+        skills_learning: currentProfile.skills_learning || [],
+        skill_proficiencies: currentProfile.skill_proficiencies || {},
         experience_level: currentProfile.experience_level,
-        years_of_experience: currentProfile.years_of_experience,
         education: currentProfile.education,
+        school: currentProfile.school,
         field_of_study: currentProfile.field_of_study,
       });
-    } else if (section === "preferences") {
+    } else if (section === "compensation_identity") {
       setDraft({
         desired_salary_min: currentProfile.desired_salary_min,
         desired_salary_max: currentProfile.desired_salary_max,
-        employment_type: currentProfile.employment_type,
-        preferred_industries: currentProfile.preferred_industries || [],
+        full_name: currentProfile.full_name,
+        headline: currentProfile.headline,
       });
     }
   }
@@ -324,6 +358,11 @@ export function ProfileEditor({ profile, email }: ProfileEditorProps) {
 
   // Profile completion bar
   const completionPct = currentProfile.profile_completion ?? 0;
+
+  // Resolve work category labels for view mode
+  function getCategoryLabel(value: string): string {
+    return WORK_CATEGORIES.find((c) => c.value === value)?.label ?? value;
+  }
 
   return (
     <div
@@ -436,30 +475,32 @@ export function ProfileEditor({ profile, email }: ProfileEditorProps) {
         </div>
       )}
 
-      {/* ─── Personal Info ─── */}
+      {/* ─── Section 1: Work & Location ─── */}
       <Section
-        title="Personal Info"
-        sectionKey="basics"
+        title="Work & Location"
+        sectionKey="work_location"
         editingSection={editingSection}
-        onEdit={() => startEditing("basics")}
+        onEdit={() => startEditing("work_location")}
         onCancel={cancelEditing}
         onSave={saveSection}
         saving={saving}
         editContent={
           <>
-            <AuthInput
-              label="Full name"
-              value={draft.full_name || ""}
-              onChange={(e) =>
-                setDraft((d) => ({ ...d, full_name: e.target.value }))
+            <WorkCategoryChipSelector
+              selected={(draft.preferred_industries as string[]) || []}
+              onChange={(categories) =>
+                setDraft((d) => ({ ...d, preferred_industries: categories }))
               }
             />
-            <AuthInput
-              label="Headline"
-              placeholder="e.g. Junior Web Developer"
-              value={draft.headline || ""}
-              onChange={(e) =>
-                setDraft((d) => ({ ...d, headline: e.target.value }))
+            <RadioGroup
+              label="Employment type"
+              options={EMPLOYMENT_TYPES}
+              value={draft.employment_type || "full_time"}
+              onChange={(val) =>
+                setDraft((d) => ({
+                  ...d,
+                  employment_type: val as Profile["employment_type"],
+                }))
               }
             />
             <SelectInput
@@ -481,26 +522,77 @@ export function ProfileEditor({ profile, email }: ProfileEditorProps) {
                 }))
               }
             />
+            <div style={{ marginBottom: 16 }}>
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  fontSize: 13,
+                  color: colors.text,
+                  cursor: "pointer",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={draft.willing_to_relocate ?? false}
+                  onChange={(e) =>
+                    setDraft((d) => ({ ...d, willing_to_relocate: e.target.checked }))
+                  }
+                  style={{ accentColor: colors.primary }}
+                />
+                Willing to relocate
+              </label>
+            </div>
           </>
         }
       >
         <div style={{ marginTop: 8 }}>
-          <ViewRow label="Name" value={currentProfile.full_name} />
-          <ViewRow label="Headline" value={currentProfile.headline} />
+          {(currentProfile.preferred_industries || []).length > 0 ? (
+            <div style={{ padding: "8px 0", borderBottom: `1px solid ${colors.border}` }}>
+              <span
+                style={{
+                  fontSize: 13,
+                  color: colors.textMuted,
+                  display: "block",
+                  marginBottom: 6,
+                }}
+              >
+                Work categories
+              </span>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                {currentProfile.preferred_industries.map((cat) => (
+                  <Badge key={cat} variant="accent" size="sm">
+                    {getCategoryLabel(cat)}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <ViewRow label="Work categories" value="—" />
+          )}
+          <ViewRow
+            label="Employment type"
+            value={getLabelForValue(EMPLOYMENT_TYPES, currentProfile.employment_type)}
+          />
           <ViewRow label="Preferred city" value={currentProfile.preferred_city} />
           <ViewRow
             label="Work preference"
             value={getLabelForValue(WORK_PREFERENCES, currentProfile.work_preference)}
           />
+          <ViewRow
+            label="Willing to relocate"
+            value={currentProfile.willing_to_relocate ? "Yes" : "No"}
+          />
         </div>
       </Section>
 
-      {/* ─── Skills & Experience ─── */}
+      {/* ─── Section 2: Skills & Proficiency ─── */}
       <Section
-        title="Skills & Experience"
-        sectionKey="skills"
+        title="Skills & Proficiency"
+        sectionKey="skills_proficiency"
         editingSection={editingSection}
-        onEdit={() => startEditing("skills")}
+        onEdit={() => startEditing("skills_proficiency")}
         onCancel={cancelEditing}
         onSave={saveSection}
         saving={saving}
@@ -509,7 +601,36 @@ export function ProfileEditor({ profile, email }: ProfileEditorProps) {
             <SkillChipSelector
               selected={(draft.skills as string[]) || []}
               onChange={(skills) => setDraft((d) => ({ ...d, skills }))}
+              proficiencies={(draft.skill_proficiencies as Record<string, SkillProficiency>) ?? {}}
+              onProficiencyChange={(proficiencies) =>
+                setDraft((d) => ({ ...d, skill_proficiencies: proficiencies }))
+              }
+              selectedCategories={(draft.preferred_industries as string[]) || currentProfile.preferred_industries || []}
+              showProficiency
             />
+            <div style={{ marginTop: 20, marginBottom: 16 }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: colors.text,
+                  marginBottom: 8,
+                }}
+              >
+                Skills I&apos;m Learning
+                <span style={{ fontSize: 11, fontWeight: 400, color: colors.textMuted, marginLeft: 6 }}>
+                  (Track skills you&apos;re developing)
+                </span>
+              </label>
+              <SkillChipSelector
+                selected={(draft.skills_learning as string[]) || []}
+                onChange={(skills) => setDraft((d) => ({ ...d, skills_learning: skills }))}
+                selectedCategories={(draft.preferred_industries as string[]) || currentProfile.preferred_industries || []}
+                excludeSkills={(draft.skills as string[]) || []}
+                variant="learning"
+              />
+            </div>
             <RadioGroup
               label="Experience level"
               options={EXPERIENCE_LEVELS}
@@ -518,21 +639,6 @@ export function ProfileEditor({ profile, email }: ProfileEditorProps) {
                 setDraft((d) => ({
                   ...d,
                   experience_level: val as Profile["experience_level"],
-                }))
-              }
-            />
-            <AuthInput
-              label="Years of experience"
-              type="number"
-              min={0}
-              max={50}
-              value={draft.years_of_experience ?? ""}
-              onChange={(e) =>
-                setDraft((d) => ({
-                  ...d,
-                  years_of_experience: e.target.value
-                    ? Number(e.target.value)
-                    : 0,
                 }))
               }
             />
@@ -548,6 +654,14 @@ export function ProfileEditor({ profile, email }: ProfileEditorProps) {
               }
             />
             <AuthInput
+              label="School"
+              placeholder="e.g. University of the Philippines"
+              value={draft.school || ""}
+              onChange={(e) =>
+                setDraft((d) => ({ ...d, school: e.target.value || null }))
+              }
+            />
+            <AuthInput
               label="Field of study"
               placeholder="e.g. Computer Science"
               value={draft.field_of_study || ""}
@@ -559,7 +673,7 @@ export function ProfileEditor({ profile, email }: ProfileEditorProps) {
         }
       >
         <div style={{ marginTop: 8 }}>
-          {(currentProfile.skills || []).length > 0 && (
+          {(currentProfile.skills || []).length > 0 ? (
             <div style={{ padding: "8px 0", borderBottom: `1px solid ${colors.border}` }}>
               <span
                 style={{
@@ -572,43 +686,62 @@ export function ProfileEditor({ profile, email }: ProfileEditorProps) {
                 Skills
               </span>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                {currentProfile.skills.map((skill) => (
-                  <Badge key={skill} variant="primary" size="sm">
-                    {skill}
+                {currentProfile.skills.map((skill) => {
+                  const proficiency = currentProfile.skill_proficiencies?.[skill];
+                  const profLabel = proficiency
+                    ? ` (${proficiency[0].toUpperCase()})`
+                    : "";
+                  return (
+                    <Badge key={skill} variant="primary" size="sm">
+                      {skill}{profLabel}
+                    </Badge>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <ViewRow label="Skills" value="—" />
+          )}
+          {(currentProfile.skills_learning || []).length > 0 && (
+            <div style={{ padding: "8px 0", borderBottom: `1px solid ${colors.border}` }}>
+              <span
+                style={{
+                  fontSize: 13,
+                  color: colors.textMuted,
+                  display: "block",
+                  marginBottom: 6,
+                }}
+              >
+                Skills I&apos;m Learning
+              </span>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                {(currentProfile.skills_learning || []).map((skill) => (
+                  <Badge key={skill} variant="warning" size="sm">
+                    📚 {skill}
                   </Badge>
                 ))}
               </div>
             </div>
-          )}
-          {(currentProfile.skills || []).length === 0 && (
-            <ViewRow label="Skills" value="—" />
           )}
           <ViewRow
             label="Experience level"
             value={getLabelForValue(EXPERIENCE_LEVELS, currentProfile.experience_level)}
           />
           <ViewRow
-            label="Years of experience"
-            value={
-              currentProfile.years_of_experience != null
-                ? `${currentProfile.years_of_experience} year${currentProfile.years_of_experience !== 1 ? "s" : ""}`
-                : null
-            }
-          />
-          <ViewRow
             label="Education"
             value={getLabelForValue(EDUCATION_LEVELS, currentProfile.education)}
           />
+          <ViewRow label="School" value={currentProfile.school} />
           <ViewRow label="Field of study" value={currentProfile.field_of_study} />
         </div>
       </Section>
 
-      {/* ─── Job Preferences ─── */}
+      {/* ─── Section 3: Compensation & Identity ─── */}
       <Section
-        title="Job Preferences"
-        sectionKey="preferences"
+        title="Compensation & Identity"
+        sectionKey="compensation_identity"
         editingSection={editingSection}
-        onEdit={() => startEditing("preferences")}
+        onEdit={() => startEditing("compensation_identity")}
         onCancel={cancelEditing}
         onSave={saveSection}
         saving={saving}
@@ -624,21 +757,19 @@ export function ProfileEditor({ profile, email }: ProfileEditorProps) {
                 setDraft((d) => ({ ...d, desired_salary_max: val }))
               }
             />
-            <RadioGroup
-              label="Employment type"
-              options={EMPLOYMENT_TYPES}
-              value={draft.employment_type || "full_time"}
-              onChange={(val) =>
-                setDraft((d) => ({
-                  ...d,
-                  employment_type: val as Profile["employment_type"],
-                }))
+            <AuthInput
+              label="Full name"
+              value={draft.full_name || ""}
+              onChange={(e) =>
+                setDraft((d) => ({ ...d, full_name: e.target.value }))
               }
             />
-            <IndustryChipSelector
-              selected={(draft.preferred_industries as string[]) || []}
-              onChange={(industries) =>
-                setDraft((d) => ({ ...d, preferred_industries: industries }))
+            <AuthInput
+              label="Headline"
+              placeholder="e.g. Junior Web Developer"
+              value={draft.headline || ""}
+              onChange={(e) =>
+                setDraft((d) => ({ ...d, headline: e.target.value }))
               }
             />
           </>
@@ -653,33 +784,8 @@ export function ProfileEditor({ profile, email }: ProfileEditorProps) {
                 : "—"
             }
           />
-          <ViewRow
-            label="Employment type"
-            value={getLabelForValue(EMPLOYMENT_TYPES, currentProfile.employment_type)}
-          />
-          {(currentProfile.preferred_industries || []).length > 0 ? (
-            <div style={{ padding: "8px 0" }}>
-              <span
-                style={{
-                  fontSize: 13,
-                  color: colors.textMuted,
-                  display: "block",
-                  marginBottom: 6,
-                }}
-              >
-                Preferred industries
-              </span>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                {currentProfile.preferred_industries.map((industry) => (
-                  <Badge key={industry} variant="accent" size="sm">
-                    {industry}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <ViewRow label="Preferred industries" value="—" />
-          )}
+          <ViewRow label="Name" value={currentProfile.full_name} />
+          <ViewRow label="Headline" value={currentProfile.headline} />
         </div>
       </Section>
     </div>

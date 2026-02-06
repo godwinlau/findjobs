@@ -3,59 +3,42 @@ export interface TourStep {
   title: string;
   description: string;
   position: "top" | "bottom" | "left" | "right";
+  highlight?: string; // What makes this different
 }
 
-export const jobSeekerSteps: TourStep[] = [
+export const tourSteps: TourStep[] = [
   {
     target: "weekly-progress",
-    title: "Weekly Progress",
+    title: "Your Dashboard Stats",
     description:
-      "Track your job search activity at a glance — applications sent, interviews scheduled, and more.",
+      "Track your applications, job views, skills progress, and streak all in one place. Stay consistent and watch your progress grow!",
     position: "bottom",
-  },
-  {
-    target: "profile-completion",
-    title: "Profile Completion",
-    description:
-      "Complete your profile to unlock better job matches. The more you fill in, the smarter our recommendations get.",
-    position: "bottom",
-  },
-  {
-    target: "applications-tracker",
-    title: "Applications Tracker",
-    description:
-      "See the status of every application in one place — pending, reviewed, interview, or hired.",
-    position: "bottom",
+    highlight: "All your metrics at a glance",
   },
   {
     target: "top-matches",
-    title: "Top Matches",
+    title: "Jobs Matched to YOUR Skills",
     description:
-      "These are jobs handpicked for you based on your skills, experience, and preferences.",
+      "Every job shows exactly WHY it matches you — skills overlap, salary fit, and location preference. No more guessing.",
     position: "top",
+    highlight: "See why each job matches you",
+  },
+  {
+    target: "profile-completion",
+    title: "Complete Your Profile",
+    description:
+      "Unlike other job sites, we match based on your actual skills — not just keywords. Complete your profile for better matches.",
+    position: "bottom",
+    highlight: "Skills-first matching, not keyword spam",
   },
 ];
 
-export const employerSteps: TourStep[] = [
-  {
-    target: "post-job-button",
-    title: "Post a Job",
-    description:
-      "Ready to hire? Click here to create a new job posting and start receiving applications.",
-    position: "bottom",
-  },
-  {
-    target: "stats-row",
-    title: "Your Stats",
-    description:
-      "Monitor your hiring performance — total postings, views, applications, and more at a glance.",
-    position: "bottom",
-  },
-  {
-    target: "posted-jobs-list",
-    title: "Job Postings",
-    description:
-      "Manage all your active and past job postings here. Edit, close, or review applicants anytime.",
-    position: "top",
-  },
-];
+// Tour step for Learn page (used when navigating there)
+export const learnTourStep: TourStep = {
+  target: "learn-section",
+  title: "Grow Your Skills",
+  description:
+    "Take assessments to discover skill gaps, then get personalized course recommendations to level up and unlock more jobs.",
+  position: "top",
+  highlight: "Skill gaps → Learning paths → Better jobs",
+};

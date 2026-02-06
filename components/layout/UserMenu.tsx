@@ -42,14 +42,13 @@ export function UserMenu({ fullName, email }: UserMenuProps) {
         <div
           style={{
             position: "absolute",
-            top: "calc(100% + 6px)",
+            top: "calc(100% + 2px)",
             right: 0,
             width: 220,
             maxWidth: "calc(100vw - 32px)",
-            background: colors.surface,
-            border: `1px solid ${colors.border}`,
-            borderRadius: 10,
-            boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+            background: "#0A0A0A",
+            border: "2px solid #0A0A0A",
+            boxShadow: "4px 4px 0 rgba(0,0,0,0.3)",
             zIndex: 100,
             overflow: "hidden",
           }}
@@ -57,13 +56,13 @@ export function UserMenu({ fullName, email }: UserMenuProps) {
           <div
             style={{
               padding: "12px 14px",
-              borderBottom: `1px solid ${colors.border}`,
+              borderBottom: "1px solid rgba(255,255,255,0.1)",
             }}
           >
-            <div style={{ fontSize: 13, fontWeight: 600, color: colors.text }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "#F5F5F0", fontFamily: "var(--font-mono)", textTransform: "uppercase" as const }}>
               {fullName || "User"}
             </div>
-            <div style={{ fontSize: 11, color: colors.textMuted, marginTop: 2 }}>
+            <div style={{ fontSize: 10, color: "rgba(245,245,240,0.4)", marginTop: 2, fontFamily: "var(--font-mono)" }}>
               {email}
             </div>
           </div>
@@ -75,14 +74,18 @@ export function UserMenu({ fullName, email }: UserMenuProps) {
               padding: "10px 14px",
               border: "none",
               background: "transparent",
-              color: colors.textSec,
-              fontSize: 13,
-              fontWeight: 500,
+              color: "rgba(245,245,240,0.6)",
+              fontSize: 11,
+              fontWeight: 700,
+              fontFamily: "var(--font-mono)",
+              textTransform: "uppercase" as const,
+              letterSpacing: "0.04em",
               cursor: "pointer",
               textAlign: "left",
               textDecoration: "none",
               boxSizing: "border-box",
-              borderBottom: `1px solid ${colors.border}`,
+              borderBottom: "1px solid rgba(255,255,255,0.06)",
+              transition: "all 0.15s",
             }}
           >
             Profile
@@ -95,9 +98,12 @@ export function UserMenu({ fullName, email }: UserMenuProps) {
                 padding: "10px 14px",
                 border: "none",
                 background: "transparent",
-                color: colors.live,
-                fontSize: 13,
-                fontWeight: 500,
+                color: "#FBBF24",
+                fontSize: 11,
+                fontWeight: 700,
+                fontFamily: "var(--font-mono)",
+                textTransform: "uppercase" as const,
+                letterSpacing: "0.04em",
                 cursor: "pointer",
                 textAlign: "left",
               }}

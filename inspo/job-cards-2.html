@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Cards</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F4F1EC;
+    --white: #FFFFFF;
+    --brand: #2D3139;
+    --brand-hover: #3A3F4A;
+    --brand-soft: #EDEEF0;
+    --brand-muted: #C4C7CC;
+    --accent: #4A4E57;
+    --accent-light: #9CA0A8;
+    --match-high: #2D8C5F;
+    --match-mid: #B08D29;
+    --match-low: #9E9E9E;
+    --text: #1A1A1A;
+    --text-mid: #5C5C5C;
+    --text-muted: #9E9E9E;
+    --radius: 24px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    padding: 48px 24px;
+    display: flex; justify-content: center;
+  }
+
+  .container { max-width: 920px; width: 100%; }
+  .header { margin-bottom: 32px; display: flex; align-items: baseline; gap: 12px; }
+  .header h1 { font-size: 26px; font-weight: 700; letter-spacing: -.02em; }
+  .header .count { font-size: 14px; color: var(--text-muted); }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 680px) {
+    .grid { grid-template-columns: 1fr; }
+    .grid > * { grid-column: 1/-1 !important; }
+  }
+
+  /* ===== CARD ===== */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 22px;
+    display: flex; flex-direction: column; gap: 12px;
+    cursor: pointer; position: relative; overflow: hidden;
+    transition: transform .35s cubic-bezier(.25,1,.5,1), box-shadow .35s ease;
+    animation: rise .55s cubic-bezier(.25,1,.5,1) both;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 14px 44px rgba(0,0,0,.07); }
+  .card::before {
+    content:''; position:absolute; bottom:0; left:0;
+    width:100%; height:3px;
+    background: linear-gradient(90deg, var(--brand), var(--accent-light));
+    border-radius: 0 0 var(--radius) var(--radius);
+    opacity:0; transition: opacity .3s ease;
+  }
+  .card:hover::before { opacity:1; }
+
+  @keyframes rise { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+  .card:nth-child(1){animation-delay:0s}
+  .card:nth-child(2){animation-delay:.05s}
+  .card:nth-child(3){animation-delay:.1s}
+  .card:nth-child(4){animation-delay:.15s}
+  .card:nth-child(5){animation-delay:.2s}
+  .card:nth-child(6){animation-delay:.25s}
+  .card:nth-child(7){animation-delay:.3s}
+  .card:nth-child(8){animation-delay:.35s}
+
+  /* Tags */
+  .tag {
+    display:inline-flex; align-items:center;
+    font-size:10.5px; font-weight:600;
+    padding:4px 10px; border-radius:100px;
+    letter-spacing:.02em; text-transform:uppercase;
+    background: var(--brand-soft); color: var(--accent);
+  }
+  .tags { display:flex; flex-wrap:wrap; gap:5px; }
+
+  /* Save */
+  .save {
+    width:32px; height:32px;
+    border:none; background: var(--brand-soft);
+    border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; transition:all .2s; flex-shrink:0;
+  }
+  .save:hover { background: var(--brand-muted); transform:scale(1.08); }
+  .save svg { width:15px; height:15px; color: var(--accent-light); }
+  .save.saved svg { color: var(--brand); fill: var(--brand); }
+
+  .desc {
+    font-size:12.5px; line-height:1.55; color: var(--text-mid);
+    display:-webkit-box; -webkit-line-clamp:2;
+    -webkit-box-orient:vertical; overflow:hidden;
+  }
+  .company { font-size:12px; font-weight:500; color: var(--text-muted); margin-bottom:3px; }
+  .title { font-size:18px; font-weight:700; line-height:1.25; letter-spacing:-.02em; }
+  .time { font-size:11px; color: var(--text-muted); }
+
+  /* Top row */
+  .top { display:flex; align-items:flex-start; gap:14px; }
+  .logo {
+    width:46px; height:46px; border-radius:14px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; font-size:19px;
+  }
+  .logo svg { width:22px; height:22px; }
+  .meta { flex:1; min-width:0; }
+
+  /* Bottom */
+  .bottom {
+    display:flex; justify-content:space-between; align-items:center;
+    padding-top:12px; border-top:1px solid rgba(0,0,0,.05);
+  }
+  .salary { font-size:16px; font-weight:700; letter-spacing:-.02em; color: var(--brand); }
+  .salary span { font-size:11px; font-weight:400; color: var(--text-muted); }
+  .apply {
+    padding:8px 20px; border:none; border-radius:100px;
+    font-family:'DM Sans',sans-serif; font-size:12.5px; font-weight:600;
+    background: var(--brand); color:#fff;
+    cursor:pointer; transition:all .2s;
+  }
+  .apply:hover { background: var(--brand-hover); transform:scale(1.03); }
+
+  /* Match */
+  .match { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+  .match-ring { width:32px; height:32px; position:relative; flex-shrink:0; }
+  .match-ring svg { width:32px; height:32px; transform:rotate(-90deg); }
+  .match-ring .track { fill:none; stroke: var(--brand-soft); stroke-width:3; }
+  .match-ring .fill { fill:none; stroke-width:3; stroke-linecap:round; }
+  .match-pct { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; }
+  .match-label { font-size:10.5px; color: var(--text-muted); line-height:1.15; }
+  .match-label strong { display:block; font-size:11px; font-weight:700; }
+
+  .match-high .match-ring .fill{stroke:var(--match-high)} .match-high .match-pct{color:var(--match-high)} .match-high .match-label strong{color:var(--match-high)}
+  .match-mid .match-ring .fill{stroke:var(--match-mid)} .match-mid .match-pct{color:var(--match-mid)} .match-mid .match-label strong{color:var(--match-mid)}
+  .match-low .match-ring .fill{stroke:var(--match-low)} .match-low .match-pct{color:var(--match-low)} .match-low .match-label strong{color:var(--text-mid)}
+
+  /* Source badges */
+  .source {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:4px 10px 4px 6px; border-radius:100px;
+    font-size:10.5px; font-weight:600; letter-spacing:.01em;
+    flex-shrink:0; line-height:1; transition:filter .2s;
+  }
+  .source:hover { filter:brightness(.95); }
+  .source-icon {
+    width:16px; height:16px; border-radius:4px;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .source-icon svg { width:10px; height:10px; }
+
+  .source--linkedin{background:#E8F1FB;color:#0A66C2} .source--linkedin .source-icon{background:#0A66C2} .source--linkedin .source-icon svg{color:#fff}
+  .source--indeed{background:#E4EDFF;color:#2557A7} .source--indeed .source-icon{background:#2557A7} .source--indeed .source-icon svg{color:#fff}
+  .source--glassdoor{background:#E2F8E8;color:#0CAA41} .source--glassdoor .source-icon{background:#0CAA41} .source--glassdoor .source-icon svg{color:#fff}
+  .source--direct{background:var(--brand-soft);color:var(--accent)} .source--direct .source-icon{background:var(--accent)} .source--direct .source-icon svg{color:#fff}
+  .source--wellfound{background:#1A1A1A;color:#fff} .source--wellfound .source-icon{background:#fff} .source--wellfound .source-icon svg{color:#1A1A1A}
+  .source--remoteok{background:#FEF3C7;color:#92400E} .source--remoteok .source-icon{background:#F59E0B} .source--remoteok .source-icon svg{color:#fff}
+
+  .card-header { display:flex; align-items:center; justify-content:space-between; }
+  .card-header-right { display:flex; align-items:center; gap:6px; }
+
+  .wide { grid-column:1/-1; }
+  .wide .title { font-size:21px; }
+  .wide .salary { font-size:18px; }
+
+  /* ===== COMPANY LOGO COLORS ===== */
+  /* Spotify — green */
+  .logo-spotify { background: #E8F7EF; }
+  .logo-spotify svg { color: #1DB954; }
+
+  /* Vercel — black */
+  .logo-vercel { background: #ECECEC; color: #000; font-weight: 800; font-size: 20px; }
+
+  /* Stripe — purple */
+  .logo-stripe { background: #EEEBFF; }
+  .logo-stripe svg { color: #635BFF; }
+
+  /* Linear — blue */
+  .logo-linear { background: #E6ECFB; }
+  .logo-linear svg { color: #5E6AD2; }
+
+  /* Shopify — green */
+  .logo-shopify { background: #E2F5E9; }
+  .logo-shopify svg { color: #5E8E3E; }
+
+  /* Figma — red/orange */
+  .logo-figma { background: #FDEAE6; }
+  .logo-figma svg { color: #F24E1E; }
+
+  /* Supabase — teal */
+  .logo-supabase { background: #E0F5F0; }
+  .logo-supabase svg { color: #3ECF8E; }
+
+  /* Apple — grey */
+  .logo-apple { background: #F0F0F0; color: #333; font-size: 22px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>New for you</h1>
+    <span class="count">— 32 matches</span>
+  </div>
+  <div class="grid">
+
+    <!-- 1 · Spotify · LinkedIn · Wide -->
+    <div class="card wide">
+      <div class="card-header">
+        <span class="source source--linkedin">
+          <span class="source-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 2h-17A1.5 1.5 0 002 3.5v17A1.5 1.5 0 003.5 22h17a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0020.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 118.3 6.5a1.78 1.78 0 01-1.8 1.75zM19 19h-3v-4.74c0-1.42-.6-1.93-1.38-1.93A1.74 1.74 0 0013 14.19V19h-3v-9h2.9v1.3a3.11 3.11 0 012.7-1.4c1.55 0 3.36.86 3.36 3.66z"/></svg></span>
+          LinkedIn
+        </span>
+        <div class="card-header-right">
+          <div class="match match-high">
+            <div class="match-ring"><svg viewBox="0 0 38 38"><circle class="track" cx="19" cy="19" r="16"/><circle class="fill" cx="19" cy="19" r="16" stroke-dasharray="100.53" stroke-dashoffset="8.04"/></svg><div class="match-pct">92%</div></div>
+            <div class="match-label"><strong>Great match</strong>Skills & exp.</div>
+          </div>
+          <button class="save saved" onclick="this.classList.toggle('saved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+        </div>
+      </div>
+      <div class="top">
+        <div class="logo logo-spotify">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.5.4-.8.2-2.2-1.3-5-1.6-8.3-.9-.3.1-.6-.1-.7-.4-.1-.3.1-.6.4-.7 3.6-.8 6.7-.5 9.2 1 .3.2.4.5.2.8zm1.2-2.7c-.2.4-.7.5-1 .3-2.5-1.5-6.3-2-9.3-1.1-.4.1-.8-.1-.9-.5-.1-.4.1-.8.5-.9 3.4-1 7.6-.5 10.4 1.2.3.2.5.7.3 1zm.1-2.8c-3-1.8-8-2-10.9-.9-.5.2-1-.1-1.1-.5-.2-.5.1-1 .5-1.1 3.3-1 8.7-.8 12.1 1.1.4.3.6.8.3 1.3-.2.4-.8.6-1.2.3l.3-.2z"/></svg>
+        </div>
+        <div class="meta">
+          <div class="company">Spotify · Stockholm</div>
+          <div class="title" style="font-size:21px">Senior Product Designer</div>
+        </div>
+      </div>
+      <p class="desc">Lead end-to-end design for Spotify's creator tools. Shape how millions of artists connect with fans through intuitive, data-informed experiences across mobile and desktop.</p>
+      <div class="tags"><span class="tag">Full-time</span><span class="tag">Remote</span><span class="tag">Senior</span><span class="tag">Design Systems</span></div>
+      <div class="bottom">
+        <div><div class="salary" style="font-size:18px">$145K – $180K <span>/yr</span></div><div class="time">2 hours ago</div></div>
+        <button class="apply">Apply Now</button>
+      </div>
+    </div>
+
+    <!-- 2 · Vercel · Wellfound -->
+    <div class="card">
+      <div class="card-header">
+        <span class="source source--wellfound">
+          <span class="source-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 19.5h20L12 2zm0 4l6.5 11.5h-13L12 6z"/></svg></span>
+          Wellfound
+        </span>
+        <div class="card-header-right">
+          <div class="match match-high">
+            <div class="match-ring"><svg viewBox="0 0 38 38"><circle class="track" cx="19" cy="19" r="16"/><circle class="fill" cx="19" cy="19" r="16" stroke-dasharray="100.53" stroke-dashoffset="5.03"/></svg><div class="match-pct">95%</div></div>
+            <div class="match-label"><strong>Top match</strong>Ideal fit</div>
+          </div>
+          <button class="save" onclick="this.classList.toggle('saved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+        </div>
+      </div>
+      <div class="top">
+        <div class="logo logo-vercel">▲</div>
+        <div class="meta">
+          <div class="company">Vercel · Remote</div>
+          <div class="title">Senior React Developer</div>
+        </div>
+      </div>
+      <p class="desc">Build the infrastructure powering the modern web — work on Next.js, Turbopack, and Vercel's deployment platform at scale.</p>
+      <div class="tags"><span class="tag">Full-time</span><span class="tag">Remote</span><span class="tag">Senior</span></div>
+      <div class="bottom">
+        <div><div class="salary">$155K – $195K <span>/yr</span></div><div class="time">4 hours ago</div></div>
+        <button class="apply">Apply Now</button>
+      </div>
+    </div>
+
+    <!-- 3 · Stripe · Glassdoor -->
+    <div class="card">
+      <div class="card-header">
+        <span class="source source--glassdoor">
+          <span class="source-icon"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="2" width="12" height="20" rx="2"/></svg></span>
+          Glassdoor
+        </span>
+        <div class="card-header-right">
+          <div class="match match-high">
+            <div class="match-ring"><svg viewBox="0 0 38 38"><circle class="track" cx="19" cy="19" r="16"/><circle class="fill" cx="19" cy="19" r="16" stroke-dasharray="100.53" stroke-dashoffset="11.06"/></svg><div class="match-pct">89%</div></div>
+            <div class="match-label"><strong>Great match</strong>Role & skills</div>
+          </div>
+          <button class="save" onclick="this.classList.toggle('saved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+        </div>
+      </div>
+      <div class="top">
+        <div class="logo logo-stripe">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.98 7.87c-1.18 0-1.95.52-2.4 1.05l-.32-1.05H9.1v12.04l2.63-.56.01-2.92c.46.33 1.13.8 2.24.8 2.26 0 4.32-1.82 4.32-5.82-.01-3.66-2.1-5.54-4.32-5.54zm-.76 8.52c-.75 0-1.19-.27-1.5-.6l-.01-4.74c.32-.37.78-.63 1.51-.63 1.15 0 1.95 1.29 1.95 2.98 0 1.72-.79 2.99-1.95 2.99zM6.22 8.73l.01-1.67L3.6 7.62v1.67l2.62-.56z"/><rect x="3.6" y="8.87" width="2.63" height="9.04" rx=".3" fill="currentColor"/></svg>
+        </div>
+        <div class="meta">
+          <div class="company">Stripe · San Francisco</div>
+          <div class="title">Design Engineer</div>
+        </div>
+      </div>
+      <p class="desc">Craft interactive prototypes and production UI for Stripe's payment flows. Define the future of internet commerce.</p>
+      <div class="tags"><span class="tag">Full-time</span><span class="tag">On-site</span><span class="tag">Senior</span></div>
+      <div class="bottom">
+        <div><div class="salary">$170K – $220K <span>/yr</span></div><div class="time">5 days ago</div></div>
+        <button class="apply">Apply Now</button>
+      </div>
+    </div>
+
+    <!-- 4 · Linear · LinkedIn -->
+    <div class="card">
+      <div class="card-header">
+        <span class="source source--linkedin">
+          <span class="source-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 2h-17A1.5 1.5 0 002 3.5v17A1.5 1.5 0 003.5 22h17a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0020.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 118.3 6.5a1.78 1.78 0 01-1.8 1.75zM19 19h-3v-4.74c0-1.42-.6-1.93-1.38-1.93A1.74 1.74 0 0013 14.19V19h-3v-9h2.9v1.3a3.11 3.11 0 012.7-1.4c1.55 0 3.36.86 3.36 3.66z"/></svg></span>
+          LinkedIn
+        </span>
+        <div class="card-header-right">
+          <div class="match match-high">
+            <div class="match-ring"><svg viewBox="0 0 38 38"><circle class="track" cx="19" cy="19" r="16"/><circle class="fill" cx="19" cy="19" r="16" stroke-dasharray="100.53" stroke-dashoffset="14.07"/></svg><div class="match-pct">86%</div></div>
+            <div class="match-label"><strong>Strong</strong>Skills align</div>
+          </div>
+          <button class="save" onclick="this.classList.toggle('saved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+        </div>
+      </div>
+      <div class="top">
+        <div class="logo logo-linear">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.36 14.1a.5.5 0 01-.13-.52l2.7-8.1a.5.5 0 01.39-.33l8.36-1.1a.5.5 0 01.49.22l4.47 6.7a.5.5 0 01-.04.58l-5.76 7.15a.5.5 0 01-.53.17l-9.08-3.33a.5.5 0 01-.17-.1L3.36 14.1z"/></svg>
+        </div>
+        <div class="meta">
+          <div class="company">Linear · Remote</div>
+          <div class="title">UX Engineer</div>
+        </div>
+      </div>
+      <p class="desc">Build and maintain Linear's component library and design system. Bridge design and engineering to deliver pixel-perfect interfaces.</p>
+      <div class="tags"><span class="tag">Full-time</span><span class="tag">Remote</span><span class="tag">Mid-Senior</span></div>
+      <div class="bottom">
+        <div><div class="salary">$120K – $150K <span>/yr</span></div><div class="time">1 day ago</div></div>
+        <button class="apply">Apply Now</button>
+      </div>
+    </div>
+
+    <!-- 5 · Shopify · Indeed -->
+    <div class="card">
+      <div class="card-header">
+        <span class="source source--indeed">
+          <span class="source-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 2C11 2 9 4 9 6.5V18c0 1.7 1.3 3 3 3s3-1.3 3-3V6.5C15 4 14.3 2 13.5 2z"/></svg></span>
+          Indeed
+        </span>
+        <div class="card-header-right">
+          <div class="match match-mid">
+            <div class="match-ring"><svg viewBox="0 0 38 38"><circle class="track" cx="19" cy="19" r="16"/><circle class="fill" cx="19" cy="19" r="16" stroke-dasharray="100.53" stroke-dashoffset="24.13"/></svg><div class="match-pct">76%</div></div>
+            <div class="match-label"><strong>Good</strong>Exp. fit</div>
+          </div>
+          <button class="save" onclick="this.classList.toggle('saved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+        </div>
+      </div>
+      <div class="top">
+        <div class="logo logo-shopify">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.54 6.5s-.13-.01-.35-.02c-.22 0-.49-.01-.49-.01s-.97-.94-1.08-1.05a.53.53 0 00-.33-.12l-.74 15.2 5.37-1.16S17.77 6.73 17.54 6.5zM13.1 5.13c-.12-.06-.24-.06-.24-.06l-.34-2.04c-.04-.04-.17-.04-.23-.03-1.02.23-2.04 3.1-2.04 3.1l-1.6-.42s-.85 3.17-.95 3.54c-.1.37-.2.73-.2.73L9.44 21l4.43-.96s-.73-15.04-.77-14.91zM11.18 7.5l-.78-.2s.44-1.63 1.05-2.2c-.36.7-.65 1.73-.65 1.73l.38.67z"/></svg>
+        </div>
+        <div class="meta">
+          <div class="company">Shopify · Remote</div>
+          <div class="title">Staff Frontend Developer</div>
+        </div>
+      </div>
+      <p class="desc">Own Shopify's storefront rendering pipeline. Lead performance initiatives and mentor engineers on the themes platform.</p>
+      <div class="tags"><span class="tag">Full-time</span><span class="tag">Remote</span><span class="tag">Staff</span></div>
+      <div class="bottom">
+        <div><div class="salary">$160K – $210K <span>/yr</span></div><div class="time">3 days ago</div></div>
+        <button class="apply">Apply Now</button>
+      </div>
+    </div>
+
+    <!-- 6 · Figma · Direct -->
+    <div class="card">
+      <div class="card-header">
+        <span class="source source--direct">
+          <span class="source-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
+          Company Site
+        </span>
+        <div class="card-header-right">
+          <div class="match match-high">
+            <div class="match-ring"><svg viewBox="0 0 38 38"><circle class="track" cx="19" cy="19" r="16"/><circle class="fill" cx="19" cy="19" r="16" stroke-dasharray="100.53" stroke-dashoffset="9.05"/></svg><div class="match-pct">91%</div></div>
+            <div class="match-label"><strong>Great</strong>Strong fit</div>
+          </div>
+          <button class="save" onclick="this.classList.toggle('saved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+        </div>
+      </div>
+      <div class="top">
+        <div class="logo logo-figma">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 24c2.2 0 4-1.8 4-4v-4H8c-2.2 0-4 1.8-4 4s1.8 4 4 4zm0-20C5.8 4 4 5.8 4 8s1.8 4 4 4h4V4H8zm0 8c-2.2 0-4 1.8-4 4s1.8 4 4 4h4v-8H8zm8-8h-4v8h4c2.2 0 4-1.8 4-4s-1.8-4-4-4zm0 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+        </div>
+        <div class="meta">
+          <div class="company">Figma · Remote</div>
+          <div class="title">Design Technologist</div>
+        </div>
+      </div>
+      <p class="desc">Prototype advanced interaction patterns for Figma's collaborative design tools. Push the boundaries of real-time canvas performance.</p>
+      <div class="tags"><span class="tag">Full-time</span><span class="tag">Remote</span><span class="tag">Senior</span></div>
+      <div class="bottom">
+        <div><div class="salary">$140K – $185K <span>/yr</span></div><div class="time">12 hours ago</div></div>
+        <button class="apply">Apply Now</button>
+      </div>
+    </div>
+
+    <!-- 7 · Supabase · Remote OK · Wide -->
+    <div class="card wide">
+      <div class="card-header">
+        <span class="source source--remoteok">
+          <span class="source-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></span>
+          Remote OK
+        </span>
+        <div class="card-header-right">
+          <div class="match match-high">
+            <div class="match-ring"><svg viewBox="0 0 38 38"><circle class="track" cx="19" cy="19" r="16"/><circle class="fill" cx="19" cy="19" r="16" stroke-dasharray="100.53" stroke-dashoffset="7.04"/></svg><div class="match-pct">93%</div></div>
+            <div class="match-label"><strong>Great match</strong>Leadership fit</div>
+          </div>
+          <button class="save" onclick="this.classList.toggle('saved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+        </div>
+      </div>
+      <div class="top">
+        <div class="logo logo-supabase">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.7 21.8c-.4.5-1.3.2-1.3-.5V14h8.1c.9 0 1.3 1 .8 1.6l-7.6 6.2zM10.3 2.2c.4-.5 1.3-.2 1.3.5V10H3.5c-.9 0-1.3-1-.8-1.6l7.6-6.2z"/></svg>
+        </div>
+        <div class="meta">
+          <div class="company">Supabase · Remote</div>
+          <div class="title" style="font-size:21px">Head of Design</div>
+        </div>
+      </div>
+      <p class="desc">Define the design direction for the open-source Firebase alternative. Build the brand, product, and design team from the ground up across dashboard, docs, and developer tools.</p>
+      <div class="tags"><span class="tag">Full-time</span><span class="tag">Remote</span><span class="tag">Lead</span><span class="tag">Brand</span><span class="tag">Product</span></div>
+      <div class="bottom">
+        <div><div class="salary" style="font-size:18px">$180K – $240K <span>/yr</span></div><div class="time">Just posted</div></div>
+        <button class="apply">Apply Now</button>
+      </div>
+    </div>
+
+    <!-- 8 · Apple · Glassdoor -->
+    <div class="card">
+      <div class="card-header">
+        <span class="source source--glassdoor">
+          <span class="source-icon"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="2" width="12" height="20" rx="2"/></svg></span>
+          Glassdoor
+        </span>
+        <div class="card-header-right">
+          <div class="match match-high">
+            <div class="match-ring"><svg viewBox="0 0 38 38"><circle class="track" cx="19" cy="19" r="16"/><circle class="fill" cx="19" cy="19" r="16" stroke-dasharray="100.53" stroke-dashoffset="6.03"/></svg><div class="match-pct">94%</div></div>
+            <div class="match-label"><strong>Top match</strong>Perfect fit</div>
+          </div>
+          <button class="save" onclick="this.classList.toggle('saved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+        </div>
+      </div>
+      <div class="top">
+        <div class="logo logo-apple">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        </div>
+        <div class="meta">
+          <div class="company">Apple · Cupertino</div>
+          <div class="title">UI/UX Designer, Health</div>
+        </div>
+      </div>
+      <p class="desc">Design experiences that empower people to live healthier lives. Work on Apple Health across iOS, watchOS, and visionOS.</p>
+      <div class="tags"><span class="tag">Full-time</span><span class="tag">On-site</span><span class="tag">Senior</span></div>
+      <div class="bottom">
+        <div><div class="salary">$175K – $230K <span>/yr</span></div><div class="time">6 hours ago</div></div>
+        <button class="apply">Apply Now</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

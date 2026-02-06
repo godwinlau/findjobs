@@ -23,14 +23,16 @@ import {
   RecommendedCoursesSection,
 } from "@/components/learn";
 import {
-  learningPaths,
   skillAssessments,
-  questionBank,
-  quickWins,
-  freeResources,
   learningActivities,
+  quickWins as hardcodedWins,
+  freeResources as hardcodedResources,
+  learningPaths as hardcodedPaths,
 } from "@/lib/data/learnMockData";
-import { courseCatalog } from "@/lib/data/courseCatalog";
+import {
+  getCourseCatalog,
+  getQuestionBank,
+} from "@/lib/data/learn-data";
 import { getAssessmentResults } from "@/lib/actions/assessments";
 import { createClient } from "@/lib/supabase/server";
 import type { SkillAssessment } from "@/lib/types/learn";
@@ -55,13 +57,21 @@ export default async function LearnPage() {
     .eq("id", user.id)
     .single();
 
+  // Fetch all content in parallel (Notion → fallback to hardcoded)
+  const [
+    courseCatalog,
+    questionBank,
+    assessmentResults,
+  ] = await Promise.all([
+    getCourseCatalog(),
+    getQuestionBank(),
+    getAssessmentResults(),
+  ]);
+
   const userSkills: string[] = profile?.skills ?? [];
   const experienceLevel: ProfileExperienceLevel =
     profile?.experience_level ?? "fresh_graduate";
   const snapshot = buildSkillsSnapshot(userSkills, SKILL_CATEGORIES);
-
-  // Fetch persisted assessment results from Supabase
-  const assessmentResults = await getAssessmentResults();
 
   // Build tailored assessments with questions selected per user context
   const tailoredAssessments: SkillAssessment[] = skillAssessments.map((a) => {
@@ -98,9 +108,9 @@ export default async function LearnPage() {
   // Compute personalized data
   const scoredCourses = scoreAndRankCourses(courseCatalog, recContext);
   const skillROIs = computeSkillROI(recContext, courseCatalog);
-  const rankedPaths = rankLearningPaths(learningPaths, recContext);
-  const rankedWins = rankQuickWins(quickWins, recContext);
-  const rankedResources = rankFreeResources(freeResources, recContext);
+  const rankedPaths = rankLearningPaths(hardcodedPaths, recContext);
+  const rankedWins = rankQuickWins(hardcodedWins, recContext);
+  const rankedResources = rankFreeResources(hardcodedResources, recContext);
 
   return (
     <div

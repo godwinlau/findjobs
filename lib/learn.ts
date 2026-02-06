@@ -51,9 +51,14 @@ const DIFFICULTY_TARGETS: Record<
   { beginner: number; intermediate: number; advanced: number }
 > = {
   fresh_graduate: { beginner: 3, intermediate: 2, advanced: 0 },
+  less_than_1yr: { beginner: 3, intermediate: 2, advanced: 0 },
   junior: { beginner: 2, intermediate: 2, advanced: 1 },
+  "1_to_3yr": { beginner: 2, intermediate: 2, advanced: 1 },
   mid: { beginner: 1, intermediate: 2, advanced: 2 },
+  "3_to_5yr": { beginner: 1, intermediate: 2, advanced: 2 },
   senior: { beginner: 0, intermediate: 2, advanced: 3 },
+  "5_to_10yr": { beginner: 0, intermediate: 2, advanced: 3 },
+  "10_plus": { beginner: 0, intermediate: 2, advanced: 3 },
 };
 
 function shuffleArray<T>(arr: T[]): T[] {

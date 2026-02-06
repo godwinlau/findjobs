@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { logActivity } from "@/lib/actions/activity";
+import { validateAssessmentResult } from "@/lib/validation/schemas";
 import type { QuizResult } from "@/lib/types/learn";
 
 export async function saveAssessmentResult(params: {
@@ -29,6 +30,20 @@ export async function saveAssessmentResult(params: {
 
     const experienceLevel = profile?.experience_level ?? "fresh_graduate";
 
+    // Validate input
+    const validation = validateAssessmentResult({
+      categoryId: params.categoryId,
+      score: params.score,
+      total: params.total,
+      questionIds: params.questionIds,
+      answers: params.answers,
+      experienceLevel,
+    });
+
+    if (!validation.success) {
+      return { success: false, error: validation.error };
+    }
+
     const { error } = await supabase
       .from("skill_assessment_results")
       .insert({
@@ -43,20 +58,20 @@ export async function saveAssessmentResult(params: {
 
     if (error) {
       console.error("Failed to save assessment result:", error.message);
-      return { success: false, error: error.message };
+      return { success: false, error: "Failed to save assessment. Please try again." };
     }
 
     // Log activity for streak tracking
-    await logActivity({
+    logActivity({
       activityType: "skill_assessment",
       targetId: params.categoryId,
       metadata: { score: params.score, total: params.total },
-    });
+    }).catch((err) => console.error("Activity log error:", err));
 
     return { success: true };
   } catch (err) {
     console.error("saveAssessmentResult error:", err);
-    return { success: false, error: "Unexpected error" };
+    return { success: false, error: "Unexpected error occurred." };
   }
 }
 

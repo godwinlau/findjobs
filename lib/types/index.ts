@@ -2,12 +2,15 @@
 
 // ─── Profile & Auth types ───
 
-export type UserRole = "job_seeker" | "employer";
+export type UserRole = "job_seeker";
 export type WorkPreference = "onsite" | "hybrid" | "remote" | "any";
 export type EmploymentType = "full_time" | "part_time" | "contract" | "freelance" | "internship" | "any";
-export type ProfileExperienceLevel = "fresh_graduate" | "junior" | "mid" | "senior";
+export type ProfileExperienceLevel =
+  | "fresh_graduate" | "junior" | "mid" | "senior"  // legacy values
+  | "less_than_1yr" | "1_to_3yr" | "3_to_5yr" | "5_to_10yr" | "10_plus";
 export type ProfileEducationLevel = "high_school" | "vocational" | "bachelors" | "masters" | "doctorate";
 export type ActivityType = "job_view" | "job_apply" | "job_save" | "profile_update" | "skill_assessment";
+export type SkillProficiency = "beginner" | "intermediate" | "advanced";
 
 export interface Profile {
   id: string;
@@ -19,6 +22,8 @@ export interface Profile {
   work_preference: WorkPreference;
   employment_type: EmploymentType;
   skills: string[];
+  skills_learning?: string[];
+  skill_proficiencies: Record<string, SkillProficiency>;
   experience_level: ProfileExperienceLevel;
   years_of_experience: number;
   education: ProfileEducationLevel | null;
@@ -27,6 +32,7 @@ export interface Profile {
   desired_salary_min: number | null;
   desired_salary_max: number | null;
   preferred_industries: string[];
+  willing_to_relocate: boolean;
   onboarding_completed: boolean;
   onboarding_step: number;
   profile_completion: number;
@@ -52,33 +58,18 @@ export interface Job {
   location: string;
   type: string;
   match: number;
+  matchRange?: [number, number];
   posted: string;
   applicants: number;
   closing: string | null;
   responseTime: string | null;
   highlight: string | null;
+  matchedSkills?: string[];
   isTop: boolean;
   desc: string;
   applyUrl: string;
   source: string;
   education: string | null;
-}
-
-export interface Activity {
-  type: "view" | "match" | "tip" | "status" | "milestone";
-  text: string;
-  time: string;
-  icon: string;
-}
-
-export interface Application {
-  company: string;
-  role: string;
-  status: "Applied" | "Viewed" | "Interview" | "Offer" | "Rejected";
-  color: string;
-  bg: string;
-  detail: string;
-  urgent: boolean;
 }
 
 export interface UserProfile {
@@ -110,44 +101,4 @@ export interface PaginatedJobs {
   pageSize: number;
   totalPages: number;
   isMatchFiltered: boolean;
-}
-
-// ─── Employer types ───
-
-export interface EmployerJobRow {
-  id: string;
-  title: string;
-  company_name: string;
-  salary_min: number | null;
-  salary_max: number | null;
-  location_city: string | null;
-  location_area: string | null;
-  is_active: boolean;
-  view_count: number;
-  applicant_count: number;
-  posted_at: string;
-  expires_at: string | null;
-}
-
-export interface JobFormData {
-  company_name: string;
-  company_logo_url: string;
-  title: string;
-  description: string;
-  apply_url: string;
-  experience_level: string;
-  skills_required: string[];
-  salary_min: number | null;
-  salary_max: number | null;
-  location_city: string;
-  location_area: string;
-  work_setup: string;
-  job_type: string;
-  expires_at: string;
-}
-
-export interface EmployerStats {
-  activeJobs: number;
-  totalViews: number;
-  totalApplicants: number;
 }

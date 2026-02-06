@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runIngestionBatch, cleanupExpiredJobs } from "@/lib/ingest";
+import { runJSearchIngestion } from "@/lib/jsearch";
 import { resetStaleStreaks } from "@/lib/streaks";
 import { TOTAL_BATCHES } from "@/lib/queries";
 
@@ -44,6 +45,9 @@ export async function GET(req: NextRequest) {
       });
     }
 
+    // Run JSearch ingestion (skips silently if RAPIDAPI_KEY not set)
+    const jsearch = await runJSearchIngestion();
+
     // Run cleanup after ingestion (combines both cron jobs into one)
     const cleanup = await cleanupExpiredJobs();
 
@@ -53,11 +57,20 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       batchesRun: TOTAL_BATCHES,
-      totalFetched,
-      totalInserted,
-      totalDuplicates,
-      totalErrors,
+      totalFetched: totalFetched + jsearch.totalFetched,
+      totalInserted: totalInserted + jsearch.totalInserted,
+      totalDuplicates: totalDuplicates + jsearch.totalDuplicates,
+      totalErrors: totalErrors + jsearch.totalErrors,
       batches: batchResults,
+      jsearch: {
+        queries: jsearch.queries,
+        requestsUsed: jsearch.requestsUsed,
+        fetched: jsearch.totalFetched,
+        inserted: jsearch.totalInserted,
+        duplicates: jsearch.totalDuplicates,
+        errors: jsearch.totalErrors,
+        durationMs: jsearch.durationMs,
+      },
       cleanup: { deactivated: cleanup.deactivated },
       streaks: { reset: streaks.reset },
     });

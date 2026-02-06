@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { calculateCompletion } from "@/lib/profile";
 import { logActivity } from "@/lib/actions/activity";
+import { validateProfileUpdate } from "@/lib/validation/schemas";
 import type { Profile } from "@/lib/types";
 
 const ALLOWED_FIELDS = [
@@ -11,19 +12,29 @@ const ALLOWED_FIELDS = [
   "preferred_city",
   "work_preference",
   "skills",
+  "skills_learning",
+  "skill_proficiencies",
   "experience_level",
   "years_of_experience",
   "education",
+  "school",
   "field_of_study",
   "desired_salary_min",
   "desired_salary_max",
   "employment_type",
   "preferred_industries",
+  "willing_to_relocate",
 ] as const;
 
 export async function updateProfile(
   data: Partial<Profile>
 ): Promise<{ error?: string }> {
+  // Validate input
+  const validation = validateProfileUpdate(data);
+  if (!validation.success) {
+    return { error: validation.error };
+  }
+
   const supabase = await createClient();
 
   const {
@@ -35,13 +46,13 @@ export async function updateProfile(
   }
 
   // Fetch current profile to merge for completion calculation
-  const { data: currentProfile } = await supabase
+  const { data: currentProfile, error: fetchError } = await supabase
     .from("profiles")
     .select("*")
     .eq("id", user.id)
     .single();
 
-  if (!currentProfile) {
+  if (fetchError || !currentProfile) {
     return { error: "Profile not found." };
   }
 
@@ -72,11 +83,14 @@ export async function updateProfile(
     .eq("id", user.id);
 
   if (error) {
-    return { error: error.message };
+    console.error("Profile update error:", error);
+    return { error: "Failed to update profile. Please try again." };
   }
 
   // Fire-and-forget: log profile update activity
-  logActivity({ activityType: "profile_update", targetId: "profile" });
+  logActivity({ activityType: "profile_update", targetId: "profile" }).catch(
+    (err) => console.error("Activity log error:", err)
+  );
 
   return {};
 }

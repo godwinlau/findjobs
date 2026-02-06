@@ -263,9 +263,9 @@ export function AssessmentQuizModal({
                       border = colors.successBorder;
                       textColor = colors.success;
                     } else if (isSelected && !isCorrect) {
-                      bg = "#FEF2F2";
-                      border = "#FECACA";
-                      textColor = "#DC2626";
+                      bg = "var(--hb-warning-bg)";
+                      border = "var(--hb-warning-border)";
+                      textColor = colors.live;
                     }
                   } else if (isSelected) {
                     bg = colors.primaryBg;
@@ -305,7 +305,7 @@ export function AssessmentQuizModal({
                               ? showExplanation
                                 ? isCorrect
                                   ? colors.success
-                                  : "#DC2626"
+                                  : "var(--hb-live)"
                                 : colors.primary
                               : "transparent",
                           display: "flex",
@@ -313,7 +313,7 @@ export function AssessmentQuizModal({
                           justifyContent: "center",
                           flexShrink: 0,
                           fontSize: 10,
-                          color: "#fff",
+                          color: colors.inv,
                           fontWeight: 700,
                           marginTop: 1,
                         }}

@@ -4,49 +4,62 @@ import { colors } from "@/lib/constants/colors";
 
 interface MatchIndicatorProps {
   percentage: number;
+  matchRange?: [number, number];
   showLabel?: boolean;
+  highlight?: string;
+  size?: "sm" | "md" | "lg";
 }
 
-export function MatchIndicator({ percentage, showLabel = true }: MatchIndicatorProps) {
-  const getColor = () => {
-    if (percentage >= 75) return colors.success;
-    if (percentage >= 65) return colors.accent;
-    return colors.textMuted;
+export function MatchIndicator({
+  percentage,
+  matchRange,
+  showLabel = true,
+  highlight,
+  size = "md",
+}: MatchIndicatorProps) {
+  const sizeStyles = {
+    sm: { padding: "3px 8px", fontSize: 10 },
+    md: { padding: "4px 10px", fontSize: 11 },
+    lg: { padding: "6px 12px", fontSize: 12 },
   };
 
-  const getBg = () => {
-    if (percentage >= 75) return colors.successBg;
-    return colors.surfaceAlt;
-  };
+  const s = sizeStyles[size];
 
   return (
-    <div
-      style={{
-        padding: "4px 9px",
-        borderRadius: 6,
-        background: getBg(),
-        display: "flex",
-        alignItems: "center",
-        gap: 4,
-      }}
-    >
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
       <div
         style={{
-          width: 6,
-          height: 6,
-          borderRadius: "50%",
-          background: getColor(),
+          padding: s.padding,
+          background: "#0A0A0A",
+          color: "#F5F5F0",
+          display: "flex",
+          alignItems: "center",
+          gap: 4,
+          fontFamily: "var(--font-mono)",
+          fontWeight: 700,
+          fontSize: s.fontSize,
+          textTransform: "uppercase" as const,
         }}
-      />
-      {showLabel && (
+      >
+        {showLabel && (
+          <span>
+            {matchRange ? `${matchRange[0]}–${matchRange[1]}%` : `${percentage}% MATCH`}
+          </span>
+        )}
+      </div>
+      {highlight && (
         <span
           style={{
-            fontSize: 12,
-            fontWeight: 600,
-            color: percentage >= 75 ? colors.success : colors.textSec,
+            fontSize: 10,
+            fontFamily: "var(--font-mono)",
+            color: "#888",
+            maxWidth: 120,
+            textAlign: "right",
+            lineHeight: 1.3,
+            textTransform: "uppercase" as const,
           }}
         >
-          {percentage}%
+          {highlight}
         </span>
       )}
     </div>

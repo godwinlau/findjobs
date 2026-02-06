@@ -7,9 +7,10 @@ import type { SkillROI } from "@/lib/types/learn";
 
 interface SkillROISectionProps {
   skills: SkillROI[];
+  youtubeMaps?: { clusters: Record<string, { url: string; channel: string }>; skills: Record<string, { url: string; channel: string }> };
 }
 
-export function SkillROISection({ skills }: SkillROISectionProps) {
+export function SkillROISection({ skills, youtubeMaps }: SkillROISectionProps) {
   if (skills.length === 0) return null;
 
   const displaySkills = skills.slice(0, 8);
@@ -32,6 +33,7 @@ export function SkillROISection({ skills }: SkillROISectionProps) {
             key={skill.skill}
             item={skill}
             maxMatches={maxMatches}
+            youtubeMaps={youtubeMaps}
           />
         ))}
         {/* Remove last border */}

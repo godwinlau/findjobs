@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowUpRight } from "@phosphor-icons/react";
 import { colors } from "@/lib/constants/colors";
 import { Badge, Button } from "@/components/ui";
 import type { QuickWin } from "@/lib/types/learn";
@@ -50,8 +51,17 @@ export function QuickWinItem({ win }: QuickWinItemProps) {
         rel="noopener noreferrer"
         style={{ textDecoration: "none", flexShrink: 0 }}
       >
-        <Button variant="ghost" size="sm">
-          Learn →
+        <Button
+          variant="ghost"
+          size="sm"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
+          }}
+        >
+          {win.resourceLabel}
+          <ArrowUpRight size={13} weight="bold" />
         </Button>
       </a>
     </div>

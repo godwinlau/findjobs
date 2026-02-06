@@ -4,31 +4,116 @@ import { useState, useMemo } from "react";
 import { colors } from "@/lib/constants/colors";
 import { SKILL_CATEGORIES } from "@/lib/constants/onboarding";
 import { SKILL_AFFINITIES } from "@/lib/constants/skillAffinities";
+import { CATEGORY_SKILL_MAP } from "@/lib/constants/categorySkillMap";
+import { SKILL_CLUSTERS } from "@/lib/constants/skillTaxonomy";
+import type { SkillProficiency } from "@/lib/types";
 
 interface SkillChipSelectorProps {
   selected: string[];
   onChange: (skills: string[]) => void;
+  proficiencies?: Record<string, SkillProficiency>;
+  onProficiencyChange?: (proficiencies: Record<string, SkillProficiency>) => void;
+  selectedCategories?: string[];
   maxSkills?: number;
   minSkills?: number;
+  showProficiency?: boolean;
+  excludeSkills?: string[];
+  variant?: "default" | "learning";
+}
+
+const PROFICIENCY_OPTIONS: { value: SkillProficiency; label: string; short: string }[] = [
+  { value: "beginner", label: "Beginner", short: "B" },
+  { value: "intermediate", label: "Intermediate", short: "I" },
+  { value: "advanced", label: "Advanced", short: "A" },
+];
+
+const DEFAULT_VISIBLE = 8;
+
+// Build a lookup from cluster name → icon
+const clusterIconMap: Record<string, string> = {};
+for (const c of SKILL_CLUSTERS) {
+  clusterIconMap[c.name] = c.icon;
 }
 
 export function SkillChipSelector({
   selected,
   onChange,
+  proficiencies = {},
+  onProficiencyChange,
+  selectedCategories = [],
   maxSkills = 10,
-  minSkills = 3,
+  minSkills = 5,
+  showProficiency = false,
+  excludeSkills = [],
+  variant = "default",
 }: SkillChipSelectorProps) {
+  const isLearning = variant === "learning";
+
+  // Colors for learning variant
+  const variantColors = isLearning
+    ? {
+        selected: colors.warning,
+        selectedBg: colors.warningBg,
+        selectedBorder: colors.warningBorder,
+      }
+    : {
+        selected: colors.primary,
+        selectedBg: colors.primaryBg,
+        selectedBorder: colors.primaryBorder,
+      };
   const [search, setSearch] = useState("");
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
 
   function toggleSkill(skill: string) {
     if (selected.includes(skill)) {
       onChange(selected.filter((s) => s !== skill));
+      // Remove proficiency when deselecting
+      if (onProficiencyChange) {
+        const newProf = { ...proficiencies };
+        delete newProf[skill];
+        onProficiencyChange(newProf);
+      }
     } else if (selected.length < maxSkills) {
       onChange([...selected, skill]);
+      // Default to intermediate
+      if (onProficiencyChange && !proficiencies[skill]) {
+        onProficiencyChange({ ...proficiencies, [skill]: "intermediate" });
+      }
     }
   }
 
+  function setProficiency(skill: string, level: SkillProficiency) {
+    if (onProficiencyChange) {
+      onProficiencyChange({ ...proficiencies, [skill]: level });
+    }
+  }
+
+  function toggleCategory(category: string) {
+    setExpandedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(category)) {
+        next.delete(category);
+      } else {
+        next.add(category);
+      }
+      return next;
+    });
+  }
+
   const atMax = selected.length >= maxSkills;
+
+  // Compute smart defaults from selected categories
+  const categoryDefaults = useMemo(() => {
+    if (selectedCategories.length === 0) return [];
+    const all = new Set<string>();
+    for (const cat of selectedCategories) {
+      const skills = CATEGORY_SKILL_MAP[cat];
+      if (skills) {
+        for (const s of skills) all.add(s);
+      }
+    }
+    return Array.from(all).filter((s) => !selected.includes(s)).slice(0, 8);
+  }, [selectedCategories, selected]);
 
   // Compute suggested skills based on affinity scoring
   const suggestions = useMemo(() => {
@@ -54,39 +139,57 @@ export function SkillChipSelector({
   // Counter color
   let counterColor: string = colors.textMuted;
   if (selected.length < minSkills) counterColor = colors.live;
-  else if (selected.length >= maxSkills) counterColor = colors.primary;
+  else if (selected.length >= maxSkills) counterColor = variantColors.selected;
 
   const searchLower = search.toLowerCase();
 
+  // Exclude set for filtering
+  const excludeSet = new Set(excludeSkills);
+
   return (
     <div style={{ marginBottom: 20 }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 8,
-        }}
-      >
-        <label
+      {!isLearning && (
+        <div
           style={{
-            fontSize: 13,
-            fontWeight: 500,
-            color: colors.text,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: 8,
           }}
         >
-          Skills *
-        </label>
-        <span
-          style={{
-            fontSize: 12,
-            fontWeight: 600,
-            color: counterColor,
-          }}
-        >
-          {selected.length} / {maxSkills} selected
-        </span>
-      </div>
+          <label
+            style={{
+              fontSize: 13,
+              fontWeight: 500,
+              color: colors.text,
+            }}
+          >
+            Skills *
+          </label>
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              color: counterColor,
+            }}
+          >
+            {selected.length} / {maxSkills} selected
+          </span>
+        </div>
+      )}
+      {isLearning && selected.length > 0 && (
+        <div style={{ marginBottom: 8 }}>
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              color: variantColors.selected,
+            }}
+          >
+            {selected.length} skill{selected.length !== 1 ? "s" : ""} in progress
+          </span>
+        </div>
+      )}
 
       <input
         type="text"
@@ -107,39 +210,125 @@ export function SkillChipSelector({
         }}
       />
 
+      {/* Selected skills with proficiency toggle */}
       {selected.length > 0 && (
         <div style={{ marginBottom: 12 }}>
           <span style={{ fontSize: 11, color: colors.textMuted, marginBottom: 4, display: "block" }}>
             Selected ({selected.length})
           </span>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {selected.map((skill) => (
+              <div
+                key={skill}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => toggleSkill(skill)}
+                  style={{
+                    padding: "5px 10px",
+                    borderRadius: 6,
+                    border: `1px solid ${variantColors.selected}`,
+                    background: variantColors.selectedBg,
+                    color: variantColors.selected,
+                    fontSize: 12,
+                    fontWeight: 500,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 4,
+                    flexShrink: 0,
+                  }}
+                >
+                  {isLearning ? "📚 " : ""}{skill}
+                  <span style={{ fontSize: 14, lineHeight: 1 }}>×</span>
+                </button>
+                {showProficiency && onProficiencyChange && (
+                  <div style={{ display: "flex", gap: 2 }}>
+                    {PROFICIENCY_OPTIONS.map((opt) => {
+                      const isActive = (proficiencies[skill] ?? "intermediate") === opt.value;
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          title={opt.label}
+                          onClick={() => setProficiency(skill, opt.value)}
+                          style={{
+                            width: 26,
+                            height: 26,
+                            borderRadius: 5,
+                            border: `1px solid ${isActive ? colors.primary : colors.border}`,
+                            background: isActive ? colors.primaryBg : colors.surface,
+                            color: isActive ? colors.primary : colors.textMuted,
+                            fontSize: 10,
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            transition: "all 0.1s ease",
+                          }}
+                        >
+                          {opt.short}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Category-based smart defaults */}
+      {categoryDefaults.length > 0 && !search && selected.length === 0 && (
+        <div style={{ marginBottom: 14 }}>
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              color: colors.primary,
+              textTransform: "uppercase",
+              letterSpacing: "0.04em",
+              marginBottom: 6,
+              display: "block",
+            }}
+          >
+            Recommended for your categories
+          </span>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {categoryDefaults.map((skill) => (
               <button
                 key={skill}
                 type="button"
                 onClick={() => toggleSkill(skill)}
+                disabled={atMax}
                 style={{
                   padding: "5px 10px",
                   borderRadius: 6,
-                  border: `1px solid ${colors.primary}`,
-                  background: colors.primaryBg,
-                  color: colors.primary,
+                  border: `1px solid ${atMax ? colors.border : colors.primaryBorder}`,
+                  background: atMax ? colors.surfaceAlt : colors.primaryBg,
+                  color: atMax ? colors.textMuted : colors.primary,
                   fontSize: 12,
                   fontWeight: 500,
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 4,
+                  cursor: atMax ? "not-allowed" : "pointer",
+                  opacity: atMax ? 0.5 : 1,
+                  transition: "all 0.15s ease",
                 }}
               >
-                {skill}
-                <span style={{ fontSize: 14, lineHeight: 1 }}>×</span>
+                + {skill}
               </button>
             ))}
           </div>
         </div>
       )}
 
+      {/* Affinity suggestions */}
       {suggestions.length > 0 && !search && (
         <div style={{ marginBottom: 14 }}>
           <span
@@ -182,12 +371,20 @@ export function SkillChipSelector({
         </div>
       )}
 
+      {/* All skill categories (12 clusters, collapsible) */}
       {Object.entries(SKILL_CATEGORIES).map(([category, skills]) => {
+        // Filter out excluded skills first, then apply search
+        const availableSkills = skills.filter((s) => !excludeSet.has(s));
         const filteredSkills = search
-          ? skills.filter((s) => s.toLowerCase().includes(searchLower))
-          : skills;
+          ? availableSkills.filter((s) => s.toLowerCase().includes(searchLower))
+          : availableSkills;
 
         if (filteredSkills.length === 0) return null;
+
+        const isExpanded = expandedCategories.has(category) || !!search;
+        const visibleSkills = isExpanded ? filteredSkills : filteredSkills.slice(0, DEFAULT_VISIBLE);
+        const hasMore = !isExpanded && filteredSkills.length > DEFAULT_VISIBLE;
+        const icon = clusterIconMap[category] ?? "";
 
         return (
           <div key={category} style={{ marginBottom: 14 }}>
@@ -202,10 +399,14 @@ export function SkillChipSelector({
                 display: "block",
               }}
             >
+              {icon && <span style={{ marginRight: 4 }}>{icon}</span>}
               {category}
+              <span style={{ fontWeight: 400, textTransform: "none", marginLeft: 4 }}>
+                ({filteredSkills.length})
+              </span>
             </span>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {filteredSkills.map((skill) => {
+              {visibleSkills.map((skill) => {
                 const isSelected = selected.includes(skill);
                 const isDisabled = !isSelected && atMax;
                 return (
@@ -217,14 +418,14 @@ export function SkillChipSelector({
                     style={{
                       padding: "5px 10px",
                       borderRadius: 6,
-                      border: `1px solid ${isSelected ? colors.primary : colors.border}`,
+                      border: `1px solid ${isSelected ? variantColors.selected : colors.border}`,
                       background: isSelected
-                        ? colors.primaryBg
+                        ? variantColors.selectedBg
                         : isDisabled
                           ? colors.surfaceAlt
                           : colors.surface,
                       color: isSelected
-                        ? colors.primary
+                        ? variantColors.selected
                         : isDisabled
                           ? colors.textMuted
                           : colors.textSec,
@@ -235,10 +436,48 @@ export function SkillChipSelector({
                       transition: "all 0.15s ease",
                     }}
                   >
-                    {skill}
+                    {isLearning && isSelected ? "📚 " : ""}{skill}
                   </button>
                 );
               })}
+              {hasMore && (
+                <button
+                  type="button"
+                  onClick={() => toggleCategory(category)}
+                  style={{
+                    padding: "5px 10px",
+                    borderRadius: 6,
+                    border: `1px dashed ${colors.border}`,
+                    background: "transparent",
+                    color: colors.primary,
+                    fontSize: 11,
+                    fontWeight: 500,
+                    cursor: "pointer",
+                    transition: "all 0.15s ease",
+                  }}
+                >
+                  +{filteredSkills.length - DEFAULT_VISIBLE} more
+                </button>
+              )}
+              {isExpanded && !search && filteredSkills.length > DEFAULT_VISIBLE && (
+                <button
+                  type="button"
+                  onClick={() => toggleCategory(category)}
+                  style={{
+                    padding: "5px 10px",
+                    borderRadius: 6,
+                    border: `1px dashed ${colors.border}`,
+                    background: "transparent",
+                    color: colors.textMuted,
+                    fontSize: 11,
+                    fontWeight: 500,
+                    cursor: "pointer",
+                    transition: "all 0.15s ease",
+                  }}
+                >
+                  Show less
+                </button>
+              )}
             </div>
           </div>
         );

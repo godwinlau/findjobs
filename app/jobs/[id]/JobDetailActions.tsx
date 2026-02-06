@@ -8,9 +8,10 @@ import { logActivity } from "@/lib/actions/activity";
 interface JobDetailActionsProps {
   jobId: string;
   applyUrl: string;
+  matchPercent?: number;
 }
 
-export function JobDetailActions({ jobId, applyUrl }: JobDetailActionsProps) {
+export function JobDetailActions({ jobId, applyUrl, matchPercent }: JobDetailActionsProps) {
   const { isSaved, toggleSave } = useSavedJobs();
   const saved = isSaved(jobId);
 
@@ -20,7 +21,11 @@ export function JobDetailActions({ jobId, applyUrl }: JobDetailActionsProps) {
         href={applyUrl}
         target="_blank"
         rel="noopener noreferrer"
-        onClick={() => logActivity({ activityType: "job_apply", targetId: jobId })}
+        onClick={() => logActivity({
+          activityType: "job_apply",
+          targetId: jobId,
+          metadata: matchPercent !== undefined ? { matchPercent } : undefined,
+        })}
         style={{
           padding: "12px 32px",
           borderRadius: 8,
@@ -50,7 +55,7 @@ export function JobDetailActions({ jobId, applyUrl }: JobDetailActionsProps) {
           height: 44,
           borderRadius: 10,
           border: `1px solid ${saved ? colors.live : colors.border}`,
-          background: saved ? "#FEF2F2" : colors.surface,
+          background: saved ? "var(--hb-warning-bg)" : colors.surface,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",

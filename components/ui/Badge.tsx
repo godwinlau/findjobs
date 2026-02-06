@@ -28,12 +28,14 @@ export function Badge({ children, variant = "primary", size = "sm" }: BadgeProps
     <span
       style={{
         padding: s.padding,
-        borderRadius: 6,
         fontSize: s.fontSize,
-        fontWeight: 600,
-        background: v.bg,
+        fontWeight: 700,
+        fontFamily: "var(--font-mono)",
+        textTransform: "uppercase" as const,
+        letterSpacing: "0.04em",
+        background: "transparent",
         color: v.color,
-        border: `1px solid ${v.border}`,
+        border: `1.5px solid ${v.border}`,
         whiteSpace: "nowrap",
       }}
     >

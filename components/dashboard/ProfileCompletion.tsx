@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { colors } from "@/lib/constants/colors";
-import { Card, Button } from "@/components/ui";
+import { ArrowRight, CheckCircle, Lightning, Info, WarningCircle } from "@phosphor-icons/react";
 import type { ProfileGap } from "@/lib/profile";
 
 interface ProfileCompletionProps {
@@ -14,22 +13,41 @@ interface ProfileCompletionProps {
 
 const MAX_VISIBLE_GAPS = 3;
 
-const IMPACT_STYLES: Record<ProfileGap["impact"], { bg: string; color: string; label: string }> = {
-  high: { bg: colors.primaryBg, color: colors.primary, label: "HIGH IMPACT" },
-  medium: { bg: colors.warningBg, color: colors.warning, label: "MEDIUM" },
-  low: { bg: colors.surfaceAlt, color: colors.textMuted, label: "LOW" },
+const IMPACT_CONFIG: Record<ProfileGap["impact"], { icon: React.ReactNode; bg: string; color: string; borderColor: string; label: string }> = {
+  high: {
+    icon: <Lightning size={12} weight="fill" />,
+    bg: "transparent",
+    color: "#FBBF24",
+    borderColor: "#FBBF24",
+    label: "HIGH IMPACT",
+  },
+  medium: {
+    icon: <WarningCircle size={12} weight="fill" />,
+    bg: "transparent",
+    color: "#888",
+    borderColor: "#888",
+    label: "MEDIUM",
+  },
+  low: {
+    icon: <Info size={12} weight="fill" />,
+    bg: "transparent",
+    color: "#666",
+    borderColor: "#666",
+    label: "LOW",
+  },
 };
 
-function ProgressRing({ percentage, size, strokeWidth, color }: {
+function ProgressRing({ percentage, size, strokeWidth }: {
   percentage: number;
   size: number;
   strokeWidth: number;
-  color: string;
 }) {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference * ((100 - percentage) / 100);
   const center = size / 2;
+
+  const color: string = percentage >= 80 ? "#6EE7B7" : percentage >= 50 ? "#FBBF24" : "#EF4444";
 
   return (
     <div style={{ position: "relative", width: size, height: size, flexShrink: 0 }}>
@@ -39,7 +57,7 @@ function ProgressRing({ percentage, size, strokeWidth, color }: {
           cy={center}
           r={radius}
           fill="none"
-          stroke={colors.border}
+          stroke="rgba(10,10,10,0.08)"
           strokeWidth={strokeWidth}
         />
         <circle
@@ -49,10 +67,11 @@ function ProgressRing({ percentage, size, strokeWidth, color }: {
           fill="none"
           stroke={color}
           strokeWidth={strokeWidth}
-          strokeLinecap="round"
+          strokeLinecap="butt"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           transform={`rotate(-90 ${center} ${center})`}
+          style={{ transition: "stroke-dashoffset 0.5s ease" }}
         />
       </svg>
       <span
@@ -62,9 +81,11 @@ function ProgressRing({ percentage, size, strokeWidth, color }: {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: size * 0.24,
+          fontSize: size * 0.26,
           fontWeight: 800,
-          color: colors.text,
+          color: "#0A0A0A",
+          fontFamily: "var(--font-mono)",
+          fontVariantNumeric: "tabular-nums",
         }}
       >
         {percentage}
@@ -79,45 +100,90 @@ export function ProfileCompletion({
   profileComplete,
   gaps,
 }: ProfileCompletionProps) {
-  // ── Complete state: compact bar ──
   if (profileComplete) {
     return (
-      <Card
+      <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           flexWrap: "wrap",
           gap: 12,
-          padding: "12px 20px",
+          padding: "16px 20px",
           marginBottom: 20,
+          background: "#F5F5F0",
+          border: "2px solid #0A0A0A",
+          animation: "slam 0.4s cubic-bezier(.22,1,.36,1) 0.06s both",
         }}
-        animationDelay={0.06}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <ProgressRing percentage={100} size={30} strokeWidth={2.5} color={colors.success} />
-          <span style={{ fontSize: 12, color: colors.textSec }}>
-            <strong style={{ color: colors.text }}>Profile complete</strong> —{" "}
-            {matchesUnlocked} job{matchesUnlocked !== 1 ? "s" : ""} matched to your profile
-          </span>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <div
+            style={{
+              width: 36,
+              height: 36,
+              background: "#0A0A0A",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <CheckCircle size={20} weight="fill" color="#FBBF24" />
+          </div>
+          <div>
+            <span style={{ fontSize: 12, fontWeight: 700, color: "#0A0A0A", fontFamily: "var(--font-mono)", textTransform: "uppercase" as const, letterSpacing: "0.04em" }}>
+              Profile complete
+            </span>
+            <span style={{ fontSize: 11, color: "#888", marginLeft: 8, fontFamily: "var(--font-mono)", textTransform: "uppercase" as const }}>
+              {matchesUnlocked} job{matchesUnlocked !== 1 ? "s" : ""} matched
+            </span>
+          </div>
         </div>
-        <Link href="/profile" style={{ textDecoration: "none" }}>
-          <Button variant="secondary" size="sm">
-            View profile →
-          </Button>
+        <Link
+          href="/profile"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            padding: "8px 14px",
+            fontSize: 11,
+            fontWeight: 700,
+            fontFamily: "var(--font-mono)",
+            textTransform: "uppercase" as const,
+            letterSpacing: "0.04em",
+            background: "transparent",
+            color: "#0A0A0A",
+            textDecoration: "none",
+            border: "2px solid #0A0A0A",
+            transition: "all 0.15s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "#0A0A0A";
+            e.currentTarget.style.color = "#F5F5F0";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "transparent";
+            e.currentTarget.style.color = "#0A0A0A";
+          }}
+        >
+          View profile
+          <ArrowRight size={14} weight="bold" />
         </Link>
-      </Card>
+      </div>
     );
   }
 
-  // ── Incomplete state: expanded card with gap analysis ──
   const visibleGaps = gaps.slice(0, MAX_VISIBLE_GAPS);
   const remainingCount = gaps.length - visibleGaps.length;
 
   return (
-    <Card
-      style={{ padding: 0, marginBottom: 20, overflow: "hidden" }}
-      animationDelay={0.06}
+    <div
+      style={{
+        marginBottom: 20,
+        background: "#F5F5F0",
+        border: "2px solid #0A0A0A",
+        overflow: "hidden",
+        animation: "slam 0.4s cubic-bezier(.22,1,.36,1) 0.06s both",
+      }}
     >
       {/* Header */}
       <div
@@ -125,18 +191,19 @@ export function ProfileCompletion({
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 16,
+          gap: 18,
+          padding: "20px 24px",
         }}
       >
-        <ProgressRing percentage={percentage} size={52} strokeWidth={3.5} color={colors.primary} />
-        <div>
-          <div style={{ fontSize: 15, fontWeight: 700, color: colors.text }}>
-            Profile Strength: {percentage}%
+        <ProgressRing percentage={percentage} size={56} strokeWidth={4} />
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#0A0A0A", fontFamily: "var(--font-mono)", textTransform: "uppercase" as const, letterSpacing: "0.06em" }}>
+            Profile Strength
           </div>
-          <div style={{ fontSize: 13, color: colors.textSec, marginTop: 2 }}>
+          <div style={{ fontSize: 12, color: "#888", marginTop: 3, fontFamily: "var(--font-mono)", textTransform: "uppercase" as const }}>
             {visibleGaps.length > 0
-              ? `${gaps.length} area${gaps.length !== 1 ? "s" : ""} to improve for better matches`
-              : "Looking good — keep your profile up to date"}
+              ? `${gaps.length} area${gaps.length !== 1 ? "s" : ""} to improve`
+              : "Looking good"}
           </div>
         </div>
       </div>
@@ -145,44 +212,52 @@ export function ProfileCompletion({
       {visibleGaps.length > 0 && (
         <div
           style={{
-            borderTop: `1px solid ${colors.border}`,
-            padding: "4px 24px 8px",
+            borderTop: "2px solid #0A0A0A",
+            padding: "8px 16px",
           }}
         >
           {visibleGaps.map((gap, i) => {
-            const style = IMPACT_STYLES[gap.impact];
+            const config = IMPACT_CONFIG[gap.impact];
             return (
               <div
                 key={gap.field}
                 style={{
                   display: "flex",
-                  gap: 12,
+                  gap: 14,
                   alignItems: "flex-start",
-                  padding: "12px 0",
-                  borderBottom: i < visibleGaps.length - 1 ? `1px solid ${colors.border}` : "none",
+                  padding: "14px 8px",
+                  borderBottom: i < visibleGaps.length - 1 ? "1px solid rgba(10,10,10,0.08)" : "none",
                 }}
               >
-                <span
+                {/* Impact badge */}
+                <div
                   style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4,
                     fontSize: 9,
                     fontWeight: 700,
+                    fontFamily: "var(--font-mono)",
                     letterSpacing: "0.04em",
-                    padding: "3px 7px",
-                    borderRadius: 4,
-                    background: style.bg,
-                    color: style.color,
+                    textTransform: "uppercase" as const,
+                    padding: "4px 8px",
+                    background: config.bg,
+                    color: config.color,
+                    border: `1.5px solid ${config.borderColor}`,
                     whiteSpace: "nowrap",
-                    marginTop: 1,
                     flexShrink: 0,
                   }}
                 >
-                  {style.label}
-                </span>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: colors.text }}>
+                  {config.icon}
+                  {config.label}
+                </div>
+
+                {/* Gap text */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#0A0A0A" }}>
                     {gap.label}
                   </div>
-                  <div style={{ fontSize: 12, color: colors.textMuted, marginTop: 2, lineHeight: 1.4 }}>
+                  <div style={{ fontSize: 12, color: "#888", marginTop: 3, lineHeight: 1.5 }}>
                     {gap.description}
                   </div>
                 </div>
@@ -196,22 +271,52 @@ export function ProfileCompletion({
       <div
         className="responsive-row completion-footer-gap profile-completion-footer"
         style={{
+          display: "flex",
           justifyContent: "space-between",
-          borderTop: `1px solid ${colors.border}`,
-          background: colors.surfaceAlt,
+          alignItems: "center",
+          padding: "14px 24px",
+          borderTop: "2px solid #0A0A0A",
+          background: "rgba(10,10,10,0.03)",
         }}
       >
-        <span style={{ fontSize: 12, color: colors.textMuted }}>
+        <span style={{ fontSize: 11, color: "#888", fontFamily: "var(--font-mono)", textTransform: "uppercase" as const }}>
           {remainingCount > 0
-            ? `+ ${remainingCount} more area${remainingCount !== 1 ? "s" : ""} to improve`
-            : "Each improvement helps surface better job matches"}
+            ? `+ ${remainingCount} more area${remainingCount !== 1 ? "s" : ""}`
+            : "Complete for better matches"}
         </span>
-        <Link href="/profile" style={{ textDecoration: "none" }}>
-          <Button variant="primary" size="sm">
-            Complete profile →
-          </Button>
+        <Link
+          href="/profile"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            padding: "10px 18px",
+            fontSize: 12,
+            fontWeight: 700,
+            fontFamily: "var(--font-mono)",
+            textTransform: "uppercase" as const,
+            letterSpacing: "0.04em",
+            background: "#0A0A0A",
+            color: "#F5F5F0",
+            textDecoration: "none",
+            border: "2px solid #0A0A0A",
+            transition: "all 0.15s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "#FBBF24";
+            e.currentTarget.style.color = "#0A0A0A";
+            e.currentTarget.style.borderColor = "#FBBF24";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "#0A0A0A";
+            e.currentTarget.style.color = "#F5F5F0";
+            e.currentTarget.style.borderColor = "#0A0A0A";
+          }}
+        >
+          Complete profile
+          <ArrowRight size={14} weight="bold" />
         </Link>
       </div>
-    </Card>
+    </div>
   );
 }

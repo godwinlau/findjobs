@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { validateLogActivity } from "@/lib/validation/schemas";
 import type { ActivityType } from "@/lib/types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -30,6 +31,13 @@ export async function logActivity({
   metadata?: Record<string, unknown>;
 }): Promise<void> {
   try {
+    // Validate input
+    const validation = validateLogActivity({ activityType, targetId, metadata });
+    if (!validation.success) {
+      console.error("Activity validation failed:", validation.error);
+      return;
+    }
+
     const supabase = await createClient();
 
     const {
@@ -66,36 +74,47 @@ async function updateStreak(
   userId: string,
   todayPHT: string
 ): Promise<void> {
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("current_streak, longest_streak, last_activity_date")
-    .eq("id", userId)
-    .single();
+  try {
+    const { data: profile, error: fetchError } = await supabase
+      .from("profiles")
+      .select("current_streak, longest_streak, last_activity_date")
+      .eq("id", userId)
+      .single();
 
-  if (!profile) return;
+    if (fetchError || !profile) {
+      console.error("Failed to fetch profile for streak:", fetchError?.message);
+      return;
+    }
 
-  const { current_streak, longest_streak, last_activity_date } = profile;
+    const { current_streak, longest_streak, last_activity_date } = profile;
 
-  // Already counted today
-  if (last_activity_date === todayPHT) return;
+    // Already counted today
+    if (last_activity_date === todayPHT) return;
 
-  const yesterdayPHT = getYesterdayPHT();
+    const yesterdayPHT = getYesterdayPHT();
 
-  let newStreak: number;
-  if (last_activity_date === yesterdayPHT) {
-    newStreak = current_streak + 1;
-  } else {
-    newStreak = 1;
+    let newStreak: number;
+    if (last_activity_date === yesterdayPHT) {
+      newStreak = current_streak + 1;
+    } else {
+      newStreak = 1;
+    }
+
+    const newLongest = Math.max(newStreak, longest_streak);
+
+    const { error: updateError } = await supabase
+      .from("profiles")
+      .update({
+        current_streak: newStreak,
+        longest_streak: newLongest,
+        last_activity_date: todayPHT,
+      })
+      .eq("id", userId);
+
+    if (updateError) {
+      console.error("Failed to update streak:", updateError.message);
+    }
+  } catch (err) {
+    console.error("updateStreak error:", err);
   }
-
-  const newLongest = Math.max(newStreak, longest_streak);
-
-  await supabase
-    .from("profiles")
-    .update({
-      current_streak: newStreak,
-      longest_streak: newLongest,
-      last_activity_date: todayPHT,
-    })
-    .eq("id", userId);
 }

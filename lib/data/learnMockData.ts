@@ -1066,9 +1066,10 @@ export const freeResources: FreeResource[] = [
     logoBg: "#1D4ED8",
     logoColor: "#fff",
     description:
-      "Free government-accredited courses for Filipinos — from IT to tourism to entrepreneurship.",
+      "Free government-accredited courses for Filipinos — from IT to tourism to entrepreneurship. Get official TESDA certificates.",
     category: "General",
     url: "https://e-tesda.gov.ph/",
+    highlight: "🇵🇭 PH Government",
   },
   {
     id: "res-google-certs",
@@ -1077,9 +1078,22 @@ export const freeResources: FreeResource[] = [
     logoBg: "#EA4335",
     logoColor: "#fff",
     description:
-      "Job-ready certificates in Data Analytics, IT Support, UX Design, and Project Management.",
+      "Job-ready certificates in Data Analytics, IT Support, UX Design, and Project Management — no degree required.",
     category: "Tech & Business",
     url: "https://grow.google/certificates/",
+    highlight: "Employer recognized",
+  },
+  {
+    id: "res-microsoft-learn",
+    provider: "Microsoft Learn",
+    letter: "M",
+    logoBg: "#00A4EF",
+    logoColor: "#fff",
+    description:
+      "Free courses and certifications in Azure, Power BI, Excel, Microsoft 365, and AI fundamentals.",
+    category: "Tech & Business",
+    url: "https://learn.microsoft.com/",
+    highlight: "MS certifications",
   },
   {
     id: "res-freecodecamp",
@@ -1088,9 +1102,10 @@ export const freeResources: FreeResource[] = [
     logoBg: "#0A0A23",
     logoColor: "#fff",
     description:
-      "Learn to code for free with interactive lessons in HTML, CSS, JavaScript, Python, and more.",
+      "Learn to code for free with interactive lessons in HTML, CSS, JavaScript, Python, and more. Earn verified certificates.",
     category: "Tech & Dev",
     url: "https://www.freecodecamp.org/",
+    highlight: "300+ hrs free",
   },
   {
     id: "res-hubspot",
@@ -1099,20 +1114,22 @@ export const freeResources: FreeResource[] = [
     logoBg: "#FF7A59",
     logoColor: "#fff",
     description:
-      "Free certifications in marketing, sales, customer service, and CRM — recognized by employers.",
+      "Free certifications in marketing, sales, customer service, and CRM — recognized by employers worldwide.",
     category: "Business",
     url: "https://academy.hubspot.com/",
+    highlight: "Free certs",
   },
   {
     id: "res-coursera",
-    provider: "Coursera (Free Courses)",
+    provider: "Coursera (Free Audit)",
     letter: "C",
     logoBg: "#0056D2",
     logoColor: "#fff",
     description:
-      "Audit university courses for free from top schools. Great for Data, Business, and Tech skills.",
+      "Audit university courses for free from Stanford, Google, IBM, and Meta. Great for Data, Business, and Tech skills.",
     category: "General",
     url: "https://www.coursera.org/courses?query=free",
+    highlight: "Top universities",
   },
   {
     id: "res-canva-design",
@@ -1121,9 +1138,33 @@ export const freeResources: FreeResource[] = [
     logoBg: "#7C3AED",
     logoColor: "#fff",
     description:
-      "Free tutorials and courses on graphic design, branding, and social media content creation.",
+      "Free tutorials on graphic design, branding, and social media content. Build a portfolio while learning.",
     category: "Design",
     url: "https://www.canva.com/designschool/",
+  },
+  {
+    id: "res-linkedin-learning",
+    provider: "LinkedIn Learning",
+    letter: "in",
+    logoBg: "#0A66C2",
+    logoColor: "#fff",
+    description:
+      "1-month free trial with 16,000+ courses. Add completed courses directly to your LinkedIn profile.",
+    category: "General",
+    url: "https://www.linkedin.com/learning/",
+    highlight: "LinkedIn badges",
+  },
+  {
+    id: "res-aws-training",
+    provider: "AWS Training",
+    letter: "A",
+    logoBg: "#FF9900",
+    logoColor: "#232F3E",
+    description:
+      "Free cloud computing fundamentals and hands-on labs. Cloud skills are in high demand for BPO and tech roles.",
+    category: "Tech",
+    url: "https://aws.amazon.com/training/digital/",
+    highlight: "Cloud skills",
   },
 ];
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowUpRight } from "@phosphor-icons/react";
 import { colors } from "@/lib/constants/colors";
 import { Card, CompanyLogo, Badge, Button } from "@/components/ui";
 import type { FreeResource } from "@/lib/types/learn";
@@ -34,9 +35,25 @@ export function FreeResourceCard({
           <div style={{ fontSize: 13, fontWeight: 600, color: colors.text }}>
             {resource.provider}
           </div>
-          <Badge variant="muted" size="sm">
-            {resource.category}
-          </Badge>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+            <Badge variant="muted" size="sm">
+              {resource.category}
+            </Badge>
+            {resource.highlight && (
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 600,
+                  color: colors.success,
+                  background: colors.successBg,
+                  padding: "2px 6px",
+                  borderRadius: 4,
+                }}
+              >
+                {resource.highlight}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -57,8 +74,19 @@ export function FreeResourceCard({
         rel="noopener noreferrer"
         style={{ textDecoration: "none" }}
       >
-        <Button variant="outline" size="sm" style={{ width: "100%" }}>
-          Visit →
+        <Button
+          variant="outline"
+          size="sm"
+          style={{
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6,
+          }}
+        >
+          Visit {resource.provider}
+          <ArrowUpRight size={14} weight="bold" />
         </Button>
       </a>
     </Card>

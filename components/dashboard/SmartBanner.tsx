@@ -1,78 +1,87 @@
 "use client";
 
 import Link from "next/link";
-import { colors } from "@/lib/constants/colors";
-import { InterviewAlert } from "./InterviewAlert";
+import { ArrowRight, Sparkle } from "@phosphor-icons/react";
 
-type SmartBannerProps =
-  | {
-      type: "interview";
-      company: string;
-      role: string;
-      date: string;
-      time: string;
-      format: string;
-      daysUntil: number;
-    }
-  | {
-      type: "new_matches";
-      matchCount: number;
-    };
+interface SmartBannerProps {
+  type: "new_matches";
+  matchCount: number;
+}
 
 export function SmartBanner(props: SmartBannerProps) {
-  if (props.type === "interview") {
-    return (
-      <div style={{ marginBottom: 16, animation: "fadeUp 0.3s ease 0.2s both" }}>
-        <InterviewAlert
-          company={props.company}
-          role={props.role}
-          date={props.date}
-          time={props.time}
-          format={props.format}
-          daysUntil={props.daysUntil}
-        />
-      </div>
-    );
-  }
-
-  // type: "new_matches"
   return (
     <div
       className="responsive-row smart-banner-gap"
       style={{
-        background: colors.successBg,
-        borderRadius: 12,
-        border: `1px solid ${colors.successBorder}`,
-        padding: "16px 20px",
-        marginBottom: 16,
+        position: "relative",
+        background: "#0A0A0A",
+        border: "2px solid #0A0A0A",
+        padding: "20px 28px",
+        marginBottom: 20,
         justifyContent: "space-between",
-        animation: "fadeUp 0.3s ease 0.2s both",
+        alignItems: "center",
+        animation: "slam 0.4s cubic-bezier(.22,1,.36,1) 0.2s both",
+        overflow: "hidden",
       }}
     >
-      <div>
-        <div style={{ fontSize: 13, fontWeight: 600, color: colors.text }}>
-          {props.matchCount} new job{props.matchCount !== 1 ? "s" : ""} match
-          your profile
+      <div style={{ display: "flex", alignItems: "center", gap: 14, position: "relative" }}>
+        <div
+          style={{
+            width: 40,
+            height: 40,
+            background: "#FBBF24",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
+          <Sparkle size={20} weight="fill" color="#0A0A0A" />
         </div>
-        <div style={{ fontSize: 12, color: colors.textSec, marginTop: 2 }}>
-          Personalized based on your skills, salary, and location
+        <div>
+          <div style={{
+            fontSize: 14,
+            fontWeight: 800,
+            color: "#F5F5F0",
+            letterSpacing: "-0.02em",
+            textTransform: "uppercase" as const,
+          }}>
+            {props.matchCount} new job{props.matchCount !== 1 ? "s" : ""} match your profile
+          </div>
+          <div style={{
+            fontSize: 11,
+            fontFamily: "var(--font-mono)",
+            color: "rgba(245,245,240,0.4)",
+            marginTop: 4,
+            textTransform: "uppercase" as const,
+            letterSpacing: "0.04em",
+          }}>
+            Personalized based on your skills
+          </div>
         </div>
       </div>
       <Link
         href="/explore?sort=match"
         style={{
-          padding: "8px 18px",
-          borderRadius: 8,
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 6,
+          padding: "12px 24px",
           fontSize: 12,
-          fontWeight: 600,
-          background: colors.success,
-          color: colors.inv,
+          fontWeight: 700,
+          fontFamily: "var(--font-mono)",
+          textTransform: "uppercase" as const,
+          letterSpacing: "0.04em",
+          background: "#FBBF24",
+          color: "#0A0A0A",
           textDecoration: "none",
           whiteSpace: "nowrap",
           textAlign: "center",
+          transition: "all 0.15s ease",
         }}
       >
-        See all matches
+        See matches
+        <ArrowRight size={14} weight="bold" />
       </Link>
     </div>
   );

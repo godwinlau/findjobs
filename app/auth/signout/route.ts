@@ -8,7 +8,6 @@ export async function POST(request: Request) {
 
   const cookieStore = await cookies();
   cookieStore.delete("onboarding_completed");
-  cookieStore.delete("user_role");
 
   const { origin } = new URL(request.url);
   return NextResponse.redirect(`${origin}/login`, {

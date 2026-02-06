@@ -59,15 +59,13 @@ export async function updateSession(request: NextRequest) {
 
   // Onboarding gate: authenticated users without completed onboarding.
   // Skip the DB check if we already know onboarding is done (cookie flag).
-  // The cookie is set by completeOnboarding() and avoids a DB round-trip
-  // on every single page navigation (~200ms saved per page load).
   if (user && !isAuthRoute && pathname !== "/onboarding") {
     const onboardingDone = request.cookies.get("onboarding_completed")?.value === "1";
 
     if (!onboardingDone) {
       const { data: profile } = await supabase
         .from("profiles")
-        .select("onboarding_completed, user_role")
+        .select("onboarding_completed")
         .eq("id", user.id)
         .single();
 
@@ -77,7 +75,7 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(url);
       }
 
-      // Onboarding confirmed done — set cookies so we skip DB check next time
+      // Onboarding confirmed done — set cookie so we skip DB check next time
       if (profile?.onboarding_completed) {
         supabaseResponse.cookies.set("onboarding_completed", "1", {
           path: "/",
@@ -85,30 +83,7 @@ export async function updateSession(request: NextRequest) {
           sameSite: "lax",
           maxAge: 60 * 60 * 24 * 365, // 1 year
         });
-        if (profile.user_role) {
-          supabaseResponse.cookies.set("user_role", profile.user_role, {
-            path: "/",
-            httpOnly: true,
-            sameSite: "lax",
-            maxAge: 60 * 60 * 24 * 7, // 7 days
-          });
-        }
       }
-    }
-
-    // Role-based routing (use cached cookie to avoid DB query)
-    const userRole = request.cookies.get("user_role")?.value;
-
-    if (userRole === "employer" && pathname === "/") {
-      const url = request.nextUrl.clone();
-      url.pathname = "/employer";
-      return NextResponse.redirect(url);
-    }
-
-    if (userRole === "job_seeker" && pathname.startsWith("/employer")) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/";
-      return NextResponse.redirect(url);
     }
   }
 

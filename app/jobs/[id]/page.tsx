@@ -160,7 +160,7 @@ export default async function JobDetailPage({
           </div>
 
           {/* Actions */}
-          <JobDetailActions jobId={job.id} applyUrl={job.applyUrl} />
+          <JobDetailActions jobId={job.id} applyUrl={job.applyUrl} matchPercent={job.match} />
         </div>
 
         {/* Meta row */}

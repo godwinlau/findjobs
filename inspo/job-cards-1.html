@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Cards</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F4F1EC;
+    --text: #1A1A1A;
+    --text-mid: #5C5C5C;
+    --text-muted: #9E9E9E;
+    --white: #FFFFFF;
+    --radius: 24px;
+    --radius-sm: 14px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    padding: 48px 24px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .container { max-width: 920px; width: 100%; }
+
+  .header {
+    margin-bottom: 32px;
+    display: flex; align-items: baseline; gap: 12px;
+  }
+  .header h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 32px; font-weight: 400; font-style: italic;
+  }
+  .header .count { font-size: 14px; color: var(--text-muted); }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 680px) {
+    .grid { grid-template-columns: 1fr; }
+    .grid > * { grid-column: 1 / -1 !important; }
+  }
+
+  /* ========== SHARED ========== */
+  .card {
+    border-radius: var(--radius);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.35s cubic-bezier(0.25,1,0.5,1), box-shadow 0.35s ease;
+    animation: rise 0.55s cubic-bezier(0.25,1,0.5,1) both;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.07); }
+  @keyframes rise {
+    from { opacity:0; transform: translateY(14px); }
+    to { opacity:1; transform: translateY(0); }
+  }
+
+  .tag {
+    display: inline-flex; align-items: center;
+    font-size: 11px; font-weight: 600;
+    padding: 5px 10px; border-radius: 100px;
+    letter-spacing: 0.02em; text-transform: uppercase;
+  }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .save {
+    width: 34px; height: 34px;
+    border: none; background: rgba(0,0,0,0.03);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s ease;
+    position: absolute; top: 16px; right: 16px; z-index: 2;
+  }
+  .save:hover { background: rgba(0,0,0,0.06); transform: scale(1.08); }
+  .save svg { width: 16px; height: 16px; color: var(--text-muted); }
+  .save.saved svg { color: #E8642C; fill: #E8642C; }
+
+  .desc {
+    font-size: 13px; line-height: 1.55; color: var(--text-mid);
+    display: -webkit-box; -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical; overflow: hidden;
+  }
+
+  .company { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px; }
+  .title { font-size: 16px; font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; }
+  .salary span { font-size: 11px; font-weight: 400; color: var(--text-muted); }
+  .time { font-size: 11px; color: var(--text-muted); }
+
+  /* Match ring */
+  .match { display: flex; align-items: center; gap: 7px; }
+  .match-ring { width: 34px; height: 34px; position: relative; flex-shrink: 0; }
+  .match-ring svg { width: 34px; height: 34px; transform: rotate(-90deg); }
+  .match-ring .track { fill: none; stroke: rgba(0,0,0,0.06); stroke-width: 3; }
+  .match-ring .fill { fill: none; stroke-width: 3; stroke-linecap: round; }
+  .match-pct {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9.5px; font-weight: 700;
+  }
+  .match-label { font-size: 11px; color: var(--text-muted); line-height: 1.15; }
+  .match-label strong { display: block; font-size: 11.5px; font-weight: 700; }
+
+  /* ===================================================
+     TYPE A — Hero: bottom gradient bar, serif title
+     =================================================== */
+  .type-a {
+    background: var(--white);
+    padding: 26px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .type-a::before {
+    content: '';
+    position: absolute; bottom: 0; left: 0;
+    width: 100%; height: 4px;
+    border-radius: 0 0 var(--radius) var(--radius);
+  }
+  .type-a .top { display: flex; align-items: flex-start; gap: 14px; }
+  .type-a .logo {
+    width: 48px; height: 48px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 20px;
+  }
+  .type-a .logo svg { width: 26px; height: 26px; color: #fff; }
+  .type-a .meta { flex: 1; }
+  .type-a .title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px; font-weight: 400; line-height: 1.2;
+  }
+  .type-a .bottom {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: 14px; border-top: 1px solid rgba(0,0,0,0.05);
+  }
+  .type-a .salary { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+  .type-a .apply {
+    padding: 9px 22px; border: none; border-radius: 100px;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+    color: #fff; cursor: pointer; transition: all 0.2s ease;
+  }
+  .type-a .apply:hover { filter: brightness(1.08); transform: scale(1.03); }
+
+  /* ===================================================
+     TYPE B — Side accent stripe
+     =================================================== */
+  .type-b {
+    background: var(--white);
+    padding: 22px 22px 22px 28px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .type-b::before {
+    content: '';
+    position: absolute; top: 16px; bottom: 16px; left: 0;
+    width: 5px; border-radius: 0 4px 4px 0;
+  }
+  .type-b .logo {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; flex-shrink: 0;
+  }
+  .type-b .salary { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; margin-top: auto; }
+  .type-b .row { display: flex; justify-content: space-between; align-items: center; }
+
+  /* ===================================================
+     TYPE C — Dashed border
+     =================================================== */
+  .type-c {
+    background: var(--white);
+    border: 2px dashed rgba(0,0,0,0.1);
+    padding: 22px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .type-c:hover { border-color: rgba(0,0,0,0.2); }
+  .type-c .top { display: flex; align-items: center; gap: 12px; }
+  .type-c .logo {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; flex-shrink: 0;
+  }
+  .type-c .salary { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; }
+  .type-c .bottom {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: auto;
+  }
+
+  /* Decorative dots */
+  .type-c::after {
+    content: '· · ·';
+    position: absolute; bottom: 10px; right: 16px;
+    font-size: 18px; letter-spacing: 4px; pointer-events: none;
+  }
+
+  /* ===================================================
+     COLOR THEMES
+     =================================================== */
+
+  /* Green (Spotify) */
+  .t-green .tag { background: #E8F7EF; color: #1B8A4A; }
+  .t-green .salary { color: #1DB954; }
+  .t-green .match-pct { color: #1DB954; }
+  .t-green .match-ring .fill { stroke: #1DB954; }
+  .t-green .match-label strong { color: #1B8A4A; }
+  .t-green.type-a::before { background: linear-gradient(90deg, #1DB954, #91EBC3); }
+  .t-green.type-a .logo { background: #1DB954; }
+  .t-green.type-a .apply { background: #1DB954; }
+  .t-green.type-b::before { background: linear-gradient(180deg, #1DB954, #91EBC3); }
+  .t-green.type-b .logo { background: #E8F7EF; }
+  .t-green.type-c { border-color: rgba(29,185,84,0.2); }
+  .t-green.type-c:hover { border-color: rgba(29,185,84,0.4); }
+  .t-green.type-c::after { color: rgba(29,185,84,0.15); }
+  .t-green.type-c .logo { background: #E8F7EF; }
+
+  /* Blue (Linear) */
+  .t-blue .tag { background: #E6F0FC; color: #2D6DC2; }
+  .t-blue .salary { color: #4A8FE7; }
+  .t-blue .match-pct { color: #4A8FE7; }
+  .t-blue .match-ring .fill { stroke: #4A8FE7; }
+  .t-blue .match-label strong { color: #2D6DC2; }
+  .t-blue.type-a::before { background: linear-gradient(90deg, #4A8FE7, #A5CCFA); }
+  .t-blue.type-a .logo { background: #4A8FE7; }
+  .t-blue.type-a .apply { background: #4A8FE7; }
+  .t-blue.type-b::before { background: linear-gradient(180deg, #4A8FE7, #A5CCFA); }
+  .t-blue.type-b .logo { background: #E6F0FC; }
+  .t-blue.type-c { border-color: rgba(74,143,231,0.2); }
+  .t-blue.type-c:hover { border-color: rgba(74,143,231,0.4); }
+  .t-blue.type-c::after { color: rgba(74,143,231,0.15); }
+  .t-blue.type-c .logo { background: #E6F0FC; }
+
+  /* Amber (Shopify) */
+  .t-amber .tag { background: #FEF3C7; color: #B45309; }
+  .t-amber .salary { color: #D97706; }
+  .t-amber .match-pct { color: #D97706; }
+  .t-amber .match-ring .fill { stroke: #D97706; }
+  .t-amber .match-label strong { color: #B45309; }
+  .t-amber.type-a::before { background: linear-gradient(90deg, #F59E0B, #FBBF24); }
+  .t-amber.type-a .logo { background: #F59E0B; }
+  .t-amber.type-a .apply { background: #D97706; }
+  .t-amber.type-b::before { background: linear-gradient(180deg, #F59E0B, #FBBF24); }
+  .t-amber.type-b .logo { background: #FEF3C7; }
+  .t-amber.type-c { border-color: rgba(245,158,11,0.2); }
+  .t-amber.type-c:hover { border-color: rgba(245,158,11,0.4); }
+  .t-amber.type-c::after { color: rgba(245,158,11,0.15); }
+  .t-amber.type-c .logo { background: #FEF3C7; }
+
+  /* Purple (Stripe) */
+  .t-purple .tag { background: #EDE8FA; color: #6D4EC7; }
+  .t-purple .salary { color: #7C5CE0; }
+  .t-purple .match-pct { color: #7C5CE0; }
+  .t-purple .match-ring .fill { stroke: #7C5CE0; }
+  .t-purple .match-label strong { color: #6D4EC7; }
+  .t-purple.type-a::before { background: linear-gradient(90deg, #7C5CE0, #C4B5FD); }
+  .t-purple.type-a .logo { background: #7C5CE0; }
+  .t-purple.type-a .apply { background: #7C5CE0; }
+  .t-purple.type-b::before { background: linear-gradient(180deg, #7C5CE0, #C4B5FD); }
+  .t-purple.type-b .logo { background: #EDE8FA; }
+  .t-purple.type-c { border-color: rgba(124,92,224,0.2); }
+  .t-purple.type-c:hover { border-color: rgba(124,92,224,0.4); }
+  .t-purple.type-c::after { color: rgba(124,92,224,0.15); }
+  .t-purple.type-c .logo { background: #EDE8FA; }
+
+  /* Rose (Notion) */
+  .t-rose .tag { background: #FCE8F1; color: #BE185D; }
+  .t-rose .salary { color: #E06C9F; }
+  .t-rose .match-pct { color: #E06C9F; }
+  .t-rose .match-ring .fill { stroke: #E06C9F; }
+  .t-rose .match-label strong { color: #BE185D; }
+  .t-rose.type-a::before { background: linear-gradient(90deg, #E06C9F, #FBCFE8); }
+  .t-rose.type-a .logo { background: #E06C9F; }
+  .t-rose.type-a .apply { background: #E06C9F; }
+  .t-rose.type-b::before { background: linear-gradient(180deg, #E06C9F, #FBCFE8); }
+  .t-rose.type-b .logo { background: #FCE8F1; }
+  .t-rose.type-c { border-color: rgba(224,108,159,0.2); }
+  .t-rose.type-c:hover { border-color: rgba(224,108,159,0.4); }
+  .t-rose.type-c::after { color: rgba(224,108,159,0.15); }
+  .t-rose.type-c .logo { background: #FCE8F1; }
+
+  /* Teal (Vercel) */
+  .t-teal .tag { background: #CCFBF1; color: #0F766E; }
+  .t-teal .salary { color: #0D9488; }
+  .t-teal .match-pct { color: #0D9488; }
+  .t-teal .match-ring .fill { stroke: #0D9488; }
+  .t-teal .match-label strong { color: #0F766E; }
+  .t-teal.type-a::before { background: linear-gradient(90deg, #0D9488, #5EEAD4); }
+  .t-teal.type-a .logo { background: #0D9488; }
+  .t-teal.type-a .apply { background: #0D9488; }
+  .t-teal.type-b::before { background: linear-gradient(180deg, #0D9488, #5EEAD4); }
+  .t-teal.type-b .logo { background: #CCFBF1; }
+  .t-teal.type-c { border-color: rgba(13,148,136,0.2); }
+  .t-teal.type-c:hover { border-color: rgba(13,148,136,0.4); }
+  .t-teal.type-c::after { color: rgba(13,148,136,0.15); }
+  .t-teal.type-c .logo { background: #CCFBF1; }
+
+  /* Red (Figma) */
+  .t-red .tag { background: #FEE2E2; color: #B91C1C; }
+  .t-red .salary { color: #DC2626; }
+  .t-red .match-pct { color: #DC2626; }
+  .t-red .match-ring .fill { stroke: #DC2626; }
+  .t-red .match-label strong { color: #B91C1C; }
+  .t-red.type-b::before { background: linear-gradient(180deg, #DC2626, #FCA5A5); }
+  .t-red.type-b .logo { background: #FEE2E2; }
+
+  /* Slate (Airbnb) */
+  .t-slate .tag { background: #F1F5F9; color: #475569; }
+  .t-slate .salary { color: #334155; }
+  .t-slate .match-pct { color: #475569; }
+  .t-slate .match-ring .fill { stroke: #475569; }
+  .t-slate .match-label strong { color: #334155; }
+  .t-slate.type-c { border-color: rgba(71,85,105,0.15); }
+  .t-slate.type-c:hover { border-color: rgba(71,85,105,0.3); }
+  .t-slate.type-c::after { color: rgba(71,85,105,0.12); }
+  .t-slate.type-c .logo { background: #F1F5F9; }
+
+  /* Wide hero spans full row */
+  .wide { grid-column: 1 / -1; }
+  .wide .top { gap: 18px; }
+  .wide .title { font-size: 24px; }
+  .wide .bottom { gap: 16px; }
+
+  /* Animation stagger */
+  .card:nth-child(1) { animation-delay: 0s; }
+  .card:nth-child(2) { animation-delay: 0.05s; }
+  .card:nth-child(3) { animation-delay: 0.1s; }
+  .card:nth-child(4) { animation-delay: 0.15s; }
+  .card:nth-child(5) { animation-delay: 0.2s; }
+  .card:nth-child(6) { animation-delay: 0.25s; }
+  .card:nth-child(7) { animation-delay: 0.3s; }
+  .card:nth-child(8) { animation-delay: 0.35s; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>New for you</h1>
+    <span class="count">— 24 matches</span>
+  </div>
+
+  <div class="grid">
+
+    <!-- 1 ▸ TYPE A · Hero · Green · Wide -->
+    <div class="card type-a t-green wide">
+      <button class="save saved" onclick="this.classList.toggle('saved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+      <div class="top">
+        <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14.5c2.5-1 5.5-1 8 0"/><path d="M7 11.5c3.5-1.5 7.5-1.5 10 0"/></svg></div>
+        <div class="meta">
+          <div class="company">Spotify · Stockholm</div>
+          <div class="title">Senior Product Designer</div>
+        </div>
+        <div class="match">
+          <div class="match-ring"><svg viewBox="0 0 38 38"><circle class="track" cx="19" cy="19" r="16"/><circle class="fill" cx="19" cy="19" r="16" stroke-dasharray="100.53" stroke-dashoffset="8.04"/></svg><div class="match-pct">92%</div></div>
+          <div class="match-label"><strong>Great match</strong>Skills & exp.</div>
+        </div>
+      </div>
+      <p class="desc">Lead end-to-end design for Spotify's creator tools. You'll shape how millions of artists connect with fans through intuitive, data-informed experiences across mobile and desktop.</p>
+      <div class="tags">
+        <span class="tag">Full-time</span><span class="tag">Remote</span><span class="tag">Senior</span><span class="tag">Design Systems</span>
+      </div>
+      <div class="bottom">
+        <div><div class="salary">$145K – $180K <span>/yr</span></div><div class="time">2 hours ago</div></div>
+        <button class="apply">Apply Now</button>
+      </div>
+    </div>
+
+    <!-- 2 ▸ TYPE B · Side stripe · Amber -->
+    <div class="card type-b t-amber">
+      <button class="save" onclick="this.classList.toggle('saved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+      <div class="logo">🛍️</div>
+      <div class="company">Shopify · Remote</div>
+      <div class="title">Staff Frontend Developer</div>
+      <p class="desc">Own Shopify's storefront rendering pipeline. Lead performance initiatives and mentor engineers on the themes platform.</p>
+      <div class="tags"><span class="tag">Full-time</span><span class="tag">Remote</span><span class="tag">Staff</span></div>
+      <div class="match">
+        <div class="match-ring"><svg viewBox="0 0 38 38"><circle class="track" cx="19" cy="19" r="16"/><circle class="fill" cx="19" cy="19" r="16" stroke-dasharray="100.53" stroke-dashoffset="24.13"/></svg><div class="match-pct">76%</div></div>
+        <div class="match-label"><strong>Good match</strong>Experience fit</div>
+      </div>
+      <div class="row">
+        <div class="salary">$160K – $210K <span>/yr</span></div>
+        <div class="time">3 days ago</div>
+      </div>
+    </div>
+
+    <!-- 3 ▸ TYPE C · Dashed · Purple -->
+    <div class="card type-c t-purple">
+      <button class="save" onclick="this.classList.toggle('saved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+      <div class="top">
+        <div class="logo">💳</div>
+        <div class="company">Stripe · San Francisco</div>
+      </div>
+      <div class="title">Design Engineer</div>
+      <p class="desc">Craft interactive prototypes and production UI for Stripe's payment flows. Define the future of internet commerce.</p>
+      <div class="tags"><span class="tag">Full-time</span><span class="tag">On-site</span><span class="tag">Senior</span></div>
+      <div class="match">
+        <div class="match-ring"><svg viewBox="0 0 38 38"><circle class="track" cx="19" cy="19" r="16"/><circle class="fill" cx="19" cy="19" r="16" stroke-dasharray="100.53" stroke-dashoffset="11.06"/></svg><div class="match-pct">89%</div></div>
+        <div class="match-label"><strong>Great match</strong>Role & skills</div>
+      </div>
+      <div class="bottom">
+        <div class="salary">$170K – $220K <span>/yr</span></div>
+        <div class="time">5 days ago</div>
+      </div>
+    </div>
+
+    <!-- 4 ▸ TYPE A · Hero · Blue -->
+    <div class="card type-a t-blue">
+      <button class="save" onclick="this.classList.toggle('saved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+      <div class="top">
+        <div class="logo">🔗</div>
+        <div class="meta">
+          <div class="company">Linear · Remote</div>
+          <div class="title">UX Engineer</div>
+        </div>
+        <div class="match">
+          <div class="match-ring"><svg viewBox="0 0 38 38"><circle class="track" cx="19" cy="19" r="16"/><circle class="fill" cx="19" cy="19" r="16" stroke-dasharray="100.53" stroke-dashoffset="14.07"/></svg><div class="match-pct">86%</div></div>
+          <div class="match-label"><strong>Strong match</strong>Skills align</div>
+        </div>
+      </div>
+      <p class="desc">Build and maintain Linear's component library and design system. Bridge design and engineering to deliver pixel-perfect, performant interfaces.</p>
+      <div class="tags"><span class="tag">Full-time</span><span class="tag">Remote</span><span class="tag">Mid-Senior</span></div>
+      <div class="bottom">
+        <div><div class="salary">$120K – $150K <span>/yr</span></div><div class="time">1 day ago</div></div>
+        <button class="apply">Apply Now</button>
+      </div>
+    </div>
+
+    <!-- 5 ▸ TYPE C · Dashed · Rose -->
+    <div class="card type-c t-rose">
+      <button class="save" onclick="this.classList.toggle('saved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+      <div class="top">
+        <div class="logo">✨</div>
+        <div class="company">Notion · San Francisco</div>
+      </div>
+      <div class="title">Product Designer, Growth</div>
+      <p class="desc">Drive activation and retention through experimentation. Design onboarding flows and growth loops that help teams adopt Notion faster.</p>
+      <div class="tags"><span class="tag">Full-time</span><span class="tag">Hybrid</span><span class="tag">Mid</span></div>
+      <div class="match">
+        <div class="match-ring"><svg viewBox="0 0 38 38"><circle class="track" cx="19" cy="19" r="16"/><circle class="fill" cx="19" cy="19" r="16" stroke-dasharray="100.53" stroke-dashoffset="32.17"/></svg><div class="match-pct">68%</div></div>
+        <div class="match-label"><strong>Decent match</strong>Partial overlap</div>
+      </div>
+      <div class="bottom">
+        <div class="salary">$130K – $165K <span>/yr</span></div>
+        <div class="time">1 week ago</div>
+      </div>
+    </div>
+
+    <!-- 6 ▸ TYPE B · Side stripe · Teal -->
+    <div class="card type-b t-teal">
+      <button class="save" onclick="this.classList.toggle('saved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+      <div class="logo">▲</div>
+      <div class="company">Vercel · Remote</div>
+      <div class="title">Senior React Developer</div>
+      <p class="desc">Build the infrastructure powering the modern web — work on Next.js, Turbopack, and Vercel's deployment platform at scale.</p>
+      <div class="tags"><span class="tag">Full-time</span><span class="tag">Remote</span><span class="tag">Senior</span></div>
+      <div class="match">
+        <div class="match-ring"><svg viewBox="0 0 38 38"><circle class="track" cx="19" cy="19" r="16"/><circle class="fill" cx="19" cy="19" r="16" stroke-dasharray="100.53" stroke-dashoffset="5.03"/></svg><div class="match-pct">95%</div></div>
+        <div class="match-label"><strong>Top match</strong>Ideal fit</div>
+      </div>
+      <div class="row">
+        <div class="salary">$155K – $195K <span>/yr</span></div>
+        <div class="time">4 hours ago</div>
+      </div>
+    </div>
+
+    <!-- 7 ▸ TYPE B · Side stripe · Red -->
+    <div class="card type-b t-red">
+      <button class="save" onclick="this.classList.toggle('saved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+      <div class="logo">🎨</div>
+      <div class="company">Figma · Remote</div>
+      <div class="title">Design Technologist</div>
+      <p class="desc">Prototype advanced interaction patterns for Figma's collaborative design tools. Push the boundaries of real-time canvas performance.</p>
+      <div class="tags"><span class="tag">Full-time</span><span class="tag">Remote</span><span class="tag">Senior</span></div>
+      <div class="match">
+        <div class="match-ring"><svg viewBox="0 0 38 38"><circle class="track" cx="19" cy="19" r="16"/><circle class="fill" cx="19" cy="19" r="16" stroke-dasharray="100.53" stroke-dashoffset="9.05"/></svg><div class="match-pct">91%</div></div>
+        <div class="match-label"><strong>Great match</strong>Strong fit</div>
+      </div>
+      <div class="row">
+        <div class="salary">$140K – $185K <span>/yr</span></div>
+        <div class="time">12 hours ago</div>
+      </div>
+    </div>
+
+    <!-- 8 ▸ TYPE C · Dashed · Slate -->
+    <div class="card type-c t-slate">
+      <button class="save" onclick="this.classList.toggle('saved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+      <div class="top">
+        <div class="logo">🏠</div>
+        <div class="company">Airbnb · San Francisco</div>
+      </div>
+      <div class="title">Senior Interaction Designer</div>
+      <p class="desc">Shape how guests discover and book unique stays. Own end-to-end interaction design for search, booking, and host tools across platforms.</p>
+      <div class="tags"><span class="tag">Full-time</span><span class="tag">On-site</span><span class="tag">Senior</span></div>
+      <div class="match">
+        <div class="match-ring"><svg viewBox="0 0 38 38"><circle class="track" cx="19" cy="19" r="16"/><circle class="fill" cx="19" cy="19" r="16" stroke-dasharray="100.53" stroke-dashoffset="18.10"/></svg><div class="match-pct">82%</div></div>
+        <div class="match-label"><strong>Strong match</strong>Role aligned</div>
+      </div>
+      <div class="bottom">
+        <div class="salary">$150K – $200K <span>/yr</span></div>
+        <div class="time">2 days ago</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

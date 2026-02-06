@@ -1,21 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { colors } from "@/lib/constants/colors";
 import { ProgressBar } from "./ProgressBar";
-import { StepRoleSelect } from "./StepRoleSelect";
-import { StepBasics } from "./StepBasics";
+import { StepWorkType } from "./StepWorkType";
+import { StepLocation } from "./StepLocation";
 import { StepSkills } from "./StepSkills";
-import { StepBackground } from "./StepBackground";
-import { StepPreferences } from "./StepPreferences";
-import { StepEmployerComingSoon } from "./StepEmployerComingSoon";
+import { StepExperience } from "./StepExperience";
+import { StepSalary } from "./StepSalary";
+import { StepIdentity } from "./StepIdentity";
+import { StepTopMatches } from "./StepTopMatches";
 import { SALARY_PRESETS } from "@/lib/constants/onboarding";
 import { saveOnboardingStep, completeOnboarding } from "@/app/onboarding/actions";
-import type { Profile, UserRole } from "@/lib/types";
+import type { Profile } from "@/lib/types";
 
-const JOB_SEEKER_LABELS = ["Your Role", "About You", "Your Skills", "Background", "Preferences"];
-const EMPLOYER_LABELS = ["Your Role", "Almost There"];
+const STEP_LABELS = [
+  "Work Type",
+  "Location",
+  "Skills",
+  "Experience",
+  "Salary",
+  "The Basics",
+  "Your Matches",
+];
+
+const TOTAL_STEPS = 7;
 
 interface OnboardingWizardProps {
   initialProfile: Partial<Profile>;
@@ -24,19 +34,21 @@ interface OnboardingWizardProps {
 export function OnboardingWizard({ initialProfile }: OnboardingWizardProps) {
   const router = useRouter();
   const [step, setStep] = useState(initialProfile.onboarding_step || 0);
-  const [data, setData] = useState<Partial<Profile>>(initialProfile);
+  const [data, setData] = useState<Partial<Profile>>({
+    ...initialProfile,
+    user_role: "job_seeker",
+  });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [topMatches, setTopMatches] = useState<
+    { role: string; company: string; match: number; salary: string }[]
+  >([]);
+  const [matchesLoading, setMatchesLoading] = useState(false);
 
-  const role: UserRole | null = data.user_role || null;
-  const isEmployer = role === "employer";
-  const totalSteps = isEmployer ? 2 : 5;
-  const labels = isEmployer ? EMPLOYER_LABELS : JOB_SEEKER_LABELS;
-
+  // Auto-fill salary when experience level changes
   function updateData(updates: Partial<Profile>) {
     const newData = { ...data, ...updates };
 
-    // Auto-fill salary when experience level changes
     if (updates.experience_level && updates.experience_level !== data.experience_level) {
       const preset = SALARY_PRESETS[updates.experience_level];
       if (preset && !data.desired_salary_min && !data.desired_salary_max) {
@@ -48,35 +60,70 @@ export function OnboardingWizard({ initialProfile }: OnboardingWizardProps) {
     setData(newData);
   }
 
-  async function handleNext() {
-    // Step 0 validation: role must be selected
-    if (step === 0 && !data.user_role) {
-      setError("Please select how you'd like to use HanapBuhay.");
-      return;
+  // Fetch top matches when reaching the final step
+  useEffect(() => {
+    if (step === 6) {
+      setMatchesLoading(true);
+      // Use the API route to get matches based on current profile data
+      fetch("/api/onboarding-matches", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+        .then((res) => res.json())
+        .then((result) => {
+          setTopMatches(result.matches || []);
+        })
+        .catch(() => {
+          setTopMatches([]);
+        })
+        .finally(() => {
+          setMatchesLoading(false);
+        });
     }
+  }, [step]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // Step 1 (About You): full name + preferred city required
-    if (step === 1 && !isEmployer) {
-      if (!data.full_name?.trim()) {
-        setError("Full name is required.");
+  async function handleNext() {
+    // Step 0 (Work Type): at least 1 category
+    if (step === 0) {
+      if (!data.preferred_industries || data.preferred_industries.length === 0) {
+        setError("Please select at least one work category.");
         return;
       }
-      if (!data.preferred_city) {
+    }
+
+    // Step 1 (Location): city required unless remote
+    if (step === 1) {
+      if (data.work_preference !== "remote" && !data.preferred_city) {
         setError("Please select your preferred city.");
         return;
       }
     }
 
-    // Step 2 (Your Skills): min 3 skills required
-    if (step === 2 && !isEmployer) {
-      if (!data.skills || data.skills.length < 3) {
-        setError("Please select at least 3 skills.");
+    // Step 2 (Skills): min 5 skills with proficiency
+    if (step === 2) {
+      if (!data.skills || data.skills.length < 5) {
+        setError("Please select at least 5 skills.");
         return;
       }
     }
 
-    // Step 3 (Background): education required
-    if (step === 3 && !isEmployer) {
+    // Step 3 (Experience): level required
+    if (step === 3) {
+      if (!data.experience_level) {
+        setError("Please select your experience level.");
+        return;
+      }
+    }
+
+    // Step 4 (Salary): skippable — no validation
+
+    // Step 5 (Identity): education + name required
+    if (step === 5) {
+      if (!data.full_name?.trim()) {
+        setError("Full name is required.");
+        return;
+      }
       if (!data.education) {
         setError("Please select your education level.");
         return;
@@ -87,7 +134,7 @@ export function OnboardingWizard({ initialProfile }: OnboardingWizardProps) {
     setSaving(true);
 
     try {
-      if (step < totalSteps - 1) {
+      if (step < TOTAL_STEPS - 1) {
         const result = await saveOnboardingStep(step, data);
         if (result?.error) {
           setError(result.error);
@@ -96,13 +143,14 @@ export function OnboardingWizard({ initialProfile }: OnboardingWizardProps) {
         }
         setStep(step + 1);
       } else {
+        // Step 6 (final): complete onboarding
         const result = await completeOnboarding(data);
         if (result?.error) {
           setError(result.error);
           setSaving(false);
           return;
         }
-        router.push(isEmployer ? "/employer?welcome=1" : "/?welcome=1");
+        router.push("/?welcome=1");
       }
     } catch {
       setError("Something went wrong. Please try again.");
@@ -116,23 +164,13 @@ export function OnboardingWizard({ initialProfile }: OnboardingWizardProps) {
     setError("");
 
     try {
-      if (step < totalSteps - 1) {
-        const result = await saveOnboardingStep(step, data);
-        if (result?.error) {
-          setError(result.error);
-          setSaving(false);
-          return;
-        }
-        setStep(step + 1);
-      } else {
-        const result = await completeOnboarding(data);
-        if (result?.error) {
-          setError(result.error);
-          setSaving(false);
-          return;
-        }
-        router.push(isEmployer ? "/employer?welcome=1" : "/?welcome=1");
+      const result = await saveOnboardingStep(step, data);
+      if (result?.error) {
+        setError(result.error);
+        setSaving(false);
+        return;
       }
+      setStep(step + 1);
     } catch {
       setError("Something went wrong. Please try again.");
     }
@@ -147,34 +185,26 @@ export function OnboardingWizard({ initialProfile }: OnboardingWizardProps) {
     }
   }
 
-  // Determine which step content to render
   function renderStep() {
-    if (step === 0) {
-      return (
-        <StepRoleSelect
-          selected={role}
-          onSelect={(r) => updateData({ user_role: r })}
-        />
-      );
-    }
-
-    if (isEmployer) {
-      return <StepEmployerComingSoon />;
-    }
-
-    // Job seeker steps
-    if (step === 1) return <StepBasics data={data} onChange={updateData} />;
+    if (step === 0) return <StepWorkType data={data} onChange={updateData} />;
+    if (step === 1) return <StepLocation data={data} onChange={updateData} />;
     if (step === 2) return <StepSkills data={data} onChange={updateData} />;
-    if (step === 3) return <StepBackground data={data} onChange={updateData} />;
-    if (step === 4) return <StepPreferences data={data} onChange={updateData} />;
-
+    if (step === 3) return <StepExperience data={data} onChange={updateData} />;
+    if (step === 4) return <StepSalary data={data} onChange={updateData} />;
+    if (step === 5) return <StepIdentity data={data} onChange={updateData} />;
+    if (step === 6) return <StepTopMatches matches={topMatches} loading={matchesLoading} />;
     return null;
   }
 
-  // Skip button only on Step 4 (Preferences) for job seekers
-  const showSkip = !isEmployer && step === totalSteps - 1;
-  // Hide back on step 0 (no previous step)
+  // Skip button only on step 4 (salary)
+  const showSkip = step === 4;
   const showBack = step > 0;
+
+  // Button labels
+  let nextLabel = "Continue";
+  if (saving) nextLabel = "Saving...";
+  else if (step === 5) nextLabel = "See Your Matches";
+  else if (step === 6) nextLabel = "Start Job Hunting";
 
   return (
     <div
@@ -197,15 +227,15 @@ export function OnboardingWizard({ initialProfile }: OnboardingWizardProps) {
           border: `1px solid ${colors.border}`,
         }}
       >
-        <ProgressBar currentStep={step} totalSteps={totalSteps} labels={labels} />
+        <ProgressBar currentStep={step} totalSteps={TOTAL_STEPS} labels={STEP_LABELS} />
 
         {error && (
           <div
             style={{
               padding: "10px 14px",
               borderRadius: 8,
-              background: "#FEF2F2",
-              border: "1px solid #FECACA",
+              background: "var(--hb-warning-bg)",
+              border: "1px solid var(--hb-warning-border)",
               color: colors.live,
               fontSize: 13,
               marginBottom: 16,
@@ -265,11 +295,7 @@ export function OnboardingWizard({ initialProfile }: OnboardingWizardProps) {
                 cursor: saving ? "not-allowed" : "pointer",
               }}
             >
-              {saving
-                ? "Saving..."
-                : step === totalSteps - 1
-                  ? "Get Started"
-                  : "Continue"}
+              {nextLabel}
             </button>
             {showSkip && (
               <button

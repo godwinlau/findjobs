@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JOBS</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #F5F5F0;
+    font-family: 'Sora', sans-serif;
+    color: #0A0A0A;
+    min-height: 100vh;
+  }
+  ::selection { background: #0A0A0A; color: #F5F5F0; }
+
+  /* ============================================================
+     NAVBAR
+     ============================================================ */
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    background: #0A0A0A;
+    color: #F5F5F0;
+    border-bottom: 3px solid #0A0A0A;
+  }
+  .nav-inner {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: stretch;
+    height: 60px;
+  }
+
+  /* Logo block */
+  .nav-brand {
+    display: flex; align-items: center; gap: 10px;
+    padding-right: 24px;
+    border-right: 2px solid rgba(255,255,255,.1);
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+  .nav-brand:hover { opacity: .8; }
+  .nav-logo {
+    width: 32px; height: 32px;
+    background: #FBBF24;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 14px; font-weight: 700;
+    color: #0A0A0A;
+  }
+  .nav-wordmark {
+    font-size: 16px; font-weight: 800;
+    letter-spacing: -.03em;
+    text-transform: uppercase;
+  }
+
+  /* Nav links */
+  .nav-links {
+    display: flex; align-items: stretch;
+    list-style: none;
+    flex: 1;
+  }
+  .nav-links li {
+    display: flex; align-items: stretch;
+    border-right: 1px solid rgba(255,255,255,.06);
+  }
+  .nav-links a {
+    display: flex; align-items: center;
+    padding: 0 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: rgba(255,255,255,.4);
+    text-decoration: none;
+    transition: all .15s;
+    position: relative;
+  }
+  .nav-links a:hover { color: #F5F5F0; background: rgba(255,255,255,.04); }
+  .nav-links a.active {
+    color: #FBBF24;
+    background: rgba(251,191,36,.05);
+  }
+  .nav-links a.active::after {
+    content: '';
+    position: absolute; bottom: -3px; left: 0;
+    width: 100%; height: 3px;
+    background: #FBBF24;
+  }
+  .nav-links .badge {
+    font-size: 9px; font-weight: 700;
+    background: #FBBF24; color: #0A0A0A;
+    padding: 2px 6px;
+    margin-left: 8px;
+    line-height: 1.2;
+  }
+
+  /* Right section */
+  .nav-right {
+    display: flex; align-items: stretch;
+    margin-left: auto;
+    border-left: 2px solid rgba(255,255,255,.1);
+  }
+  .nav-btn {
+    display: flex; align-items: center;
+    padding: 0 16px;
+    background: transparent; border: none;
+    color: rgba(255,255,255,.4);
+    cursor: pointer; transition: all .15s;
+    border-left: 1px solid rgba(255,255,255,.06);
+    position: relative;
+  }
+  .nav-btn:hover { color: #F5F5F0; background: rgba(255,255,255,.04); }
+  .nav-btn svg { width: 18px; height: 18px; }
+  .nav-btn .notif-dot {
+    width: 6px; height: 6px;
+    background: #FBBF24;
+    position: absolute;
+    top: 16px; right: 14px;
+  }
+  .nav-avatar {
+    width: 28px; height: 28px;
+    background: #FBBF24;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; font-weight: 700;
+    color: #0A0A0A;
+  }
+
+  @media (max-width: 700px) {
+    .nav-links a span.full { display: none; }
+    .nav-links a span.short { display: inline; }
+    .nav-links a { padding: 0 12px; font-size: 10px; }
+    .nav-wordmark { display: none; }
+  }
+  @media (min-width: 701px) {
+    .nav-links a span.short { display: none; }
+  }
+
+  /* ============================================================
+     SUBHEADER — Filters strip
+     ============================================================ */
+  .subheader {
+    background: #F5F5F0;
+    border-bottom: 2px solid #0A0A0A;
+  }
+  .subheader-inner {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .filters { display: flex; gap: 6px; flex-wrap: wrap; }
+  .filter-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    padding: 6px 14px;
+    border: 2px solid #0A0A0A;
+    background: transparent;
+    color: #0A0A0A;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .filter-btn:hover { background: #0A0A0A; color: #F5F5F0; }
+  .filter-btn.active { background: #0A0A0A; color: #FBBF24; }
+  .sort-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: #888;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 4px;
+    transition: color .15s;
+  }
+  .sort-btn:hover { color: #0A0A0A; }
+  .sort-btn svg { width: 14px; height: 14px; }
+
+  /* ============================================================
+     MAIN CONTENT
+     ============================================================ */
+  .main { max-width: 980px; margin: 0 auto; padding: 32px 20px 60px; }
+
+  .header {
+    margin-bottom: 28px;
+    display: flex; justify-content: space-between; align-items: flex-end;
+  }
+  .header-left { display: flex; flex-direction: column; gap: 4px; }
+  .header-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; letter-spacing: .08em;
+    text-transform: uppercase; color: #888;
+  }
+  .header h1 {
+    font-size: 48px; font-weight: 800;
+    letter-spacing: -.04em; line-height: .95;
+    text-transform: uppercase;
+  }
+  .header-right {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px; color: #888;
+    text-align: right; line-height: 1.5;
+  }
+  .header-right strong { color: #0A0A0A; }
+
+  @media (max-width: 600px) {
+    .header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .header h1 { font-size: 36px; }
+  }
+
+  /* ===== GRID ===== */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 0;
+  }
+  @media (max-width: 700px) {
+    .grid { grid-template-columns: 1fr; }
+    .grid > * { grid-column: 1/-1 !important; }
+  }
+
+  /* ===== CARD BASE ===== */
+  .card {
+    border: 2px solid #0A0A0A;
+    position: relative;
+    cursor: pointer;
+    transition: all .2s ease;
+    animation: slam .4s cubic-bezier(.22,1,.36,1) both;
+    margin-top: -2px; margin-left: -2px;
+  }
+  .card:hover { z-index: 10; }
+  @keyframes slam { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .card:nth-child(1){animation-delay:0s}
+  .card:nth-child(2){animation-delay:.03s}
+  .card:nth-child(3){animation-delay:.06s}
+  .card:nth-child(4){animation-delay:.09s}
+  .card:nth-child(5){animation-delay:.12s}
+  .card:nth-child(6){animation-delay:.15s}
+  .card:nth-child(7){animation-delay:.18s}
+  .card:nth-child(8){animation-delay:.21s}
+  .card:nth-child(9){animation-delay:.24s}
+
+  /* Shared elements */
+  .logo-brutal {
+    width: 48px; height: 48px;
+    border: 2px solid currentColor;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 20px;
+  }
+  .logo-brutal svg { width: 22px; height: 22px; }
+
+  .source-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; font-weight: 700;
+    padding: 4px 10px;
+    text-transform: uppercase; letter-spacing: .06em;
+    border: 1.5px solid;
+  }
+  .src-linkedin { border-color: #818CF8; color: #818CF8; }
+  .src-glassdoor { border-color: #6EE7B7; color: #6EE7B7; }
+  .src-indeed { border-color: #FBBF24; color: #FBBF24; }
+  .src-wellfound { border-color: #F5F5F0; color: #F5F5F0; }
+  .src-direct { border-color: #888; color: #888; }
+  .card-std .src-linkedin { border-color: #4338CA; color: #4338CA; }
+  .card-std .src-glassdoor { border-color: #0CAA41; color: #0CAA41; }
+  .card-std .src-indeed { border-color: #B45309; color: #B45309; }
+  .card-std .src-wellfound { border-color: #0A0A0A; color: #0A0A0A; }
+  .card-wide .src-linkedin { border-color: #4338CA; color: #4338CA; }
+  .card-wide .src-indeed { border-color: #B45309; color: #B45309; }
+
+  .match-brutal {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; font-weight: 700;
+    padding: 4px 10px;
+    background: #F5F5F0; color: #0A0A0A;
+  }
+  .card-std .match-brutal { background: #0A0A0A; color: #F5F5F0; }
+
+  .tag-brutal {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; padding: 4px 8px;
+    text-transform: uppercase; letter-spacing: .04em;
+    border: 1px solid rgba(255,255,255,.15);
+    color: rgba(255,255,255,.5);
+  }
+  .card-std .tag-brutal, .card-wide .tag-brutal {
+    border-color: rgba(0,0,0,.12); color: #888;
+  }
+
+  .save-brutal {
+    width: 36px; height: 36px;
+    border: 1.5px solid rgba(255,255,255,.15);
+    background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all .15s;
+  }
+  .save-brutal:hover { border-color: rgba(255,255,255,.4); }
+  .save-brutal svg { width: 15px; height: 15px; color: rgba(255,255,255,.3); }
+  .save-brutal.saved svg { color: #FBBF24; fill: #FBBF24; }
+  .card-std .save-brutal, .card-wide .save-brutal { border-color: rgba(0,0,0,.12); }
+  .card-std .save-brutal svg, .card-wide .save-brutal svg { color: #ccc; }
+  .card-std .save-brutal.saved svg, .card-wide .save-brutal.saved svg { color: #0A0A0A; fill: #0A0A0A; }
+
+  /* ============================================================
+     HERO
+     ============================================================ */
+  .card-hero {
+    grid-column: 1 / -1;
+    background: #0A0A0A; color: #F5F5F0;
+    padding: 40px;
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 32px; align-items: end;
+    min-height: 300px;
+  }
+  .card-hero:hover {
+    background: #1A1A1A;
+    box-shadow: 8px 8px 0 #0A0A0A;
+    transform: translate(-4px, -4px);
+  }
+  .hero-left { display: flex; flex-direction: column; gap: 16px; }
+  .hero-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .card-hero .logo-brutal { border-color: rgba(255,255,255,.2); }
+  .hero-company {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px; color: rgba(245,245,240,.4);
+    text-transform: uppercase; letter-spacing: .06em;
+  }
+  .hero-title {
+    font-size: 42px; font-weight: 800;
+    letter-spacing: -.04em; line-height: 1;
+    text-transform: uppercase;
+  }
+  .hero-desc {
+    font-size: 14px; line-height: 1.65;
+    color: rgba(245,245,240,.5); max-width: 520px;
+  }
+  .hero-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .hero-right {
+    display: flex; flex-direction: column; align-items: flex-end;
+    gap: 16px; align-self: stretch; justify-content: space-between;
+  }
+  .hero-salary {
+    font-size: 36px; font-weight: 800;
+    letter-spacing: -.03em; line-height: 1; text-align: right;
+  }
+  .hero-salary span {
+    display: block;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; font-weight: 400;
+    color: rgba(245,245,240,.3); margin-top: 4px; letter-spacing: .04em;
+  }
+  .hero-time {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; color: rgba(245,245,240,.25); text-align: right;
+  }
+  .apply-brutal {
+    padding: 14px 32px;
+    background: #F5F5F0; color: #0A0A0A; border: none;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .06em;
+    cursor: pointer; transition: all .15s;
+  }
+  .apply-brutal:hover {
+    background: #FBBF24;
+    box-shadow: 4px 4px 0 rgba(255,255,255,.2);
+    transform: translate(-2px, -2px);
+  }
+
+  @media (max-width: 700px) {
+    .card-hero { grid-template-columns: 1fr; padding: 28px; min-height: auto; }
+    .hero-title { font-size: 28px; }
+    .hero-salary { font-size: 24px; }
+    .hero-right { align-items: flex-start; flex-direction: row; flex-wrap: wrap; gap: 12px; }
+  }
+
+  /* ============================================================
+     STANDARD
+     ============================================================ */
+  .card-std {
+    background: #F5F5F0;
+    padding: 24px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .card-std:hover {
+    background: #EEEEE8;
+    box-shadow: 6px 6px 0 #0A0A0A;
+    transform: translate(-3px, -3px);
+  }
+  .std-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .std-top-left { display: flex; align-items: center; gap: 8px; }
+  .card-std .logo-brutal { border-color: #0A0A0A; }
+  .logo-spotify-d { background: #E8F7EF; }
+  .logo-vercel-d { background: #ECECEC; font-weight: 800; font-size: 17px; }
+  .logo-stripe-d { background: #EEEBFF; }
+  .logo-linear-d { background: #E6ECFB; }
+  .logo-shopify-d { background: #E2F5E9; }
+  .logo-figma-d { background: #FDEAE6; }
+
+  .std-company {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; color: #888;
+    text-transform: uppercase; letter-spacing: .05em;
+  }
+  .std-title {
+    font-size: 20px; font-weight: 800;
+    letter-spacing: -.03em; line-height: 1.15;
+    text-transform: uppercase;
+  }
+  .std-desc {
+    font-size: 12.5px; line-height: 1.6; color: #666;
+    display: -webkit-box; -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .std-bottom {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-top: auto; padding-top: 14px;
+    border-top: 2px solid #0A0A0A;
+  }
+  .std-salary { font-size: 18px; font-weight: 800; letter-spacing: -.02em; }
+  .std-salary span {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; font-weight: 400; color: #888;
+    display: block; margin-top: 2px;
+  }
+  .apply-std {
+    padding: 10px 20px; border: 2px solid #0A0A0A;
+    background: transparent; color: #0A0A0A;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .04em;
+    cursor: pointer; transition: all .15s;
+  }
+  .apply-std:hover {
+    background: #0A0A0A; color: #F5F5F0;
+    box-shadow: 3px 3px 0 #888;
+    transform: translate(-2px, -2px);
+  }
+
+  /* ============================================================
+     WIDE
+     ============================================================ */
+  .card-wide {
+    grid-column: 1 / 10;
+    background: #F5F5F0;
+    padding: 20px 28px;
+    display: grid;
+    grid-template-columns: auto auto 1fr auto auto auto;
+    gap: 20px; align-items: center;
+  }
+  .card-wide:hover {
+    background: #EEEEE8;
+    box-shadow: 6px 6px 0 #0A0A0A;
+    transform: translate(-3px, -3px);
+  }
+  .card-wide .logo-brutal { border-color: #0A0A0A; }
+  .wide-info { display: flex; flex-direction: column; gap: 3px; }
+  .wide-info .std-title { font-size: 17px; }
+  .wide-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .wide-salary { font-size: 17px; font-weight: 800; letter-spacing: -.02em; text-align: right; }
+  .wide-salary span {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; font-weight: 400; color: #888; display: block;
+  }
+  @media (max-width: 700px) {
+    .card-wide { grid-template-columns: 1fr; gap: 12px; }
+  }
+
+  /* ============================================================
+     ACCENT BLOCKS
+     ============================================================ */
+  .card-accent {
+    background: #FBBF24;
+    padding: 28px;
+    display: flex; flex-direction: column;
+    justify-content: space-between; gap: 20px;
+  }
+  .card-accent:hover {
+    box-shadow: 6px 6px 0 #0A0A0A;
+    transform: translate(-3px, -3px);
+  }
+  .accent-big {
+    font-size: 64px; font-weight: 800;
+    letter-spacing: -.05em; line-height: .9;
+  }
+  .accent-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; text-transform: uppercase;
+    letter-spacing: .06em; color: rgba(10,10,10,.5);
+  }
+  .card-accent-dark { background: #0A0A0A; color: #F5F5F0; }
+  .card-accent-dark .accent-label { color: rgba(245,245,240,.4); }
+</style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <div class="nav-logo">JB</div>
+      <span class="nav-wordmark">Jobboard</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#" class="active"><span class="full">Jobs</span><span class="short">Jobs</span><span class="badge">32</span></a></li>
+      <li><a href="#"><span class="full">Saved</span><span class="short">★</span></a></li>
+      <li><a href="#"><span class="full">Applications</span><span class="short">Apps</span></a></li>
+      <li><a href="#"><span class="full">Companies</span><span class="short">Co.</span></a></li>
+      <li><a href="#"><span class="full">Messages</span><span class="short">Msg</span></a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-btn" title="Search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </button>
+      <button class="nav-btn" title="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="notif-dot"></span>
+      </button>
+      <button class="nav-btn" title="Profile">
+        <div class="nav-avatar">GR</div>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== FILTER BAR ===== -->
+<div class="subheader">
+  <div class="subheader-inner">
+    <div class="filters">
+      <button class="filter-btn active">All</button>
+      <button class="filter-btn">Remote</button>
+      <button class="filter-btn">Full-time</button>
+      <button class="filter-btn">Senior+</button>
+      <button class="filter-btn">$150K+</button>
+      <button class="filter-btn">Design</button>
+      <button class="filter-btn">Engineering</button>
+    </div>
+    <button class="sort-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5h10M11 9h7M11 13h4M3 17l4 4 4-4M7 3v18"/></svg>
+      Sort: Relevance
+    </button>
+  </div>
+</div>
+
+<!-- ===== MAIN ===== -->
+<main class="main">
+  <div class="header">
+    <div class="header-left">
+      <span class="header-label">// job_feed.results</span>
+      <h1>New Jobs</h1>
+    </div>
+    <div class="header-right">
+      <strong>32</strong> matches<br>
+      updated <strong>2 min</strong> ago
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <!-- HERO -->
+    <div class="card card-hero">
+      <div class="hero-left">
+        <div class="hero-top">
+          <div class="logo-brutal"><svg viewBox="0 0 24 24" fill="#1DB954"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.5.4-.8.2-2.2-1.3-5-1.6-8.3-.9-.3.1-.6-.1-.7-.4-.1-.3.1-.6.4-.7 3.6-.8 6.7-.5 9.2 1 .3.2.4.5.2.8zm1.2-2.7c-.2.4-.7.5-1 .3-2.5-1.5-6.3-2-9.3-1.1-.4.1-.8-.1-.9-.5-.1-.4.1-.8.5-.9 3.4-1 7.6-.5 10.4 1.2.3.2.5.7.3 1zm.1-2.8c-3-1.8-8-2-10.9-.9-.5.2-1-.1-1.1-.5-.2-.5.1-1 .5-1.1 3.3-1 8.7-.8 12.1 1.1.4.3.6.8.3 1.3-.2.4-.8.6-1.2.3l.3-.2z"/></svg></div>
+          <span class="source-tag src-linkedin">LinkedIn</span>
+          <span class="match-brutal">95% MATCH</span>
+        </div>
+        <div class="hero-company">Spotify — Stockholm — Remote</div>
+        <div class="hero-title">Senior Product<br>Designer</div>
+        <p class="hero-desc">Lead end-to-end design for Spotify's creator tools. Shape how millions of artists connect with fans through data-informed experiences.</p>
+        <div class="hero-tags">
+          <span class="tag-brutal">Full-time</span><span class="tag-brutal">Remote</span>
+          <span class="tag-brutal">Senior</span><span class="tag-brutal">Design Systems</span>
+        </div>
+      </div>
+      <div class="hero-right">
+        <button class="save-brutal saved" onclick="this.classList.toggle('saved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+        <div>
+          <div class="hero-salary">$180K<span>$145K — $180K /YR</span></div>
+          <div class="hero-time">2 HOURS AGO</div>
+        </div>
+        <button class="apply-brutal">Apply Now →</button>
+      </div>
+    </div>
+
+    <!-- 3 Standard + Accent -->
+    <div class="card card-std" style="grid-column:1/4">
+      <div class="std-top">
+        <div class="std-top-left">
+          <div class="logo-brutal logo-vercel-d">▲</div>
+          <span class="source-tag src-wellfound">Wellfound</span>
+        </div>
+        <button class="save-brutal" onclick="this.classList.toggle('saved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+      </div>
+      <div class="std-company">Vercel — Remote</div>
+      <div class="std-title">Senior React Developer</div>
+      <p class="std-desc">Build Next.js, Turbopack, and Vercel's deployment platform at massive scale.</p>
+      <div class="hero-tags"><span class="tag-brutal">Full-time</span><span class="tag-brutal">Remote</span></div>
+      <div class="std-bottom">
+        <div class="std-salary">$195K<span>$155K — $195K /YR</span></div>
+        <button class="apply-std">Apply →</button>
+      </div>
+    </div>
+
+    <div class="card card-std" style="grid-column:4/7">
+      <div class="std-top">
+        <div class="std-top-left">
+          <div class="logo-brutal logo-stripe-d"><svg viewBox="0 0 24 24" fill="#635BFF"><path d="M13.98 7.87c-1.18 0-1.95.52-2.4 1.05l-.32-1.05H9.1v12.04l2.63-.56.01-2.92c.46.33 1.13.8 2.24.8 2.26 0 4.32-1.82 4.32-5.82-.01-3.66-2.1-5.54-4.32-5.54zm-.76 8.52c-.75 0-1.19-.27-1.5-.6l-.01-4.74c.32-.37.78-.63 1.51-.63 1.15 0 1.95 1.29 1.95 2.98 0 1.72-.79 2.99-1.95 2.99z"/></svg></div>
+          <span class="source-tag src-glassdoor">Glassdoor</span>
+        </div>
+        <span class="match-brutal">89%</span>
+      </div>
+      <div class="std-company">Stripe — SF</div>
+      <div class="std-title">Design Engineer</div>
+      <p class="std-desc">Craft interactive prototypes and production UI for Stripe's payment flows.</p>
+      <div class="hero-tags"><span class="tag-brutal">Full-time</span><span class="tag-brutal">On-site</span></div>
+      <div class="std-bottom">
+        <div class="std-salary">$220K<span>$170K — $220K /YR</span></div>
+        <button class="apply-std">Apply →</button>
+      </div>
+    </div>
+
+    <div class="card card-std" style="grid-column:7/10">
+      <div class="std-top">
+        <div class="std-top-left">
+          <div class="logo-brutal logo-figma-d"><svg viewBox="0 0 24 24" fill="#F24E1E"><path d="M8 24c2.2 0 4-1.8 4-4v-4H8c-2.2 0-4 1.8-4 4s1.8 4 4 4zm0-20C5.8 4 4 5.8 4 8s1.8 4 4 4h4V4H8zm8 0h-4v8h4c2.2 0 4-1.8 4-4s-1.8-4-4-4zm-4 8c-2.2 0-4 1.8-4 4s1.8 4 4 4h4v-8H8h4zm4 0a4 4 0 100 8 4 4 0 000-8z"/></svg></div>
+          <span class="source-tag src-direct">Direct</span>
+        </div>
+        <span class="match-brutal">91%</span>
+      </div>
+      <div class="std-company">Figma — Remote</div>
+      <div class="std-title">Design Technologist</div>
+      <p class="std-desc">Prototype advanced interaction patterns for Figma's collaborative design tools.</p>
+      <div class="hero-tags"><span class="tag-brutal">Full-time</span><span class="tag-brutal">Remote</span></div>
+      <div class="std-bottom">
+        <div class="std-salary">$185K<span>$140K — $185K /YR</span></div>
+        <button class="apply-std">Apply →</button>
+      </div>
+    </div>
+
+    <div class="card card-accent" style="grid-column:10/13">
+      <div class="accent-label">Avg. match<br>this week</div>
+      <div class="accent-big">89%</div>
+    </div>
+
+    <!-- Wide rows + accent blocks -->
+    <div class="card card-wide" style="grid-column:1/10">
+      <div class="logo-brutal logo-shopify-d" style="border-color:#0A0A0A"><svg viewBox="0 0 24 24" fill="#5E8E3E"><path d="M15.34 6.45s-.16-.02-.16-.02l-.7-.13-.52-.52c-.05-.05-.14-.04-.14-.04l-.32.1c-.19-.56-.52-1.07-1.1-1.07h-.05c-.16-.21-.36-.3-.53-.3-.01 0-.02 0-.03 0-1.32.06-1.95 1.66-2.15 2.5l-1.76.55s-.52.16-.54.18c-.16.05-.17.06-.19.2L6.3 17.66l7.37 1.27 3.26-.82C16.93 18.11 15.37 6.48 15.34 6.45z"/></svg></div>
+      <span class="source-tag src-indeed">Indeed</span>
+      <div class="wide-info">
+        <div class="std-company">Shopify — Remote</div>
+        <div class="std-title">Staff Frontend Developer</div>
+      </div>
+      <div class="wide-tags"><span class="tag-brutal">Staff</span><span class="tag-brutal">Remote</span><span class="match-brutal" style="background:#0A0A0A;color:#F5F5F0">76%</span></div>
+      <div class="wide-salary">$210K<span>$160K — $210K /YR</span></div>
+      <button class="apply-std">Apply →</button>
+    </div>
+
+    <div class="card card-accent card-accent-dark" style="grid-column:10/13">
+      <div class="accent-label">New today</div>
+      <div class="accent-big">6</div>
+    </div>
+
+    <div class="card card-wide" style="grid-column:1/10">
+      <div class="logo-brutal logo-linear-d" style="border-color:#0A0A0A"><svg viewBox="0 0 24 24" fill="#5E6AD2"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></div>
+      <span class="source-tag src-linkedin">LinkedIn</span>
+      <div class="wide-info">
+        <div class="std-company">Linear — Remote</div>
+        <div class="std-title">UX Engineer</div>
+      </div>
+      <div class="wide-tags"><span class="tag-brutal">Mid-Sr</span><span class="tag-brutal">Remote</span><span class="match-brutal" style="background:#0A0A0A;color:#F5F5F0">86%</span></div>
+      <div class="wide-salary">$150K<span>$120K — $150K /YR</span></div>
+      <button class="apply-std">Apply →</button>
+    </div>
+
+    <div class="card card-accent" style="grid-column:10/13">
+      <div class="accent-label">Applications<br>this week</div>
+      <div class="accent-big">12</div>
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

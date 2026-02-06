@@ -1,7 +1,9 @@
 "use client";
 
 import { colors } from "@/lib/constants/colors";
+import { ArrowUpRight, YoutubeLogo } from "@phosphor-icons/react";
 import { Card, CompanyLogo, Badge, Button } from "@/components/ui";
+import { getYoutubeForSkill } from "@/lib/constants/youtubeResources";
 import type { ScoredCourse } from "@/lib/types/learn";
 
 interface CourseCardProps {
@@ -10,6 +12,13 @@ interface CourseCardProps {
 }
 
 export function CourseCard({ course, animationDelay = 0 }: CourseCardProps) {
+  const youtube =
+    course.youtubeUrl
+      ? { url: course.youtubeUrl, channel: "YouTube" }
+      : course.skillsTaught.length > 0
+        ? getYoutubeForSkill(course.skillsTaught[0], course.categoryId)
+        : null;
+
   return (
     <Card
       style={{ display: "flex", flexDirection: "column", gap: 12 }}
@@ -114,17 +123,56 @@ export function CourseCard({ course, animationDelay = 0 }: CourseCardProps) {
         </div>
       )}
 
-      {/* CTA */}
-      <a
-        href={course.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{ textDecoration: "none" }}
-      >
-        <Button variant="secondary" size="sm" style={{ width: "100%" }}>
-          Start Learning →
-        </Button>
-      </a>
+      {/* CTAs */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <a
+          href={course.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ textDecoration: "none" }}
+        >
+          <Button
+            variant="secondary"
+            size="sm"
+            style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
+            }}
+          >
+            Learn on {course.provider}
+            <ArrowUpRight size={14} weight="bold" />
+          </Button>
+        </a>
+
+        {youtube && (
+          <a
+            href={youtube.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ textDecoration: "none" }}
+          >
+            <Button
+              variant="ghost"
+              size="sm"
+              style={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 6,
+                color: colors.textMuted,
+              }}
+            >
+              <YoutubeLogo size={16} weight="fill" color="#FF0000" />
+              Watch on {youtube.channel}
+              <ArrowUpRight size={12} weight="bold" />
+            </Button>
+          </a>
+        )}
+      </div>
     </Card>
   );
 }

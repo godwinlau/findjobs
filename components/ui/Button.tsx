@@ -17,35 +17,35 @@ export function Button({
 }: ButtonProps) {
   const variants = {
     primary: {
-      background: colors.primary,
-      color: colors.inv,
-      border: "none",
-      boxShadow: `0 2px 8px ${colors.primary}20`,
+      background: "#0A0A0A",
+      color: "#F5F5F0",
+      border: "2px solid #0A0A0A",
+      boxShadow: "none",
     },
     secondary: {
-      background: colors.primaryBg,
-      color: colors.primary,
-      border: `1px solid ${colors.primaryBorder}`,
+      background: "transparent",
+      color: "#0A0A0A",
+      border: "2px solid #0A0A0A",
       boxShadow: "none",
     },
     outline: {
-      background: colors.surface,
-      color: colors.textSec,
-      border: `1px solid ${colors.border}`,
+      background: "transparent",
+      color: "#0A0A0A",
+      border: "2px solid #0A0A0A",
       boxShadow: "none",
     },
     ghost: {
       background: "transparent",
-      color: colors.textSec,
-      border: "none",
+      color: "#0A0A0A",
+      border: "2px solid transparent",
       boxShadow: "none",
     },
   };
 
   const sizes = {
-    sm: { padding: "6px 12px", fontSize: 11, borderRadius: 6 },
-    md: { padding: "8px 16px", fontSize: 12, borderRadius: 7 },
-    lg: { padding: "10px 24px", fontSize: 13, borderRadius: 8 },
+    sm: { padding: "6px 14px", fontSize: 10 },
+    md: { padding: "8px 18px", fontSize: 11 },
+    lg: { padding: "10px 24px", fontSize: 12 },
   };
 
   const v = variants[variant];
@@ -55,11 +55,14 @@ export function Button({
     <button
       style={{
         padding: s.padding,
-        borderRadius: s.borderRadius,
         fontSize: s.fontSize,
-        fontWeight: 600,
+        fontWeight: 700,
+        fontFamily: "var(--font-mono)",
+        textTransform: "uppercase" as const,
+        letterSpacing: "0.04em",
         cursor: "pointer",
         whiteSpace: "nowrap",
+        transition: "all 0.15s ease",
         ...v,
         ...style,
       }}

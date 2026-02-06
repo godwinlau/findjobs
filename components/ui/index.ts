@@ -5,3 +5,5 @@ export { Button } from "./Button";
 export { Card } from "./Card";
 export { CompanyLogo } from "./CompanyLogo";
 export { MatchIndicator } from "./MatchIndicator";
+export { SalaryBadge } from "./SalaryBadge";
+export { SkillMatchBadge } from "./SkillMatchBadge";

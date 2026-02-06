@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { colors } from "@/lib/constants/colors";
 
 interface FilterBarProps {
   locations: string[];
@@ -72,106 +71,84 @@ export function FilterBar({ locations, hasProfile, filters, onFilterChange }: Fi
     return filters[key] || "";
   }
 
-  // Borderless dropdown style (Kalibrr-style)
   const dropdownStyle = (isActive: boolean): React.CSSProperties => ({
     flex: 1,
     minWidth: 0,
-    padding: "10px 4px",
-    fontSize: 13,
-    fontWeight: isActive ? 600 : 500,
+    padding: "10px 8px",
+    fontSize: 10,
+    fontWeight: 700,
+    fontFamily: "var(--font-mono)",
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
     border: "none",
     background: "transparent",
-    color: isActive ? colors.primary : colors.text,
+    color: isActive ? "#FBBF24" : "#0A0A0A",
     cursor: "pointer",
     outline: "none",
     textAlign: "center",
     appearance: "none" as const,
     WebkitAppearance: "none" as const,
-    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239E9E96' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
+    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
     backgroundRepeat: "no-repeat",
     backgroundPosition: "right 4px center",
     paddingRight: 20,
   });
 
-  // Pill sort dropdown
   const sortStyle: React.CSSProperties = {
-    padding: "6px 12px",
-    paddingRight: 26,
-    fontSize: 12,
-    fontWeight: 500,
-    borderRadius: 20,
-    border: `1px solid ${colors.border}`,
-    background: colors.surface,
-    color: colors.text,
+    padding: "8px 12px",
+    paddingRight: 28,
+    fontSize: 10,
+    fontWeight: 700,
+    fontFamily: "var(--font-mono)",
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+    border: "2px solid #0A0A0A",
+    background: "transparent",
+    color: "#0A0A0A",
     cursor: "pointer",
     outline: "none",
     appearance: "none" as const,
     WebkitAppearance: "none" as const,
-    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239E9E96' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
+    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
     backgroundRepeat: "no-repeat",
     backgroundPosition: "right 10px center",
   };
 
-  // Toggle switch style
   function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
     return (
-      <label
+      <button
+        onClick={() => onChange(!checked)}
         style={{
-          display: "flex",
+          display: "inline-flex",
           alignItems: "center",
-          gap: 8,
+          gap: 6,
+          padding: "8px 14px",
+          fontSize: 10,
+          fontWeight: 700,
+          fontFamily: "var(--font-mono)",
+          textTransform: "uppercase" as const,
+          letterSpacing: "0.04em",
+          border: "2px solid #0A0A0A",
+          background: checked ? "#0A0A0A" : "transparent",
+          color: checked ? "#FBBF24" : "#0A0A0A",
           cursor: "pointer",
-          fontSize: 13,
-          fontWeight: 500,
-          color: checked ? colors.text : colors.textSec,
-          whiteSpace: "nowrap",
+          transition: "all 0.15s ease",
         }}
       >
         {label}
-        <button
-          role="switch"
-          aria-checked={checked}
-          onClick={(e) => { e.preventDefault(); onChange(!checked); }}
-          style={{
-            position: "relative",
-            width: 36,
-            height: 20,
-            borderRadius: 10,
-            border: "none",
-            background: checked ? colors.primary : colors.border,
-            cursor: "pointer",
-            transition: "background 0.2s ease",
-            flexShrink: 0,
-            padding: 0,
-          }}
-        >
-          <span
-            style={{
-              position: "absolute",
-              top: 2,
-              left: checked ? 18 : 2,
-              width: 16,
-              height: 16,
-              borderRadius: "50%",
-              background: "#fff",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
-              transition: "left 0.2s ease",
-            }}
-          />
-        </button>
-      </label>
+      </button>
     );
   }
 
   return (
     <div style={{ marginBottom: 16 }}>
-      {/* Row 1 — Primary filter dropdowns (Kalibrr-style full-width bar) */}
+      {/* Row 1 — Primary filter dropdowns */}
       <div
         className="filter-bar-primary"
         style={{
           alignItems: "center",
-          background: colors.surfaceAlt,
-          borderRadius: 10,
+          background: "#F5F5F0",
+          border: "2px solid #0A0A0A",
           marginBottom: 10,
         }}
       >
@@ -186,7 +163,7 @@ export function FilterBar({ locations, hasProfile, filters, onFilterChange }: Fi
           ))}
         </select>
 
-        <span className="filter-bar-divider" style={{ width: 1, height: 20, background: colors.border, flexShrink: 0 }} />
+        <span className="filter-bar-divider" style={{ width: 2, height: 20, background: "#0A0A0A", flexShrink: 0 }} />
 
         <select
           value={getParam("experienceLevel")}
@@ -198,7 +175,7 @@ export function FilterBar({ locations, hasProfile, filters, onFilterChange }: Fi
           ))}
         </select>
 
-        <span className="filter-bar-divider" style={{ width: 1, height: 20, background: colors.border, flexShrink: 0 }} />
+        <span className="filter-bar-divider" style={{ width: 2, height: 20, background: "#0A0A0A", flexShrink: 0 }} />
 
         <select
           value={getParam("jobType")}
@@ -210,7 +187,7 @@ export function FilterBar({ locations, hasProfile, filters, onFilterChange }: Fi
           ))}
         </select>
 
-        <span className="filter-bar-divider" style={{ width: 1, height: 20, background: colors.border, flexShrink: 0 }} />
+        <span className="filter-bar-divider" style={{ width: 2, height: 20, background: "#0A0A0A", flexShrink: 0 }} />
 
         <select
           value={getParam("workSetup")}
@@ -222,7 +199,7 @@ export function FilterBar({ locations, hasProfile, filters, onFilterChange }: Fi
           ))}
         </select>
 
-        <span className="filter-bar-divider" style={{ width: 1, height: 20, background: colors.border, flexShrink: 0 }} />
+        <span className="filter-bar-divider" style={{ width: 2, height: 20, background: "#0A0A0A", flexShrink: 0 }} />
 
         <select
           value={getParam("salaryMin") || getParam("salaryMax") ? `${getParam("salaryMin") || ""}-${getParam("salaryMax") || ""}` : ""}
@@ -240,7 +217,7 @@ export function FilterBar({ locations, hasProfile, filters, onFilterChange }: Fi
           )}
         </select>
 
-        <span className="filter-bar-divider" style={{ width: 1, height: 20, background: colors.border, flexShrink: 0 }} />
+        <span className="filter-bar-divider" style={{ width: 2, height: 20, background: "#0A0A0A", flexShrink: 0 }} />
 
         <select
           value={getParam("datePosted")}
@@ -254,17 +231,29 @@ export function FilterBar({ locations, hasProfile, filters, onFilterChange }: Fi
 
       </div>
 
-      {/* Row 2 — Sort + toggle switches */}
+      {/* Row 2 — Sort + toggle buttons */}
       <div
         className="responsive-gap-md"
         style={{
           display: "flex",
           alignItems: "center",
           flexWrap: "wrap",
+          gap: 8,
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 13, fontWeight: 500, color: colors.textSec }}>Sort by</span>
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              fontFamily: "var(--font-mono)",
+              textTransform: "uppercase" as const,
+              letterSpacing: "0.04em",
+              color: "#888",
+            }}
+          >
+            Sort by
+          </span>
           <select
             value={getParam("sort") || "recency"}
             onChange={(e) => onFilterChange("sort", e.target.value === "recency" ? "" : e.target.value)}
@@ -276,10 +265,10 @@ export function FilterBar({ locations, hasProfile, filters, onFilterChange }: Fi
           </select>
         </div>
 
-        <span style={{ width: 1, height: 20, background: colors.border, flexShrink: 0 }} />
+        <span style={{ width: 2, height: 20, background: "#0A0A0A", flexShrink: 0 }} />
 
         <Toggle
-          label="Remote Work"
+          label="Remote"
           checked={getParam("workSetup") === "remote"}
           onChange={(v) => onFilterChange("workSetup", v ? "remote" : "")}
         />
@@ -298,24 +287,26 @@ export function FilterBar({ locations, hasProfile, filters, onFilterChange }: Fi
 
         <button
           onClick={() => setShowMore(!showMore)}
-          className="more-filters-btn"
           style={{
-            padding: "6px 14px",
-            fontSize: 12,
-            fontWeight: 500,
-            borderRadius: 20,
-            border: `1px solid ${colors.border}`,
-            background: colors.surface,
-            color: colors.textSec,
+            padding: "8px 14px",
+            fontSize: 10,
+            fontWeight: 700,
+            fontFamily: "var(--font-mono)",
+            textTransform: "uppercase" as const,
+            letterSpacing: "0.04em",
+            border: "2px solid #0A0A0A",
+            background: "transparent",
+            color: "#0A0A0A",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
             gap: 5,
+            transition: "all 0.15s ease",
           }}
         >
           {showMore ? "Less filters" : "More filters"}
           <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style={{ transform: showMore ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
-            <path d="M1 1l4 4 4-4" stroke={colors.textMuted} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M1 1l4 4 4-4" stroke="#888" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
       </div>
@@ -330,11 +321,22 @@ export function FilterBar({ locations, hasProfile, filters, onFilterChange }: Fi
             flexWrap: "wrap",
             marginTop: 12,
             paddingTop: 12,
-            borderTop: `1px solid ${colors.border}`,
+            borderTop: "2px solid #0A0A0A",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ fontSize: 12, fontWeight: 500, color: colors.textSec }}>Salary range</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                fontFamily: "var(--font-mono)",
+                textTransform: "uppercase" as const,
+                letterSpacing: "0.04em",
+                color: "#888",
+              }}
+            >
+              Salary range
+            </span>
             <select
               value={getParam("salaryMin")}
               onChange={(e) => onFilterChange("salaryMin", e.target.value)}
@@ -345,7 +347,16 @@ export function FilterBar({ locations, hasProfile, filters, onFilterChange }: Fi
                 <option key={`min-${o.value}`} value={o.value}>{o.label}</option>
               ))}
             </select>
-            <span style={{ fontSize: 12, color: colors.textMuted }}>–</span>
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                fontFamily: "var(--font-mono)",
+                color: "#888",
+              }}
+            >
+              –
+            </span>
             <select
               value={getParam("salaryMax")}
               onChange={(e) => onFilterChange("salaryMax", e.target.value)}

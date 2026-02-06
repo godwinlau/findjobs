@@ -1,5 +1,4 @@
-import { Job, Activity, Application } from "@/lib/types";
-import { colors } from "@/lib/constants/colors";
+import { Job } from "@/lib/types";
 
 export const jobs: Job[] = [
   {
@@ -100,41 +99,4 @@ export const jobs: Job[] = [
   },
 ];
 
-export const activities: Activity[] = [
-  { type: "view", text: "Accenture viewed your profile", time: "30 min ago", icon: "👁️" },
-  { type: "match", text: "New 92% match: Customer Support Rep", time: "2h ago", icon: "✦" },
-  { type: "tip", text: "Complete a skill test to stand out", time: "Today", icon: "💡" },
-  { type: "status", text: "Canva PH opened your application", time: "Yesterday", icon: "📬" },
-  { type: "milestone", text: "You've applied to 4 jobs this week!", time: "This week", icon: "🎯" },
-];
-
-export const applications: Application[] = [
-  {
-    company: "Accenture",
-    role: "Customer Support Rep",
-    status: "Interview",
-    color: colors.primary,
-    bg: colors.primaryBg,
-    detail: "Feb 6, 2:00 PM",
-    urgent: true,
-  },
-  {
-    company: "Canva PH",
-    role: "Social Media Coord.",
-    status: "Viewed",
-    color: colors.accent,
-    bg: colors.accentBg,
-    detail: "Opened 2h ago",
-    urgent: false,
-  },
-  {
-    company: "TaskUs",
-    role: "Data Entry Specialist",
-    status: "Applied",
-    color: colors.textMuted,
-    bg: colors.surfaceAlt,
-    detail: "Sent Jan 30",
-    urgent: false,
-  },
-];
 

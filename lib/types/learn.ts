@@ -96,6 +96,7 @@ export interface FreeResource {
   description: string;
   category: string;
   url: string;
+  highlight?: string;
 }
 
 export interface LearningActivity {
@@ -124,6 +125,7 @@ export interface Course {
   format: "video" | "interactive" | "reading" | "project";
   isFree: boolean;
   icon: string;
+  youtubeUrl?: string;
 }
 
 export interface ScoredCourse extends Course {

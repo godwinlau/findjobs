@@ -243,7 +243,7 @@ interface ScoringRow {
   posted_at: string;
 }
 
-function mapRowToJob(row: JobRow, result: { score: number; highlight: string | null }, isTop: boolean): Job {
+function mapRowToJob(row: JobRow, result: { score: number; scoreRange?: [number, number]; highlight: string | null; matchedSkills?: string[] }, isTop: boolean): Job {
   return {
     id: row.id,
     company: row.company_name ?? "",
@@ -257,11 +257,13 @@ function mapRowToJob(row: JobRow, result: { score: number; highlight: string | n
     location: formatLocation(row.location_city, row.location_area ?? null),
     type: formatJobType(row.job_type, row.work_setup),
     match: result.score,
+    matchRange: result.scoreRange,
     posted: formatRelativeTime(row.posted_at),
     applicants: row.applicant_count ?? 0,
     closing: formatClosing(row.expires_at ?? null),
     responseTime: null,
     highlight: result.highlight,
+    matchedSkills: result.matchedSkills,
     isTop,
     desc: (() => { const d = stripDescriptionHeading(row.description_plain ?? ""); return d.slice(0, 300) + (d.length > 300 ? "..." : ""); })(),
     applyUrl: row.apply_url ?? "",
@@ -715,9 +717,10 @@ function formatSalary(min: number | null, max: number | null, isEstimate: boolea
 }
 
 function formatLocation(city: string | null, area: string | null): string {
-  if (area && city) return `${area}, ${city}`;
-  if (city) return city;
-  return "Philippines";
+  // Use the most specific part only (area or city), not the full address
+  const raw = area || city || "Philippines";
+  // Take the first segment before any comma
+  return raw.split(",")[0].trim();
 }
 
 function formatJobType(jobType: string | null, workSetup: string | null): string {
@@ -1018,6 +1021,28 @@ async function getExploreJobsMatchSorted(
     .filter((j): j is Job => j !== null);
 
   return { jobs, total, page, pageSize, totalPages: Math.ceil(total / pageSize), isMatchFiltered: false };
+}
+
+// ─── Job freshness indicator ───
+
+export async function getJobsLastUpdated(): Promise<{ lastUpdated: string | null; totalActiveJobs: number }> {
+  const supabase = createServiceClient();
+
+  const { data, error, count } = await supabase
+    .from("jobs")
+    .select("posted_at", { count: "exact" })
+    .eq("is_active", true)
+    .order("posted_at", { ascending: false })
+    .limit(1);
+
+  if (error || !data || data.length === 0) {
+    return { lastUpdated: null, totalActiveJobs: 0 };
+  }
+
+  return {
+    lastUpdated: (data[0] as { posted_at: string }).posted_at,
+    totalActiveJobs: count ?? 0,
+  };
 }
 
 // ─── Distinct locations for filter dropdown ───

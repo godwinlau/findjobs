@@ -16,31 +16,32 @@ export function Logo({ size = "md" }: LogoProps) {
   const s = sizes[size];
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
       <div
         style={{
           width: s.box,
           height: s.box,
-          borderRadius: 6,
-          background: colors.primary,
+          background: "#FBBF24",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           fontSize: s.fontSize,
-          color: colors.inv,
-          fontWeight: 800,
+          color: "#0A0A0A",
+          fontWeight: 700,
+          fontFamily: "var(--font-mono)",
         }}
       >
-        H
+        HB
       </div>
       <span
         style={{
           fontSize: s.textSize,
-          fontWeight: 700,
+          fontWeight: 800,
           letterSpacing: "-0.03em",
+          textTransform: "uppercase" as const,
         }}
       >
-        Hanap<span style={{ color: colors.primary }}>Buhay</span>
+        HanapBuhay
       </span>
     </div>
   );

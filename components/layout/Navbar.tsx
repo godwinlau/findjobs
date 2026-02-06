@@ -3,46 +3,38 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { colors } from "@/lib/constants/colors";
 import { Logo } from "@/components/ui";
 import { UserMenu } from "./UserMenu";
 
 interface NavItem {
   label: string;
   href: string;
-  dot?: boolean;
+  shortLabel?: string;
+  badge?: string;
 }
 
-const jobSeekerNavItems: NavItem[] = [
-  { label: "Home", href: "/" },
-  { label: "Explore", href: "/explore" },
-  { label: "Applications", href: "/applications", dot: true },
-  { label: "Learn", href: "/learn" },
-];
-
-const employerNavItems: NavItem[] = [
-  { label: "Dashboard", href: "/employer" },
-  { label: "Post a Job", href: "/employer/post" },
+const navItems: NavItem[] = [
+  { label: "Home", href: "/", shortLabel: "Home" },
+  { label: "Explore", href: "/explore", shortLabel: "Exp" },
+  { label: "Notifications", href: "/notifications", shortLabel: "Notif" },
+  { label: "Learn", href: "/learn", shortLabel: "Learn" },
 ];
 
 interface NavbarProps {
   fullName?: string;
   email?: string;
-  role?: "job_seeker" | "employer";
 }
 
-export function Navbar({ fullName, email, role = "job_seeker" }: NavbarProps) {
+export function Navbar({ fullName, email }: NavbarProps) {
   const pathname = usePathname();
-  const navItems = role === "employer" ? employerNavItems : jobSeekerNavItems;
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Close menu on route change
   useEffect(() => {
     setMenuOpen(false);
   }, [pathname]);
 
   function isActive(href: string) {
-    if (href === "/" || href === "/employer") return pathname === href;
+    if (href === "/") return pathname === href;
     return pathname.startsWith(href);
   }
 
@@ -55,106 +47,213 @@ export function Navbar({ fullName, email, role = "job_seeker" }: NavbarProps) {
       }}
     >
       <nav
-        className="nav-padding"
         style={{
-          height: 52,
-          borderBottom: `1px solid ${colors.border}`,
-          background: colors.surface,
+          background: "#0A0A0A",
+          color: "#F5F5F0",
+          borderBottom: "3px solid #0A0A0A",
           display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
+          alignItems: "stretch",
+          height: 60,
         }}
       >
-        <div className="nav-left-gap" style={{ display: "flex", alignItems: "center" }}>
-          <Logo />
-          <div className="nav-desktop-links" style={{ gap: 2 }}>
-            {navItems.map((item) => {
-              const active = isActive(item.href);
-              return (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  style={{
-                    padding: "6px 12px",
-                    borderRadius: 7,
-                    fontSize: 13,
-                    fontWeight: active ? 600 : 450,
-                    border: "none",
-                    cursor: "pointer",
-                    background: active ? colors.surfaceAlt : "transparent",
-                    color: active ? colors.text : colors.textSec,
-                    position: "relative",
-                    textDecoration: "none",
-                  }}
-                >
-                  {item.label}
-                  {item.dot && (
-                    <span
-                      style={{
-                        position: "absolute",
-                        top: 5,
-                        right: 5,
-                        width: 5,
-                        height: 5,
-                        borderRadius: "50%",
-                        background: colors.live,
-                      }}
-                    />
-                  )}
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div
-            className="nav-search"
-            style={{
-              padding: "6px 12px",
-              borderRadius: 8,
-              background: colors.surfaceAlt,
-              border: `1px solid ${colors.border}`,
-              fontSize: 12,
-              color: colors.textMuted,
-              width: 200,
-              alignItems: "center",
-              gap: 6,
-            }}
-          >
-            <span style={{ fontSize: 11 }}>⌘K</span>
-            <span>Search...</span>
-          </div>
+        {/* Brand */}
+        <Link
+          href="/"
+          className="nav-padding"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            paddingRight: 24,
+            borderRight: "2px solid rgba(255,255,255,0.1)",
+            flexShrink: 0,
+            cursor: "pointer",
+            textDecoration: "none",
+            color: "#F5F5F0",
+            transition: "opacity 0.15s",
+          }}
+        >
           <div
             style={{
-              width: 30,
-              height: 30,
-              borderRadius: 7,
-              border: `1px solid ${colors.border}`,
-              background: colors.surface,
+              width: 32,
+              height: 32,
+              background: "#FBBF24",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 13,
-              cursor: "pointer",
+              fontFamily: "var(--font-mono)",
+              fontSize: 14,
+              fontWeight: 700,
+              color: "#0A0A0A",
             }}
           >
-            🔔
+            HB
           </div>
-          {fullName && email ? (
-            <UserMenu fullName={fullName} email={email} />
-          ) : (
-            <UserMenu fullName="" email="" />
-          )}
+          <span
+            style={{
+              fontSize: 16,
+              fontWeight: 800,
+              letterSpacing: "-0.03em",
+              textTransform: "uppercase" as const,
+            }}
+          >
+            HanapBuhay
+          </span>
+        </Link>
+
+        {/* Desktop Nav Links */}
+        <div
+          className="nav-desktop-links"
+          style={{
+            alignItems: "stretch",
+            flex: 1,
+          }}
+        >
+          {navItems.map((item) => {
+            const active = isActive(item.href);
+            return (
+              <Link
+                key={item.label}
+                href={item.href}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  padding: "0 20px",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 11,
+                  fontWeight: 400,
+                  textTransform: "uppercase" as const,
+                  letterSpacing: "0.06em",
+                  color: active ? "#FBBF24" : "rgba(255,255,255,0.4)",
+                  textDecoration: "none",
+                  transition: "all 0.15s",
+                  position: "relative",
+                  borderRight: "1px solid rgba(255,255,255,0.06)",
+                  background: active ? "rgba(251,191,36,0.05)" : "transparent",
+                }}
+              >
+                {item.label}
+                {item.badge && (
+                  <span
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 700,
+                      background: "#FBBF24",
+                      color: "#0A0A0A",
+                      padding: "2px 6px",
+                      marginLeft: 8,
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {item.badge}
+                  </span>
+                )}
+                {active && (
+                  <span
+                    style={{
+                      position: "absolute",
+                      bottom: -3,
+                      left: 0,
+                      width: "100%",
+                      height: 3,
+                      background: "#FBBF24",
+                    }}
+                  />
+                )}
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Right section */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "stretch",
+            marginLeft: "auto",
+            borderLeft: "2px solid rgba(255,255,255,0.1)",
+          }}
+        >
+          {/* Search button */}
+          <button
+            className="nav-search"
+            style={{
+              alignItems: "center",
+              padding: "0 16px",
+              background: "transparent",
+              border: "none",
+              color: "rgba(255,255,255,0.4)",
+              cursor: "pointer",
+              transition: "all 0.15s",
+              borderLeft: "1px solid rgba(255,255,255,0.06)",
+            }}
+          >
+            <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+          </button>
+
+          {/* Notifications */}
+          <Link
+            href="/notifications"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              padding: "0 16px",
+              background: "transparent",
+              border: "none",
+              color: "rgba(255,255,255,0.4)",
+              cursor: "pointer",
+              transition: "all 0.15s",
+              borderLeft: "1px solid rgba(255,255,255,0.06)",
+              textDecoration: "none",
+              position: "relative",
+            }}
+          >
+            <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 01-3.46 0" />
+            </svg>
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                background: "#FBBF24",
+                position: "absolute",
+                top: 16,
+                right: 14,
+              }}
+            />
+          </Link>
+
+          {/* Avatar / User Menu */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              padding: "0 16px",
+              borderLeft: "1px solid rgba(255,255,255,0.06)",
+            }}
+          >
+            {fullName && email ? (
+              <UserMenu fullName={fullName} email={email} />
+            ) : (
+              <UserMenu fullName="" email="" />
+            )}
+          </div>
+
+          {/* Mobile hamburger */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
             className="nav-hamburger"
             style={{
-              width: 34,
-              height: 34,
-              borderRadius: 7,
-              border: `1px solid ${colors.border}`,
-              background: menuOpen ? colors.surfaceAlt : colors.surface,
+              width: 60,
+              height: 60,
+              border: "none",
+              borderLeft: "1px solid rgba(255,255,255,0.06)",
+              background: menuOpen ? "rgba(255,255,255,0.04)" : "transparent",
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
@@ -183,26 +282,19 @@ export function Navbar({ fullName, email, role = "job_seeker" }: NavbarProps) {
                 display: "flex",
                 alignItems: "center",
                 gap: 8,
-                padding: "12px 16px",
-                fontSize: 14,
-                fontWeight: active ? 600 : 450,
-                color: active ? colors.text : colors.textSec,
-                background: active ? colors.surfaceAlt : "transparent",
+                padding: "14px 20px",
+                fontFamily: "var(--font-mono)",
+                fontSize: 11,
+                fontWeight: active ? 700 : 400,
+                textTransform: "uppercase" as const,
+                letterSpacing: "0.06em",
+                color: active ? "#FBBF24" : "rgba(255,255,255,0.4)",
+                background: active ? "rgba(251,191,36,0.05)" : "transparent",
                 textDecoration: "none",
-                borderBottom: `1px solid ${colors.border}`,
+                borderBottom: "1px solid rgba(255,255,255,0.06)",
               }}
             >
               {item.label}
-              {item.dot && (
-                <span
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: "50%",
-                    background: colors.live,
-                  }}
-                />
-              )}
             </Link>
           );
         })}

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { WelcomeModal } from "./WelcomeModal";
 import { SpotlightOverlay } from "./SpotlightOverlay";
-import { jobSeekerSteps, employerSteps } from "./tour-config";
+import { tourSteps } from "./tour-config";
 
 type Phase = "idle" | "welcome" | "tour" | "done";
 
@@ -13,13 +13,9 @@ const INITIAL_DELAY = 600;
 
 interface WelcomeWalkthroughProps {
   firstName: string;
-  isEmployer: boolean;
 }
 
-export function WelcomeWalkthrough({
-  firstName,
-  isEmployer,
-}: WelcomeWalkthroughProps) {
+export function WelcomeWalkthrough({ firstName }: WelcomeWalkthroughProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("idle");
@@ -63,8 +59,6 @@ export function WelcomeWalkthrough({
 
   if (phase === "idle" || phase === "done") return null;
 
-  const steps = isEmployer ? employerSteps : jobSeekerSteps;
-
   return (
     <>
       {phase === "welcome" && (
@@ -75,7 +69,7 @@ export function WelcomeWalkthrough({
         />
       )}
       {phase === "tour" && (
-        <SpotlightOverlay steps={steps} onComplete={handleTourComplete} />
+        <SpotlightOverlay steps={tourSteps} onComplete={handleTourComplete} />
       )}
     </>
   );
