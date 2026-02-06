@@ -1,14 +1,12 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { TopMatchesPreview } from "./TopMatchesPreview";
 import { QuickActions } from "./QuickActions";
 import { ProfileCompletion } from "./ProfileCompletion";
 import { SkillsRecommendationBanner } from "./SkillsRecommendationBanner";
-import { JobDetailDrawer } from "./JobDetailDrawer";
-import { getJobDetailForDrawer } from "@/lib/actions/job-detail";
 import type { Job } from "@/lib/types";
-import type { JobDetail } from "@/lib/jobs";
 import type { SkillROI } from "@/lib/types/learn";
 import type { ProfileGap } from "@/lib/profile";
 
@@ -39,32 +37,14 @@ export function DashboardClient({
   highMatchJobCount,
   youtubeMaps,
 }: DashboardClientProps) {
-  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
-  const [jobDetail, setJobDetail] = useState<JobDetail | null>(null);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isDrawerClosing, setIsDrawerClosing] = useState(false);
+  const router = useRouter();
 
-  const handleJobSelect = useCallback(async (job: Job) => {
-    setSelectedJob(job);
-    setJobDetail(null);
-    setIsDrawerOpen(true);
-    setIsDrawerClosing(false);
-
-    // Fetch full job details
-    const detail = await getJobDetailForDrawer(job.id);
-    setJobDetail(detail);
-  }, []);
-
-  const handleCloseDrawer = useCallback(() => {
-    setIsDrawerClosing(true);
-    // Wait for animation to complete before fully closing
-    setTimeout(() => {
-      setIsDrawerOpen(false);
-      setIsDrawerClosing(false);
-      setSelectedJob(null);
-      setJobDetail(null);
-    }, 250);
-  }, []);
+  const handleJobSelect = useCallback(
+    (job: Job) => {
+      router.push(`/jobs/${job.id}`);
+    },
+    [router],
+  );
 
   return (
     <>
@@ -104,15 +84,6 @@ export function DashboardClient({
           />
         </div>
       )}
-
-      {/* Job Detail Drawer */}
-      <JobDetailDrawer
-        job={selectedJob}
-        jobDetail={jobDetail}
-        isOpen={isDrawerOpen}
-        isClosing={isDrawerClosing}
-        onClose={handleCloseDrawer}
-      />
     </>
   );
 }

@@ -72,7 +72,16 @@ export default async function Dashboard() {
   );
 
   const skillROI = computeSkillROI(recommendationContext, courseCatalog);
-  const topSkills = skillROI.slice(0, 3);
+  // Deduplicate by recommended course to avoid showing the same course title twice in the banner
+  const seenCourses = new Set<string>();
+  const topSkills: typeof skillROI = [];
+  for (const s of skillROI) {
+    const key = s.recommendedCourse?.id ?? s.skill;
+    if (seenCourses.has(key)) continue;
+    seenCourses.add(key);
+    topSkills.push(s);
+    if (topSkills.length >= 3) break;
+  }
 
   const hasAssessments = Object.keys(assessmentScores).length > 0;
   const highMatchJobCount = topJobs.filter((j) => j.match >= 70).length;

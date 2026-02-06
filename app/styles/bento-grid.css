@@ -1,0 +1,49 @@
+/* ═══════════════════════════════════════════════════════
+   BRUTALIST BENTO GRID
+   Dashboard bento grid layout with responsive breakpoints
+   for 4-column, 2-column, and mobile layouts.
+   ═══════════════════════════════════════════════════════ */
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: auto auto;
+  gap: 0;
+}
+
+.bento-applications { grid-column: span 1; }
+.bento-streak { grid-column: span 2; }
+.bento-views { grid-column: span 1; }
+.bento-skills { grid-column: span 1; }
+.bento-assessment { grid-column: span 2; }
+.bento-match { grid-column: span 1; }
+
+@media (max-width: 900px) {
+  .bento-grid { grid-template-columns: repeat(2, 1fr); }
+  .bento-applications { grid-column: span 1; }
+  .bento-streak { grid-column: span 2; }
+  .bento-views { grid-column: span 1; }
+  .bento-skills { grid-column: span 1; }
+  .bento-assessment { grid-column: span 2; }
+  .bento-match { grid-column: span 2; }
+}
+
+@media (max-width: 600px) {
+  .bento-grid { grid-template-columns: 1fr 1fr; }
+  .bento-applications { grid-column: span 1; }
+  .bento-streak { grid-column: span 2; }
+  .bento-views { grid-column: span 1; }
+  .bento-skills { grid-column: span 1; }
+  .bento-assessment { grid-column: span 2; }
+  .bento-match { grid-column: span 2; }
+}
+
+/* Dashboard bottom grid (activity + actions) */
+.dashboard-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 0;
+}
+@media (max-width: 768px) {
+  .dashboard-bottom-grid { grid-template-columns: 1fr; }
+}

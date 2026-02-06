@@ -1,0 +1,67 @@
+/* ═══════════════════════════════════════════════════════
+   JOB DESCRIPTION PROSE STYLING
+   Styles for rendered job description HTML content,
+   including headings, lists, links, and section headers.
+   ═══════════════════════════════════════════════════════ */
+
+.job-description p {
+  margin-bottom: 0.75em;
+}
+
+.job-description br + br {
+  display: block;
+  content: "";
+  margin-top: 0.5em;
+}
+
+.job-description ul,
+.job-description ol {
+  padding-left: 1.5em;
+  margin-bottom: 0.75em;
+}
+
+.job-description li {
+  margin-bottom: 0.35em;
+  list-style: disc;
+}
+
+.job-description ol li {
+  list-style: decimal;
+}
+
+.job-description h1,
+.job-description h2,
+.job-description h3,
+.job-description h4 {
+  font-weight: 700;
+  color: var(--hb-text);
+  margin-top: 1.25em;
+  margin-bottom: 0.5em;
+  letter-spacing: -0.03em;
+}
+
+.job-description h1 { font-size: 1.15em; }
+.job-description h2 { font-size: 1.1em; }
+.job-description h3,
+.job-description h4 { font-size: 1em; }
+
+.job-description strong,
+.job-description b {
+  font-weight: 700;
+  color: var(--hb-text);
+}
+
+.job-description a {
+  color: var(--hb-text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Section headers detected from plain text */
+.job-description .desc-section-header {
+  display: block;
+  font-weight: 700;
+  color: var(--hb-text);
+  margin-top: 1.25em;
+  margin-bottom: 0.4em;
+}

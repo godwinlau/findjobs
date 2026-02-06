@@ -1,0 +1,53 @@
+/* ═══════════════════════════════════════════════════════
+   BRUTALIST NAVBAR
+   Mobile menu dropdown, hamburger icon, and nav-specific
+   responsive breakpoints.
+   ═══════════════════════════════════════════════════════ */
+
+/* ─── Mobile menu (dropdown) ─── */
+.mobile-menu-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #0A0A0A;
+  border-bottom: 2px solid #0A0A0A;
+  z-index: 49;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.25s ease, opacity 0.2s ease;
+}
+
+.mobile-menu-dropdown.open {
+  max-height: 400px;
+  opacity: 1;
+}
+
+.hamburger-line {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: #F5F5F0;
+  border-radius: 0;
+  transition: all 0.2s ease;
+}
+
+/* Navbar responsive breakpoints */
+.nav-padding { padding: 0 20px; }
+.nav-desktop-links { display: flex; }
+.nav-search { display: flex; }
+.nav-hamburger { display: none; }
+.nav-mobile-menu { display: none; }
+.nav-left-gap { gap: 0; }
+@media (max-width: 1024px) {
+  .nav-padding { padding: 0 20px; }
+  .nav-search { display: none !important; }
+  .nav-left-gap { gap: 0; }
+}
+@media (max-width: 639px) {
+  .nav-padding { padding: 0; }
+  .nav-desktop-links { display: none !important; }
+  .nav-hamburger { display: flex !important; }
+  .nav-mobile-menu { display: block !important; }
+}

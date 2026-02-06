@@ -1048,6 +1048,45 @@ async function getExploreJobsMatchSorted(
   return { jobs, total, page, pageSize, totalPages: Math.ceil(total / pageSize), isMatchFiltered: false };
 }
 
+// ─── Similar jobs (for detail page sidebar) ───
+
+export async function getSimilarJobs(
+  jobId: string,
+  skills: string[],
+  profile: Profile | null,
+  limit = 3,
+): Promise<Job[]> {
+  const supabase = createServiceClient();
+
+  const { data } = await supabase
+    .from("jobs")
+    .select(FEED_COLUMNS)
+    .eq("is_active", true)
+    .neq("id", jobId)
+    .order("posted_at", { ascending: false })
+    .limit(100);
+
+  if (!data || data.length === 0) return [];
+
+  const rows = data as unknown as JobRow[];
+
+  // Score by overlapping skills
+  const skillSet = new Set(skills.map((s) => s.toLowerCase()));
+  const scored = rows.map((row) => {
+    const overlap = (row.skills_required ?? []).filter((s) =>
+      skillSet.has(s.toLowerCase()),
+    ).length;
+    return { row, overlap };
+  });
+
+  scored.sort((a, b) => b.overlap - a.overlap);
+
+  return scored.slice(0, limit).map(({ row }) => {
+    const result = computeMatchScore(row, profile);
+    return mapRowToJob(row, result, false);
+  });
+}
+
 // ─── Job freshness indicator ───
 
 export async function getJobsLastUpdated(): Promise<{ lastUpdated: string | null; totalActiveJobs: number }> {

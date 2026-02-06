@@ -1,12 +1,16 @@
+import "@/app/styles/job-detail-page.css";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { colors } from "@/lib/constants/colors";
-import { fetchJobRow, buildJobDetail } from "@/lib/jobs";
-import { CompanyLogo, Badge, MatchIndicator } from "@/components/ui";
-import { ResponsiveContainer } from "@/components/layout/ResponsiveContainer";
-import { JobDetailActions } from "./JobDetailActions";
+import { fetchJobRow, buildJobDetail, getSimilarJobs } from "@/lib/jobs";
 import { createClient } from "@/lib/supabase/server";
 import { logActivity } from "@/lib/actions/activity";
+import { Navbar } from "@/components/layout/Navbar";
+import {
+  JobDetailHero,
+  JobDetailSection,
+  JobDetailSidebar,
+  JobDetailApplyBar,
+} from "@/components/jobs";
 
 export const dynamic = "force-dynamic";
 
@@ -18,8 +22,9 @@ export default async function JobDetailPage({
   const { id } = await params;
 
   const supabase = await createClient();
-
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   // Run job fetch + profile fetch in parallel
   const [row, profileResult] = await Promise.all([
@@ -39,238 +44,78 @@ export default async function JobDetailPage({
   const profile = profileResult?.data ?? null;
   const job = buildJobDetail(row, profile);
 
-  const postedDate = new Date(job.postedAt).toLocaleDateString("en-PH", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
+  // Fetch similar jobs in parallel (won't block render significantly)
+  const similarJobs = await getSimilarJobs(id, job.skills, profile, 3);
 
-  const expiresDate = job.expiresAt
-    ? new Date(job.expiresAt).toLocaleDateString("en-PH", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      })
-    : null;
+  // Navbar props
+  const fullName = profile?.full_name ?? undefined;
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: colors.bg,
-        color: colors.text,
-      }}
-    >
-      <ResponsiveContainer maxWidth={720}>
-        {/* Back link */}
-        <Link
-          href="/"
-          style={{
-            fontSize: 13,
-            color: colors.textMuted,
-            textDecoration: "none",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 6,
-            marginBottom: 24,
-          }}
-        >
-          ← Back to jobs
-        </Link>
+    <div className="jd-debug-test" style={{ minHeight: "100vh", background: "var(--hb-bg)", color: "var(--hb-text)" }}>
+      <Navbar fullName={fullName} />
 
-        {/* Header card */}
-        <div
-          className="job-detail-header-card"
-          style={{
-            background: colors.surface,
-            borderRadius: 14,
-            border: `1px solid ${colors.border}`,
-            padding: "28px 28px 24px",
-            marginBottom: 20,
-          }}
-        >
-          <div
-            className="job-detail-header-flex"
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-              marginBottom: 20,
-            }}
-          >
-            <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
-              <CompanyLogo
-                letter={job.logo}
-                logoUrl={job.logoUrl}
-                bgColor={job.logoBg}
-                textColor={job.logoColor}
-                size="lg"
-              />
-              <div>
-                <div style={{ fontSize: 14, color: colors.textSec, fontWeight: 600 }}>
-                  {job.company}
-                  {job.verified && (
-                    <span style={{ color: colors.success, marginLeft: 4 }}>✓</span>
-                  )}
-                </div>
-                <h1
-                  style={{
-                    fontSize: 22,
-                    fontWeight: 700,
-                    color: colors.text,
-                    marginTop: 4,
-                    letterSpacing: "-0.03em",
-                  }}
-                >
-                  {job.role}
-                </h1>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    marginTop: 8,
-                  }}
-                >
-                  <span
-                    style={{ fontSize: 16, fontWeight: 700, color: colors.success }}
-                  >
-                    {job.salary}
-                    {job.salary !== "Salary not disclosed" && (
-                      <span
-                        style={{
-                          fontWeight: 400,
-                          fontSize: 12,
-                          color: colors.textMuted,
-                        }}
-                      >
-                        /mo
-                      </span>
-                    )}
-                  </span>
-                  {job.salaryIsEstimate && (
-                    <span style={{ fontSize: 11, color: colors.textMuted }}>
-                      (estimated)
+      {/* Breadcrumb */}
+      <div className="jd-breadcrumb-bar">
+        <div className="jd-breadcrumb-inner">
+          <Link href="/explore" className="jd-bc-link">
+            Jobs
+          </Link>
+          <span className="jd-bc-sep">/</span>
+          <span className="jd-bc-current">{job.role}</span>
+        </div>
+      </div>
+
+      {/* 2-column layout */}
+      <div className="jd-page">
+        {/* Left — Detail */}
+        <div className="jd-detail">
+          <JobDetailHero job={job} />
+
+          {/* Description */}
+          <JobDetailSection label="About the Role">
+            <div
+              className="jd-description"
+              dangerouslySetInnerHTML={{ __html: job.descriptionFull }}
+            />
+          </JobDetailSection>
+
+          {/* Skills */}
+          {job.skills.length > 0 && (
+            <JobDetailSection label="Skills & Tools">
+              <div className="jd-stack-row">
+                {job.skills.map((skill) => {
+                  const isMatched =
+                    profile?.skills &&
+                    profile.skills.some(
+                      (s: string) =>
+                        s.toLowerCase() === skill.toLowerCase(),
+                    );
+                  return (
+                    <span
+                      key={skill}
+                      className={`jd-stack-tag${isMatched ? " matched" : ""}`}
+                    >
+                      {skill}
                     </span>
-                  )}
-                </div>
+                  );
+                })}
               </div>
-            </div>
-            <MatchIndicator percentage={job.match} />
-          </div>
-
-          {/* Actions */}
-          <JobDetailActions jobId={job.id} applyUrl={job.applyUrl} matchPercent={job.match} />
-        </div>
-
-        {/* Meta row */}
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 10,
-            marginBottom: 20,
-          }}
-        >
-          <Badge variant="muted" size="md">
-            {job.location}
-          </Badge>
-          <Badge variant="muted" size="md">
-            {job.type}
-          </Badge>
-          {job.experienceLevel && (
-            <Badge variant="muted" size="md">
-              {job.experienceLevel}
-            </Badge>
+            </JobDetailSection>
           )}
-          <Badge variant="muted" size="md">
-            Posted {postedDate}
-          </Badge>
-          {expiresDate && (
-            <Badge variant="warning" size="md">
-              Deadline: {expiresDate}
-            </Badge>
-          )}
-        </div>
 
-        {/* Stats row */}
-        <div
-          style={{
-            display: "flex",
-            gap: 24,
-            marginBottom: 24,
-            fontSize: 12,
-            color: colors.textMuted,
-          }}
-        >
-          <span>{job.applicants} applicants</span>
-          <span>{job.viewCount} views</span>
-        </div>
-
-        {/* Full description */}
-        <div
-          className="job-detail-description-card"
-          style={{
-            background: colors.surface,
-            borderRadius: 12,
-            border: `1px solid ${colors.border}`,
-            padding: "24px 28px",
-            marginBottom: 20,
-          }}
-        >
-          <h2
-            style={{
-              fontSize: 15,
-              fontWeight: 600,
-              color: colors.text,
-              marginBottom: 14,
-            }}
-          >
-            Job Description
-          </h2>
-          <div
-            className="job-description"
-            style={{
-              fontSize: 13,
-              color: colors.textSec,
-              lineHeight: 1.8,
-            }}
-            dangerouslySetInnerHTML={{ __html: job.descriptionFull }}
+          {/* Apply bar */}
+          <JobDetailApplyBar
+            jobId={job.id}
+            applyUrl={job.applyUrl}
+            applicants={job.applicants}
+            closing={job.closing}
+            matchPercent={job.match}
           />
         </div>
 
-        {/* Skills */}
-        {job.skills.length > 0 && (
-          <div
-            className="job-detail-skills-card"
-            style={{
-              background: colors.surface,
-              borderRadius: 12,
-              border: `1px solid ${colors.border}`,
-              padding: "20px 28px",
-              marginBottom: 20,
-            }}
-          >
-            <h2
-              style={{
-                fontSize: 15,
-                fontWeight: 600,
-                color: colors.text,
-                marginBottom: 12,
-              }}
-            >
-              Required Skills
-            </h2>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {job.skills.map((skill) => (
-                <Badge key={skill} variant="primary" size="md">
-                  {skill}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        )}
-      </ResponsiveContainer>
+        {/* Right — Sidebar */}
+        <JobDetailSidebar job={job} similarJobs={similarJobs} />
+      </div>
     </div>
   );
 }

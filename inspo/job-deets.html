@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Senior Product Designer — Spotify</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#F5F5F0;font-family:'Sora',sans-serif;color:#0A0A0A;min-height:100vh}
+  ::selection{background:#0A0A0A;color:#F5F5F0}
+  .mono{font-family:'Space Mono',monospace}
+
+  /* ============ NAV ============ */
+  .nav{position:sticky;top:0;z-index:100;background:#0A0A0A;color:#F5F5F0;border-bottom:3px solid #0A0A0A}
+  .nav-inner{max-width:1060px;margin:0 auto;padding:0 20px;display:flex;align-items:stretch;height:60px}
+  .nav-brand{display:flex;align-items:center;gap:10px;padding-right:24px;border-right:2px solid rgba(255,255,255,.1);flex-shrink:0;cursor:pointer;transition:opacity .15s;text-decoration:none;color:#F5F5F0}
+  .nav-brand:hover{opacity:.8}
+  .nav-logo{width:32px;height:32px;background:#FBBF24;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:#0A0A0A}
+  .nav-wordmark{font-size:16px;font-weight:800;letter-spacing:-.03em}
+  .nav-links{display:flex;align-items:stretch;list-style:none;flex:1}
+  .nav-links li{display:flex;align-items:stretch;border-right:1px solid rgba(255,255,255,.06)}
+  .nav-links a{display:flex;align-items:center;padding:0 20px;font-family:'Space Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.4);text-decoration:none;transition:all .15s;position:relative}
+  .nav-links a:hover{color:#F5F5F0;background:rgba(255,255,255,.04)}
+  .nav-links a.active{color:#FBBF24;background:rgba(251,191,36,.05)}
+  .nav-links a.active::after{content:'';position:absolute;bottom:-3px;left:0;width:100%;height:3px;background:#FBBF24}
+  .nav-links .badge{font-size:9px;font-weight:700;background:#FBBF24;color:#0A0A0A;padding:2px 6px;margin-left:8px}
+  .nav-right{display:flex;align-items:stretch;margin-left:auto;border-left:2px solid rgba(255,255,255,.1)}
+  .nav-btn{display:flex;align-items:center;padding:0 16px;background:0;border:0;color:rgba(255,255,255,.4);cursor:pointer;transition:all .15s;border-left:1px solid rgba(255,255,255,.06);position:relative}
+  .nav-btn:hover{color:#F5F5F0;background:rgba(255,255,255,.04)}
+  .nav-btn svg{width:18px;height:18px}
+  .nav-btn .notif-dot{width:6px;height:6px;background:#FBBF24;position:absolute;top:16px;right:14px}
+  .nav-avatar{width:28px;height:28px;background:#FBBF24;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#0A0A0A}
+  @media(max-width:700px){.nav-links a span.full{display:none}.nav-links a span.short{display:inline}.nav-links a{padding:0 12px;font-size:10px}.nav-wordmark{display:none}}
+  @media(min-width:701px){.nav-links a span.short{display:none}}
+
+  /* ============ BREADCRUMB BAR ============ */
+  .breadcrumb-bar{border-bottom:2px solid #0A0A0A;background:#F5F5F0}
+  .breadcrumb-inner{max-width:1060px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:8px}
+  .bc-link{font-family:'Space Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#888;text-decoration:none;transition:color .15s}
+  .bc-link:hover{color:#0A0A0A}
+  .bc-sep{font-family:'Space Mono',monospace;font-size:11px;color:#ccc}
+  .bc-current{font-family:'Space Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#0A0A0A;font-weight:700}
+
+  /* ============ MAIN LAYOUT ============ */
+  .page{max-width:1060px;margin:0 auto;padding:32px 20px 60px;display:grid;grid-template-columns:1fr 320px;gap:0}
+  @media(max-width:800px){.page{grid-template-columns:1fr;gap:28px}}
+
+  /* ============ LEFT — JOB DETAIL ============ */
+  .detail{border:3px solid #0A0A0A;background:#F5F5F0}
+
+  /* Hero section */
+  .detail-hero{background:#0A0A0A;color:#F5F5F0;padding:40px;display:flex;flex-direction:column;gap:20px;position:relative}
+  .detail-hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+  .detail-hero-left{display:flex;align-items:center;gap:14px;flex:1}
+  .detail-logo{width:64px;height:64px;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .detail-logo svg{width:28px;height:28px}
+  .detail-company-info{display:flex;flex-direction:column;gap:4px}
+  .detail-company-name{font-size:18px;font-weight:700;letter-spacing:-.02em}
+  .detail-company-meta{font-family:'Space Mono',monospace;font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:6px}
+  .detail-company-meta .dot{width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.2)}
+
+  .detail-hero-actions{display:flex;gap:8px;flex-shrink:0}
+  .action-btn{width:40px;height:40px;border:1.5px solid rgba(255,255,255,.12);background:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;color:rgba(255,255,255,.4)}
+  .action-btn:hover{border-color:rgba(255,255,255,.3);color:#F5F5F0;background:rgba(255,255,255,.04)}
+  .action-btn.saved svg{color:#FBBF24;fill:#FBBF24}
+  .action-btn svg{width:16px;height:16px}
+
+  .detail-title{font-size:40px;font-weight:800;letter-spacing:-.04em;line-height:1.05}
+  .detail-tags-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .dtag{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:5px 12px;text-transform:uppercase;letter-spacing:.05em;border:1.5px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5)}
+  .dtag-match{background:#F5F5F0;color:#0A0A0A;border-color:#F5F5F0}
+  .dtag-source{border-color:#818CF8;color:#818CF8}
+
+  .detail-salary-row{display:flex;justify-content:space-between;align-items:flex-end;padding-top:20px;border-top:1px solid rgba(255,255,255,.06);flex-wrap:wrap;gap:12px}
+  .detail-salary{font-size:32px;font-weight:800;letter-spacing:-.03em}
+  .detail-salary span{font-family:'Space Mono',monospace;font-size:11px;font-weight:400;color:rgba(255,255,255,.3);display:block;margin-top:2px}
+  .detail-posted{font-family:'Space Mono',monospace;font-size:11px;color:rgba(255,255,255,.25);text-align:right}
+
+  @media(max-width:600px){.detail-title{font-size:28px}.detail-salary{font-size:24px}}
+
+  /* Content sections */
+  .detail-section{padding:32px 40px;border-top:2px solid #0A0A0A}
+  .section-label{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+  .section-label::after{content:'';flex:1;height:1px;background:rgba(0,0,0,.08)}
+
+  .detail-section p{font-size:14px;line-height:1.75;color:#555;margin-bottom:12px}
+  .detail-section p:last-child{margin-bottom:0}
+
+  /* Requirements list */
+  .req-list{list-style:none;display:flex;flex-direction:column;gap:10px}
+  .req-list li{display:flex;gap:12px;font-size:13.5px;line-height:1.6;color:#555}
+  .req-bullet{width:8px;height:8px;background:#FBBF24;flex-shrink:0;margin-top:7px}
+  .req-list li strong{color:#0A0A0A}
+
+  /* Perks grid */
+  .perks-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0}
+  @media(max-width:500px){.perks-grid{grid-template-columns:1fr}}
+  .perk{padding:20px;border:1px solid rgba(0,0,0,.08);display:flex;gap:14px;align-items:flex-start;transition:background .15s}
+  .perk:hover{background:rgba(0,0,0,.02)}
+  .perk-icon{width:40px;height:40px;background:#FBBF24;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .perk-text{display:flex;flex-direction:column;gap:2px}
+  .perk-title{font-size:13px;font-weight:700}
+  .perk-desc{font-size:11.5px;color:#888;line-height:1.4}
+
+  /* Tech stack */
+  .stack-row{display:flex;gap:6px;flex-wrap:wrap}
+  .stack-tag{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:8px 14px;border:2px solid #0A0A0A;text-transform:uppercase;letter-spacing:.04em;transition:all .15s;cursor:default}
+  .stack-tag:hover{background:#0A0A0A;color:#F5F5F0}
+
+  /* Apply section */
+  .apply-section{padding:32px 40px;border-top:3px solid #0A0A0A;background:#0A0A0A;color:#F5F5F0;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+  .apply-info{display:flex;flex-direction:column;gap:4px}
+  .apply-info-title{font-size:20px;font-weight:800;letter-spacing:-.02em}
+  .apply-info-sub{font-family:'Space Mono',monospace;font-size:11px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.04em}
+  .apply-cta{padding:16px 40px;background:#FBBF24;color:#0A0A0A;border:none;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;transition:all .15s}
+  .apply-cta:hover{box-shadow:6px 6px 0 rgba(255,255,255,.15);transform:translate(-3px,-3px)}
+
+  /* ============ RIGHT — SIDEBAR ============ */
+  .sidebar{border:3px solid #0A0A0A;border-left:0;display:flex;flex-direction:column}
+  @media(max-width:800px){.sidebar{border-left:3px solid #0A0A0A}}
+
+  /* Company card */
+  .sidebar-company{padding:28px;border-bottom:2px solid #0A0A0A;display:flex;flex-direction:column;gap:16px}
+  .sc-header{display:flex;align-items:center;gap:12px}
+  .sc-logo{width:48px;height:48px;background:#E8F7EF;border:2px solid #0A0A0A;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .sc-logo svg{width:22px;height:22px}
+  .sc-info{display:flex;flex-direction:column;gap:2px}
+  .sc-name{font-size:16px;font-weight:700;letter-spacing:-.02em}
+  .sc-type{font-family:'Space Mono',monospace;font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.05em}
+
+  .sc-stats{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  .sc-stat{padding:12px;border:1px solid rgba(0,0,0,.08);display:flex;flex-direction:column;gap:2px}
+  .sc-stat-val{font-size:18px;font-weight:800;letter-spacing:-.02em}
+  .sc-stat-label{font-family:'Space Mono',monospace;font-size:9px;color:#888;text-transform:uppercase;letter-spacing:.05em}
+
+  .sc-btn{padding:10px;border:2px solid #0A0A0A;background:0;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;transition:all .15s;text-align:center;display:block;width:100%;color:#0A0A0A}
+  .sc-btn:hover{background:#0A0A0A;color:#F5F5F0}
+
+  /* Quick facts */
+  .sidebar-facts{padding:28px;border-bottom:2px solid #0A0A0A;display:flex;flex-direction:column;gap:12px}
+  .sf-title{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#888}
+  .sf-list{display:flex;flex-direction:column;gap:0}
+  .sf-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(0,0,0,.06)}
+  .sf-item:last-child{border-bottom:0}
+  .sf-key{font-family:'Space Mono',monospace;font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.04em}
+  .sf-val{font-size:13px;font-weight:600}
+
+  /* Similar jobs */
+  .sidebar-similar{padding:28px;display:flex;flex-direction:column;gap:14px;flex:1}
+  .ss-title{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#888}
+  .sim-card{padding:16px;border:2px solid rgba(0,0,0,.08);display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:all .15s}
+  .sim-card:hover{border-color:#0A0A0A;box-shadow:4px 4px 0 #0A0A0A;transform:translate(-2px,-2px)}
+  .sim-top{display:flex;align-items:center;gap:10px}
+  .sim-logo{width:32px;height:32px;border:1.5px solid rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+  .sim-logo svg{width:16px;height:16px}
+  .sim-company{font-family:'Space Mono',monospace;font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.04em}
+  .sim-title{font-size:14px;font-weight:700;letter-spacing:-.02em;line-height:1.2}
+  .sim-bottom{display:flex;justify-content:space-between;align-items:center}
+  .sim-salary{font-size:13px;font-weight:700}
+  .sim-match{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:3px 8px;background:#0A0A0A;color:#F5F5F0}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav"><div class="nav-inner">
+  <a class="nav-brand" href="#"><div class="nav-logo">JB</div><span class="nav-wordmark">Jobboard</span></a>
+  <ul class="nav-links">
+    <li><a href="#" class="active"><span class="full">Jobs</span><span class="short">Jobs</span><span class="badge">32</span></a></li>
+    <li><a href="#"><span class="full">Saved</span><span class="short">★</span></a></li>
+    <li><a href="#"><span class="full">Applications</span><span class="short">Apps</span></a></li>
+    <li><a href="#"><span class="full">Companies</span><span class="short">Co.</span></a></li>
+    <li><a href="#"><span class="full">Messages</span><span class="short">Msg</span></a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></button>
+    <button class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span class="notif-dot"></span></button>
+    <button class="nav-btn"><div class="nav-avatar">GR</div></button>
+  </div>
+</div></nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb-bar"><div class="breadcrumb-inner">
+  <a class="bc-link" href="#">Jobs</a>
+  <span class="bc-sep">/</span>
+  <a class="bc-link" href="#">Design</a>
+  <span class="bc-sep">/</span>
+  <span class="bc-current">Senior Product Designer</span>
+</div></div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- LEFT -->
+  <div class="detail">
+
+    <!-- Hero -->
+    <div class="detail-hero">
+      <div class="detail-hero-top">
+        <div class="detail-hero-left">
+          <div class="detail-logo"><svg viewBox="0 0 24 24" fill="#1DB954"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.5.4-.8.2-2.2-1.3-5-1.6-8.3-.9-.3.1-.6-.1-.7-.4-.1-.3.1-.6.4-.7 3.6-.8 6.7-.5 9.2 1 .3.2.4.5.2.8zm1.2-2.7c-.2.4-.7.5-1 .3-2.5-1.5-6.3-2-9.3-1.1-.4.1-.8-.1-.9-.5-.1-.4.1-.8.5-.9 3.4-1 7.6-.5 10.4 1.2.3.2.5.7.3 1zm.1-2.8c-3-1.8-8-2-10.9-.9-.5.2-1-.1-1.1-.5-.2-.5.1-1 .5-1.1 3.3-1 8.7-.8 12.1 1.1.4.3.6.8.3 1.3-.2.4-.8.6-1.2.3l.3-.2z"/></svg></div>
+          <div class="detail-company-info">
+            <div class="detail-company-name">Spotify</div>
+            <div class="detail-company-meta">Stockholm, Sweden <span class="dot"></span> Music & Entertainment <span class="dot"></span> 8,000+ employees</div>
+          </div>
+        </div>
+        <div class="detail-hero-actions">
+          <button class="action-btn saved" onclick="this.classList.toggle('saved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+          <button class="action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>
+          <button class="action-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
+        </div>
+      </div>
+
+      <div class="detail-title">Senior Product Designer</div>
+
+      <div class="detail-tags-row">
+        <span class="dtag dtag-match">95% Match</span>
+        <span class="dtag dtag-source">LinkedIn</span>
+        <span class="dtag">Full-time</span>
+        <span class="dtag">Remote</span>
+        <span class="dtag">Senior</span>
+        <span class="dtag">Design Systems</span>
+      </div>
+
+      <div class="detail-salary-row">
+        <div class="detail-salary">$145,000 – $180,000<span>Per year · Base salary + equity</span></div>
+        <div class="detail-posted">Posted 2 hours ago<br>142 applicants</div>
+      </div>
+    </div>
+
+    <!-- About the role -->
+    <div class="detail-section">
+      <div class="section-label">About the Role</div>
+      <p>We're looking for a Senior Product Designer to join Spotify's Creator Tools team. You'll lead the design of features that help millions of artists share music, connect with fans, and grow their audience on the world's largest streaming platform.</p>
+      <p>You'll work closely with product managers, engineers, and data scientists to ship high-impact work. This is a role for someone who thrives in ambiguity, loves systems thinking, and cares deeply about craft at scale.</p>
+    </div>
+
+    <!-- Requirements -->
+    <div class="detail-section">
+      <div class="section-label">Requirements</div>
+      <ul class="req-list">
+        <li><span class="req-bullet"></span><div><strong>6+ years</strong> of product design experience, with at least 2 years at a scaled consumer product</div></li>
+        <li><span class="req-bullet"></span><div>Deep expertise in <strong>design systems</strong> — building, maintaining, and evolving component libraries</div></li>
+        <li><span class="req-bullet"></span><div>Strong portfolio showing <strong>end-to-end product thinking</strong> from discovery to shipped features</div></li>
+        <li><span class="req-bullet"></span><div>Experience with <strong>data-informed design</strong> — working with A/B tests, user research, and analytics</div></li>
+        <li><span class="req-bullet"></span><div>Proficiency in <strong>Figma</strong> with advanced prototyping and auto-layout skills</div></li>
+        <li><span class="req-bullet"></span><div>Excellent communication — can present work to leadership and influence cross-functional stakeholders</div></li>
+        <li><span class="req-bullet"></span><div>Bonus: experience with <strong>motion design</strong>, front-end development, or accessibility standards</div></li>
+      </ul>
+    </div>
+
+    <!-- Tech & Tools -->
+    <div class="detail-section">
+      <div class="section-label">Tech & Tools</div>
+      <div class="stack-row">
+        <span class="stack-tag">Figma</span>
+        <span class="stack-tag">Protopie</span>
+        <span class="stack-tag">React</span>
+        <span class="stack-tag">Storybook</span>
+        <span class="stack-tag">Jira</span>
+        <span class="stack-tag">Amplitude</span>
+        <span class="stack-tag">Notion</span>
+        <span class="stack-tag">Lottie</span>
+      </div>
+    </div>
+
+    <!-- Perks -->
+    <div class="detail-section">
+      <div class="section-label">Perks & Benefits</div>
+      <div class="perks-grid">
+        <div class="perk">
+          <div class="perk-icon">🏠</div>
+          <div class="perk-text"><div class="perk-title">Fully Remote</div><div class="perk-desc">Work from anywhere in EU timezone ±3 hours</div></div>
+        </div>
+        <div class="perk">
+          <div class="perk-icon">💰</div>
+          <div class="perk-text"><div class="perk-title">Equity Package</div><div class="perk-desc">RSUs vesting over 4 years with 1-year cliff</div></div>
+        </div>
+        <div class="perk">
+          <div class="perk-icon">🎧</div>
+          <div class="perk-text"><div class="perk-title">Home Office Budget</div><div class="perk-desc">$3,000 setup + $500/yr ongoing</div></div>
+        </div>
+        <div class="perk">
+          <div class="perk-icon">🏥</div>
+          <div class="perk-text"><div class="perk-title">Health & Wellness</div><div class="perk-desc">Full medical, dental, vision + mental health support</div></div>
+        </div>
+        <div class="perk">
+          <div class="perk-icon">📚</div>
+          <div class="perk-text"><div class="perk-title">Learning Budget</div><div class="perk-desc">$2,500/yr for courses, conferences, books</div></div>
+        </div>
+        <div class="perk">
+          <div class="perk-icon">🌴</div>
+          <div class="perk-text"><div class="perk-title">Generous PTO</div><div class="perk-desc">25 days vacation + local holidays + 2 recharge weeks</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Apply bar -->
+    <div class="apply-section">
+      <div class="apply-info">
+        <div class="apply-info-title">Ready to apply?</div>
+        <div class="apply-info-sub">142 applicants · Closes in 14 days</div>
+      </div>
+      <button class="apply-cta">Apply Now →</button>
+    </div>
+
+  </div>
+
+  <!-- RIGHT — SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- Company card -->
+    <div class="sidebar-company">
+      <div class="sc-header">
+        <div class="sc-logo"><svg viewBox="0 0 24 24" fill="#1DB954"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.6 14.4c-.2.3-.5.4-.8.2-2.2-1.3-5-1.6-8.3-.9-.3.1-.6-.1-.7-.4-.1-.3.1-.6.4-.7 3.6-.8 6.7-.5 9.2 1 .3.2.4.5.2.8zm1.2-2.7c-.2.4-.7.5-1 .3-2.5-1.5-6.3-2-9.3-1.1-.4.1-.8-.1-.9-.5-.1-.4.1-.8.5-.9 3.4-1 7.6-.5 10.4 1.2.3.2.5.7.3 1zm.1-2.8c-3-1.8-8-2-10.9-.9-.5.2-1-.1-1.1-.5-.2-.5.1-1 .5-1.1 3.3-1 8.7-.8 12.1 1.1.4.3.6.8.3 1.3-.2.4-.8.6-1.2.3l.3-.2z"/></svg></div>
+        <div class="sc-info">
+          <div class="sc-name">Spotify</div>
+          <div class="sc-type">Music & Entertainment</div>
+        </div>
+      </div>
+      <div class="sc-stats">
+        <div class="sc-stat"><div class="sc-stat-val">8,400+</div><div class="sc-stat-label">Employees</div></div>
+        <div class="sc-stat"><div class="sc-stat-val">4.2★</div><div class="sc-stat-label">Glassdoor</div></div>
+        <div class="sc-stat"><div class="sc-stat-val">79</div><div class="sc-stat-label">Open Roles</div></div>
+        <div class="sc-stat"><div class="sc-stat-val">2006</div><div class="sc-stat-label">Founded</div></div>
+      </div>
+      <button class="sc-btn">View Company →</button>
+    </div>
+
+    <!-- Quick facts -->
+    <div class="sidebar-facts">
+      <div class="sf-title">Quick Facts</div>
+      <div class="sf-list">
+        <div class="sf-item"><span class="sf-key">Seniority</span><span class="sf-val">Senior (IC4)</span></div>
+        <div class="sf-item"><span class="sf-key">Type</span><span class="sf-val">Full-time</span></div>
+        <div class="sf-item"><span class="sf-key">Location</span><span class="sf-val">Remote (EU)</span></div>
+        <div class="sf-item"><span class="sf-key">Visa</span><span class="sf-val">Sponsored</span></div>
+        <div class="sf-item"><span class="sf-key">Reports To</span><span class="sf-val">Design Director</span></div>
+        <div class="sf-item"><span class="sf-key">Team Size</span><span class="sf-val">8 designers</span></div>
+      </div>
+    </div>
+
+    <!-- Similar jobs -->
+    <div class="sidebar-similar">
+      <div class="ss-title">Similar Jobs</div>
+
+      <div class="sim-card">
+        <div class="sim-top">
+          <div class="sim-logo" style="background:#FDEAE6"><svg viewBox="0 0 24 24" fill="#F24E1E"><path d="M8 24c2.2 0 4-1.8 4-4v-4H8c-2.2 0-4 1.8-4 4s1.8 4 4 4zm0-20C5.8 4 4 5.8 4 8s1.8 4 4 4h4V4H8zm8 0h-4v8h4c2.2 0 4-1.8 4-4s-1.8-4-4-4zm-4 8c-2.2 0-4 1.8-4 4s1.8 4 4 4h4v-8H8h4zm4 0a4 4 0 100 8 4 4 0 000-8z"/></svg></div>
+          <span class="sim-company">Figma · Remote</span>
+        </div>
+        <div class="sim-title">Design Technologist</div>
+        <div class="sim-bottom">
+          <span class="sim-salary">$140–185K</span>
+          <span class="sim-match">91%</span>
+        </div>
+      </div>
+
+      <div class="sim-card">
+        <div class="sim-top">
+          <div class="sim-logo" style="background:#EEEBFF"><svg viewBox="0 0 24 24" fill="#635BFF"><path d="M13.98 7.87c-1.18 0-1.95.52-2.4 1.05l-.32-1.05H9.1v12.04l2.63-.56.01-2.92c.46.33 1.13.8 2.24.8 2.26 0 4.32-1.82 4.32-5.82-.01-3.66-2.1-5.54-4.32-5.54zm-.76 8.52c-.75 0-1.19-.27-1.5-.6l-.01-4.74c.32-.37.78-.63 1.51-.63 1.15 0 1.95 1.29 1.95 2.98 0 1.72-.79 2.99-1.95 2.99z"/></svg></div>
+          <span class="sim-company">Stripe · San Francisco</span>
+        </div>
+        <div class="sim-title">Design Engineer</div>
+        <div class="sim-bottom">
+          <span class="sim-salary">$170–220K</span>
+          <span class="sim-match">89%</span>
+        </div>
+      </div>
+
+      <div class="sim-card">
+        <div class="sim-top">
+          <div class="sim-logo" style="background:#E6ECFB"><svg viewBox="0 0 24 24" fill="#5E6AD2"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></div>
+          <span class="sim-company">Linear · Remote</span>
+        </div>
+        <div class="sim-title">UX Engineer</div>
+        <div class="sim-bottom">
+          <span class="sim-salary">$120–150K</span>
+          <span class="sim-match">86%</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

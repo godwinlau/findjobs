@@ -4,11 +4,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FilterBar } from "./FilterBar";
 import { ExploreJobList } from "./ExploreJobList";
-import { Pagination, JobDetailDrawer } from "@/components/dashboard";
-import { getJobDetailForDrawer } from "@/lib/actions/job-detail";
+import { Pagination } from "@/components/dashboard";
 import { colors } from "@/lib/constants/colors";
 import type { Job } from "@/lib/types";
-import type { JobDetail } from "@/lib/jobs";
 
 interface ExploreClientProps {
   initialJobs: Job[];
@@ -44,31 +42,12 @@ export function ExploreClient({
   const [isLoading, setIsLoading] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
-  // Drawer state
-  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
-  const [jobDetail, setJobDetail] = useState<JobDetail | null>(null);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isDrawerClosing, setIsDrawerClosing] = useState(false);
-
-  const handleJobSelect = useCallback(async (job: Job) => {
-    setSelectedJob(job);
-    setJobDetail(null);
-    setIsDrawerOpen(true);
-    setIsDrawerClosing(false);
-
-    const detail = await getJobDetailForDrawer(job.id);
-    setJobDetail(detail);
-  }, []);
-
-  const handleCloseDrawer = useCallback(() => {
-    setIsDrawerClosing(true);
-    setTimeout(() => {
-      setIsDrawerOpen(false);
-      setIsDrawerClosing(false);
-      setSelectedJob(null);
-      setJobDetail(null);
-    }, 200);
-  }, []);
+  const handleJobSelect = useCallback(
+    (job: Job) => {
+      router.push(`/jobs/${job.id}`);
+    },
+    [router],
+  );
 
   // Build current filters from URL
   function getFilters(): Record<string, string> {
@@ -212,13 +191,6 @@ export function ExploreClient({
         />
       </div>
 
-      <JobDetailDrawer
-        job={selectedJob}
-        jobDetail={jobDetail}
-        isOpen={isDrawerOpen}
-        isClosing={isDrawerClosing}
-        onClose={handleCloseDrawer}
-      />
     </>
   );
 }
