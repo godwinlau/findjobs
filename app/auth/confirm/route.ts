@@ -21,8 +21,14 @@ export async function GET(request: NextRequest) {
     if (!error) {
       return NextResponse.redirect(redirectTo);
     }
+
+    // Surface the error so we can debug
+    redirectTo.pathname = "/login";
+    redirectTo.searchParams.set("error", error.message);
+    return NextResponse.redirect(redirectTo);
   }
 
   redirectTo.pathname = "/login";
+  redirectTo.searchParams.set("error", "missing_params");
   return NextResponse.redirect(redirectTo);
 }
