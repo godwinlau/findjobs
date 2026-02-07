@@ -47,9 +47,12 @@ const EarthIcon = forwardRef<EarthIconHandle, EarthIconProps>(
     useEffect(() => {
       let active = true;
       const loop = async () => {
+        // Wait a frame so motion controls are mounted
+        await new Promise((r) => requestAnimationFrame(r));
         while (active) {
           await controls.start("animate");
           await new Promise((r) => setTimeout(r, 2000));
+          if (!active) break;
           await controls.start("normal");
           await new Promise((r) => setTimeout(r, 500));
         }

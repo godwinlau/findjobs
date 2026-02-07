@@ -1,0 +1,452 @@
+import { useState, useRef, useEffect, useMemo } from "react";
+
+const SKILLS_DB = {
+  "Development": [
+    "React", "JavaScript", "TypeScript", "Python", "Node.js", "Next.js",
+    "Vue.js", "Angular", "PHP", "Laravel", "Ruby on Rails", "Go",
+    "Swift", "Kotlin", "Flutter", "React Native", "HTML/CSS", "Tailwind CSS",
+    "GraphQL", "REST APIs", "PostgreSQL", "MongoDB", "Firebase", "AWS",
+    "Docker", "Git", "CI/CD", "Shopify Liquid", "WordPress", "Webflow"
+  ],
+  "Design": [
+    "UI Design", "UX Design", "Figma", "Adobe Photoshop", "Adobe Illustrator",
+    "Adobe XD", "Sketch", "Canva", "Prototyping", "Wireframing",
+    "Design Systems", "Motion Design", "3D Design", "Brand Design",
+    "Interaction Design", "Visual Design", "User Research", "Usability Testing"
+  ],
+  "Marketing": [
+    "SEO", "SEM", "Google Ads", "Meta Ads", "Content Marketing",
+    "Email Marketing", "Social Media Marketing", "Copywriting",
+    "Analytics", "Google Analytics", "HubSpot", "Mailchimp"
+  ],
+  "Data & AI": [
+    "Machine Learning", "Data Analysis", "SQL", "Power BI", "Tableau",
+    "Excel Advanced", "Data Visualization", "TensorFlow", "Pandas"
+  ],
+  "Operations": [
+    "Project Management", "Agile/Scrum", "Jira", "Notion", "Asana",
+    "Customer Support", "Virtual Assistance", "Data Entry", "Bookkeeping",
+    "QuickBooks", "Salesforce", "CRM Management"
+  ]
+};
+
+const ALL_SKILLS = Object.entries(SKILLS_DB).flatMap(([cat, skills]) =>
+  skills.map(s => ({ name: s, category: cat }))
+);
+
+const QUICK_PICKS = [
+  "React", "Figma", "Python", "TypeScript", "SEO", "Node.js",
+  "UI Design", "Next.js", "Excel Advanced", "Project Management",
+  "Copywriting", "Data Analysis"
+];
+
+function getMatchCount(count) {
+  const curve = [0, 12, 31, 48, 73, 94, 118, 139, 156, 167, 178];
+  return curve[Math.min(count, 10)] || 0;
+}
+
+export default function SkillPickerSection() {
+  const [selected, setSelected] = useState([]);
+  const [query, setQuery] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [highlightIdx, setHighlightIdx] = useState(-1);
+  const inputRef = useRef(null);
+  const wrapRef = useRef(null);
+
+  const filtered = useMemo(() => {
+    if (!query.trim()) return [];
+    const q = query.toLowerCase();
+    return ALL_SKILLS
+      .filter(s => s.name.toLowerCase().includes(q) && !selected.includes(s.name))
+      .slice(0, 6);
+  }, [query, selected]);
+
+  useEffect(() => { setHighlightIdx(-1); }, [filtered]);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) setShowDropdown(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const add = (name) => {
+    if (selected.length >= 10 || selected.includes(name)) return;
+    setSelected(p => [...p, name]);
+    setQuery("");
+    setShowDropdown(false);
+    inputRef.current?.focus();
+  };
+
+  const remove = (name) => setSelected(p => p.filter(s => s !== name));
+
+  const handleKey = (e) => {
+    if (e.key === "ArrowDown") { e.preventDefault(); setHighlightIdx(p => Math.min(p + 1, filtered.length - 1)); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); setHighlightIdx(p => Math.max(p - 1, 0)); }
+    else if (e.key === "Enter" && highlightIdx >= 0 && filtered[highlightIdx]) { e.preventDefault(); add(filtered[highlightIdx].name); }
+    else if (e.key === "Backspace" && !query && selected.length) remove(selected[selected.length - 1]);
+  };
+
+  const matchCount = getMatchCount(selected.length);
+  const quickAvailable = QUICK_PICKS.filter(s => !selected.includes(s));
+
+  return (
+    <div style={{
+      background: "#0A0A0A",
+      fontFamily: "'IBM Plex Mono', monospace",
+      padding: "0 24px",
+    }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+        * { box-sizing: border-box; }
+
+        .sp-section {
+          max-width: 800px;
+          margin: 0 auto;
+          padding: 64px 0;
+        }
+
+        .sp-eyebrow {
+          font-size: 11px;
+          color: #555;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+          font-weight: 600;
+          margin: 0 0 12px;
+          font-family: 'IBM Plex Mono', monospace;
+        }
+
+        .sp-heading {
+          font-family: 'Space Grotesk', sans-serif;
+          font-size: 32px;
+          font-weight: 700;
+          color: #F5F5F0;
+          margin: 0 0 6px;
+          letter-spacing: -0.5px;
+          line-height: 1.15;
+        }
+
+        .sp-heading em {
+          color: #E8C547;
+          font-style: normal;
+        }
+
+        .sp-sub {
+          font-size: 14px;
+          color: #555;
+          margin: 0 0 28px;
+          font-weight: 400;
+          line-height: 1.4;
+        }
+
+        /* Card */
+        .sp-card {
+          border: 2px solid #1E1E1E;
+          background: #111;
+          position: relative;
+        }
+
+        /* Search row */
+        .sp-search-row {
+          display: flex;
+          align-items: center;
+          border-bottom: 1px solid #1A1A1A;
+        }
+
+        .sp-search-icon {
+          padding: 0 0 0 16px;
+          color: #444;
+          font-size: 14px;
+          flex-shrink: 0;
+        }
+
+        .sp-input {
+          flex: 1;
+          background: none;
+          border: none;
+          outline: none;
+          color: #F5F5F0;
+          font-size: 14px;
+          font-family: 'IBM Plex Mono', monospace;
+          padding: 14px 16px;
+          caret-color: #E8C547;
+        }
+
+        .sp-input::placeholder { color: #444; }
+
+        .sp-count-badge {
+          padding: 0 16px;
+          font-size: 11px;
+          color: #555;
+          font-weight: 600;
+          white-space: nowrap;
+          font-variant-numeric: tabular-nums;
+        }
+
+        .sp-count-badge span { color: #E8C547; }
+
+        /* Dropdown */
+        .sp-dropdown {
+          position: absolute;
+          left: -2px;
+          right: -2px;
+          top: 47px;
+          background: #151515;
+          border: 2px solid #E8C547;
+          border-top: none;
+          z-index: 50;
+          max-height: 240px;
+          overflow-y: auto;
+        }
+
+        .sp-dd-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 10px 16px;
+          cursor: pointer;
+          border-bottom: 1px solid #1A1A1A;
+          transition: background 0.1s;
+        }
+
+        .sp-dd-item:last-child { border-bottom: none; }
+        .sp-dd-item:hover, .sp-dd-item.hl { background: #1A1A1A; }
+
+        .sp-dd-name {
+          font-size: 13px;
+          color: #F5F5F0;
+          font-weight: 500;
+        }
+
+        .sp-dd-name mark {
+          background: none;
+          color: #E8C547;
+          font-weight: 700;
+        }
+
+        .sp-dd-cat {
+          font-size: 10px;
+          color: #555;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .sp-dd-empty {
+          padding: 16px;
+          text-align: center;
+          color: #444;
+          font-size: 12px;
+        }
+
+        /* Selected + Quick picks zone */
+        .sp-chips-zone {
+          padding: 14px 16px;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          min-height: 50px;
+          align-items: flex-start;
+        }
+
+        .sp-sel-chip {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: #E8C547;
+          color: #0A0A0A;
+          padding: 5px 8px 5px 10px;
+          font-size: 11px;
+          font-weight: 600;
+          font-family: 'IBM Plex Mono', monospace;
+          letter-spacing: 0.2px;
+          animation: chipPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes chipPop {
+          from { opacity: 0; transform: scale(0.9); }
+          to { opacity: 1; transform: scale(1); }
+        }
+
+        .sp-sel-x {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 14px;
+          height: 14px;
+          background: rgba(0,0,0,0.12);
+          border: none;
+          cursor: pointer;
+          color: #0A0A0A;
+          font-size: 12px;
+          font-weight: 700;
+          padding: 0;
+          line-height: 1;
+        }
+
+        .sp-sel-x:hover { background: rgba(0,0,0,0.25); }
+
+        .sp-quick-chip {
+          padding: 5px 10px;
+          background: transparent;
+          border: 1px solid #2A2A2A;
+          color: #666;
+          font-size: 11px;
+          font-family: 'IBM Plex Mono', monospace;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.12s;
+        }
+
+        .sp-quick-chip:hover {
+          border-color: #E8C547;
+          color: #E8C547;
+        }
+
+        .sp-empty-hint {
+          font-size: 12px;
+          color: #333;
+          padding: 4px 0;
+        }
+
+        /* Footer bar */
+        .sp-footer {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          background: #E8C547;
+          padding: 14px 16px;
+        }
+
+        .sp-match-row {
+          display: flex;
+          align-items: baseline;
+          gap: 10px;
+        }
+
+        .sp-match-num {
+          font-family: 'Space Grotesk', sans-serif;
+          font-size: 28px;
+          font-weight: 700;
+          color: #0A0A0A;
+          line-height: 1;
+          font-variant-numeric: tabular-nums;
+        }
+
+        .sp-match-label {
+          font-size: 11px;
+          color: rgba(10,10,10,0.6);
+          font-weight: 500;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .sp-cta {
+          background: #0A0A0A;
+          color: #E8C547;
+          border: none;
+          padding: 10px 20px;
+          font-family: 'IBM Plex Mono', monospace;
+          font-size: 12px;
+          font-weight: 600;
+          cursor: pointer;
+          letter-spacing: 0.5px;
+          text-transform: uppercase;
+          transition: background 0.15s;
+        }
+
+        .sp-cta:hover { background: #1A1A1A; }
+        .sp-cta.off { opacity: 0.35; pointer-events: none; }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+          .sp-heading { font-size: 24px; }
+          .sp-section { padding: 48px 0; }
+        }
+      `}</style>
+
+      <section className="sp-section">
+        <p className="sp-eyebrow">// Try it yourself</p>
+        <h2 className="sp-heading">See how many jobs <em>match</em> you</h2>
+        <p className="sp-sub">Pick a few skills — no signup needed.</p>
+
+        <div className="sp-card" ref={wrapRef}>
+          {/* Search input */}
+          <div className="sp-search-row">
+            <span className="sp-search-icon">⌕</span>
+            <input
+              ref={inputRef}
+              className="sp-input"
+              placeholder="Type a skill..."
+              value={query}
+              onChange={e => { setQuery(e.target.value); setShowDropdown(true); }}
+              onFocus={() => { if (query) setShowDropdown(true); }}
+              onKeyDown={handleKey}
+              disabled={selected.length >= 10}
+            />
+            {selected.length > 0 && (
+              <div className="sp-count-badge"><span>{selected.length}</span>/10</div>
+            )}
+          </div>
+
+          {/* Dropdown */}
+          {showDropdown && query.trim() && (
+            <div className="sp-dropdown">
+              {filtered.length > 0 ? filtered.map((s, i) => {
+                const idx = s.name.toLowerCase().indexOf(query.toLowerCase());
+                const before = s.name.slice(0, idx);
+                const match = s.name.slice(idx, idx + query.length);
+                const after = s.name.slice(idx + query.length);
+                return (
+                  <div
+                    key={s.name}
+                    className={`sp-dd-item ${i === highlightIdx ? 'hl' : ''}`}
+                    onMouseDown={e => { e.preventDefault(); add(s.name); }}
+                    onMouseEnter={() => setHighlightIdx(i)}
+                  >
+                    <span className="sp-dd-name">{before}<mark>{match}</mark>{after}</span>
+                    <span className="sp-dd-cat">{s.category}</span>
+                  </div>
+                );
+              }) : (
+                <div className="sp-dd-empty">No results for "{query}"</div>
+              )}
+            </div>
+          )}
+
+          {/* Selected chips + quick picks */}
+          <div className="sp-chips-zone">
+            {selected.map(s => (
+              <span key={s} className="sp-sel-chip">
+                {s}
+                <button className="sp-sel-x" onClick={() => remove(s)}>×</button>
+              </span>
+            ))}
+            {selected.length === 0 && quickAvailable.slice(0, 8).map(s => (
+              <button key={s} className="sp-quick-chip" onClick={() => add(s)}>+ {s}</button>
+            ))}
+            {selected.length === 0 && (
+              <div className="sp-empty-hint">↑ search or tap to add</div>
+            )}
+            {selected.length > 0 && selected.length < 10 && quickAvailable.slice(0, Math.max(0, 6 - selected.length)).map(s => (
+              <button key={s} className="sp-quick-chip" onClick={() => add(s)}>+ {s}</button>
+            ))}
+          </div>
+
+          {/* Match footer */}
+          <div className="sp-footer">
+            <div className="sp-match-row">
+              <span className="sp-match-num" key={matchCount}>{matchCount}</span>
+              <span className="sp-match-label">
+                {selected.length === 0 ? "Add skills to see matches" : "jobs match your skills"}
+              </span>
+            </div>
+            <button className={`sp-cta ${selected.length < 3 ? 'off' : ''}`}>
+              See matches →
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

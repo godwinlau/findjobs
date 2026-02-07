@@ -5,26 +5,29 @@ export function HeroSection() {
     <section className="lp-hero" id="heroSection">
       <div className="lp-hero-inner">
         <div>
-          <div className="lp-hero-eyebrow">For Filipino Professionals</div>
+          <div className="lp-hero-eyebrow">
+            Career intelligence that actually works
+          </div>
           <h1 className="lp-hero-title">
-            Stop scrolling.
+            Your career called.
             <br />
-            Start <span>matching.</span>
+            It wants a <span>big movv.</span>
           </h1>
           <p className="lp-hero-sub">
-            We analyze your skills and match you with jobs that actually fit.
-            Real salary ranges. Real match scores. Built for Filipinos.
+            We score your skills against real jobs and show you embarrassingly
+            good matches. Salaries in PHP. Zero guesswork.
           </p>
           <div className="lp-hero-ctas">
             <Link className="lp-btn-primary" href="/signup">
-              Get Matched Free &rarr;
+              Make Your Bigmovv &rarr;
             </Link>
             <a className="lp-btn-ghost" href="#how">
               See How It Works
             </a>
           </div>
           <div className="lp-hero-note">
-            Free forever &middot; No credit card &middot; 60-second setup
+            Free forever &middot; No resume needed &middot; 60 seconds to your
+            score
           </div>
           <div className="lp-hero-avatars">
             <div className="lp-hero-av lp-hero-av-1">MA</div>
@@ -33,7 +36,7 @@ export function HeroSection() {
             <div className="lp-hero-av lp-hero-av-4">AL</div>
             <div className="lp-hero-av lp-hero-av-5">RM</div>
             <span className="lp-hero-av-text">
-              12,000+ Filipinos already matched
+              12,000+ Filipinos already scored
             </span>
           </div>
         </div>
@@ -54,7 +57,7 @@ export function HeroSection() {
                     marginLeft: "auto",
                   }}
                 >
-                  Your Feed &middot; 32 Jobs
+                  Your Bigmovv Score &middot; 32 Jobs
                 </span>
               </div>
               {[

@@ -72,7 +72,7 @@ export function AuthEntry({ initialMode }: { initialMode: Mode }) {
       <div className="auth-left-panel">
         <div className="auth-lp-top">
           <div className="auth-lp-brand">
-            <div className="auth-lp-wordmark">bigmovv<span className="auth-lp-period">.</span></div>
+            <div className="auth-lp-wordmark">bigmo<span className="auth-lp-vv">vv</span></div>
           </div>
           <div className="auth-lp-headline">
             Find work that <span>fits you</span>
@@ -107,7 +107,7 @@ export function AuthEntry({ initialMode }: { initialMode: Mode }) {
         <div className="auth-box">
           {/* Mobile brand */}
           <div className="auth-mobile-brand">
-            <div className="auth-lp-wordmark">bigmovv<span className="auth-lp-period">.</span></div>
+            <div className="auth-lp-wordmark">bigmo<span className="auth-lp-vv">vv</span></div>
           </div>
 
           {sent ? (

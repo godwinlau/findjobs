@@ -77,11 +77,12 @@ export function Navbar({ fullName, email }: NavbarProps) {
               fontSize: 18,
               fontWeight: 800,
               letterSpacing: "-0.04em",
+              fontStyle: "italic",
               color: "#F5F5F0",
             }}
           >
-            bigmovv
-            <span style={{ color: "#FBBF24" }}>.</span>
+            bigmo
+            <span style={{ color: "#FBBF24" }}>vv</span>
           </span>
         </Link>
 

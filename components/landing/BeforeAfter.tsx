@@ -14,19 +14,19 @@ const CheckIcon = () => (
 );
 
 const withoutItems = [
-  "Scroll through 500+ irrelevant listings daily",
-  "Salary hidden until the interview \u2014 or never",
-  "Apply to 40 jobs, hear back from 0",
-  "No idea which skills to learn next",
-  "Same generic results for everyone",
+  "Scroll 500+ listings like it\u2019s a sad dating app",
+  "Salary? \u201CCompetitive.\u201D (Translation: disappointing)",
+  "Apply to 40 jobs, ghost of Christmas past at all 40",
+  "No clue which skills would actually get you hired",
+  "Same generic results for literally everyone alive",
 ];
 
 const withItems = [
-  "32 matched jobs ranked by relevance to you",
-  "Every job shows salary range in PHP upfront",
-  "Apply to 5 high-match jobs, get 3 interviews",
-  "Skills page shows exactly what to learn and why",
-  "Feed personalized to your skills and preferences",
+  "32 jobs scored and ranked \u2014 only the ones that actually want you",
+  "Salary in PHP. Upfront. No awkward third-interview surprises",
+  "Apply to 5 high-score jobs, get 3 interviews (real numbers)",
+  "Skill gap shows you exactly what to learn and why it matters",
+  "Your feed. Your skills. Your matches. Nobody else\u2019s.",
 ];
 
 export function BeforeAfter() {
@@ -34,17 +34,22 @@ export function BeforeAfter() {
     <section className="lp-section" style={{ paddingTop: 0 }}>
       <div className="lp-section-inner">
         <ScrollReveal>
-          <div className="lp-section-label">{"// the difference"}</div>
-          <div className="lp-section-title">What changes when you switch</div>
+          <div className="lp-section-label">{"// the awkward truth"}</div>
+          <div className="lp-section-title">
+            Your current job search is broken
+          </div>
           <div className="lp-section-sub">
-            Same you. Same skills. Completely different experience.
+            Don&apos;t take it personally. Every job platform just forgot to care
+            about you. We remembered.
           </div>
           <div className="lp-ba-grid">
             <div className="lp-ba-card lp-ba-card-old">
               <div className="lp-ba-label lp-ba-label-old">
-                <XIcon /> Without bigmovv
+                <XIcon /> JobStreet vibes
               </div>
-              <div className="lp-ba-title">Spray and pray</div>
+              <div className="lp-ba-title">
+                Apply to everything, hear from nothing
+              </div>
               <div className="lp-ba-items">
                 {withoutItems.map((item) => (
                   <div key={item} className="lp-ba-item">
@@ -59,7 +64,7 @@ export function BeforeAfter() {
                 <CheckIcon /> With bigmovv
               </div>
               <div className="lp-ba-title" style={{ color: "#F5F5F0" }}>
-                Apply with confidence
+                Apply less. Land more. Know your worth.
               </div>
               <div className="lp-ba-items">
                 {withItems.map((item) => (

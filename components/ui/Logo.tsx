@@ -20,12 +20,13 @@ export function Logo({ size = "md", color = "light" }: LogoProps) {
         fontSize: sizes[size],
         fontWeight: 800,
         letterSpacing: "-0.04em",
+        fontStyle: "italic",
         lineHeight: 1,
         color: textColor,
       }}
     >
-      bigmovv
-      <span style={{ color: "#FBBF24" }}>.</span>
+      bigmo
+      <span style={{ color: "#FBBF24" }}>vv</span>
     </span>
   );
 }

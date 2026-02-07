@@ -23,11 +23,11 @@ export function StickyCta() {
       <div className="lp-sticky-inner">
         <div className="lp-sticky-text">
           <div className="lp-sticky-pulse" />
-          <strong>32 new jobs</strong>{" "}
-          <span>posted today matching your skills</span>
+          <strong>32 jobs scored</strong>{" "}
+          <span>for your skills right now</span>
         </div>
         <Link className="lp-sticky-btn" href="/signup">
-          Get Matched Free &rarr;
+          Make Your Move &rarr;
         </Link>
       </div>
     </div>

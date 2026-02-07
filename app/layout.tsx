@@ -7,7 +7,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "bigmovv.",
+  title: "bigmovv",
   description: "Job matching for Filipino professionals",
 };
 

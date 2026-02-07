@@ -10,38 +10,38 @@ import { MapPinIcon } from "@/components/ui/map-pin";
 const features = [
   {
     icon: <CompassIcon size={22} />,
-    title: "Skill-Based Matching",
-    desc: "We map your skills to job requirements and give you a real match percentage. 92% means 92%.",
+    title: "Your Bigmovv Score",
+    desc: "A match percentage for every job. 92% means 92% of required skills match. Not vibes \u2014 math.",
     tag: "Core Feature",
   },
   {
     icon: <CircleDollarSignIcon size={22} />,
-    title: "Salary in PHP",
-    desc: "Every job shows salary ranges in pesos. Plus market data so you know your worth before you apply.",
+    title: "Salary in PHP. Always.",
+    desc: "Every job shows real salary ranges in pesos. Know your worth before you apply, not after 3 interviews and a case study.",
     tag: "Always Visible",
   },
   {
     icon: <ChartBarIncreasingIcon size={22} />,
     title: "Skill Intelligence",
-    desc: "See what skills the market wants, what you\u2019re missing, and exactly how many jobs they\u2019d unlock.",
-    tag: "Unique to bigmovv",
+    desc: "See which skills boost your score the most. We show the gap, the impact, and free resources to close it. Your career GPS.",
+    tag: "Only on bigmovv",
   },
   {
     icon: <EarthIcon size={22} />,
     title: "Remote-First",
-    desc: "62% of our jobs are remote. Filter by setup, see which companies truly hire from the Philippines.",
+    desc: "62% of jobs are remote. Filter by setup. Find companies that actually hire from the Philippines, not just say they do.",
     tag: "62% Remote",
   },
   {
     icon: <ZapIcon size={22} />,
     title: "60-Second Setup",
-    desc: "No resume upload. No 20-field forms. Pick skills, set preferences, see matches. Under a minute.",
+    desc: "No resume. No 20-field forms. No uploading a PDF you made in 2019. Pick skills, get scored. Done.",
     tag: "Zero Friction",
   },
   {
     icon: <MapPinIcon size={22} />,
-    title: "Built for Filipinos",
-    desc: "PHP salaries, PH market data, roles popular here, companies that actually hire remotely from PH.",
+    title: "Built for PH. Actually.",
+    desc: "PHP salaries. PH market data. Companies that genuinely hire from the Philippines, not just have a Manila office for tax purposes.",
     tag: "Local-First",
   },
 ];
@@ -51,11 +51,13 @@ export function FeaturesSection() {
     <section className="lp-section" id="features">
       <div className="lp-section-inner">
         <ScrollReveal>
-          <div className="lp-section-label">{"// what you get"}</div>
-          <div className="lp-section-title">Built different. On purpose.</div>
+          <div className="lp-section-label">{"// the good stuff"}</div>
+          <div className="lp-section-title">
+            Built different. And we can prove it.
+          </div>
           <div className="lp-section-sub">
-            Every feature exists because we asked: does this help someone get
-            hired faster?
+            Every feature exists because the current way of finding jobs is
+            honestly embarrassing for 2026.
           </div>
           <div className="lp-feat-grid">
             {features.map((f) => (

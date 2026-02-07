@@ -5,24 +5,24 @@ import { ScrollReveal } from "./ScrollReveal";
 
 const faqs = [
   {
-    q: "Is this actually free?",
-    a: "Yes. Completely free for job seekers. No hidden fees, no premium tier, no credit card required. We make money from employers who pay to post jobs and access our matching platform. You\u2019ll never pay a single peso.",
+    q: "Wait, this is actually free?",
+    a: "Free as in \u201Cfree free.\u201D Not free-trial-free or free-but-we\u2019ll-upsell-you-free. 100% free for job seekers, forever. Employers pay to post and access our matching. You\u2019ll never pay a single peso. We promise. Pinky swear.",
   },
   {
     q: "How is this different from JobStreet or LinkedIn?",
-    a: "Those platforms show you everything and let you sort through thousands of listings. We do the opposite \u2014 we analyze your skills and only show you jobs where you\u2019re a strong match. Plus we show salaries in PHP upfront, give you a match score for every job, and tell you exactly which skills to learn to unlock more opportunities.",
+    a: "They throw 500 listings at you and wish you luck. We score your skills against every job and only show matches where you\u2019d actually get hired. Plus transparent PHP salaries (not \u201Ccompetitive\u201D) and a skill gap feature that tells you exactly what to learn next. It\u2019s like going from Google Maps to a personal driver.",
   },
   {
-    q: "Are these real jobs from real companies?",
-    a: "Every job on our platform is verified. We aggregate from company career pages, partner APIs, and direct employer postings. No fake listings, no duplicates, no expired roles. If a job is on bigmovv, you can apply to it today.",
+    q: "Are these real jobs or are you catfishing me?",
+    a: "Every single job is verified. We pull from company career pages, partner APIs, and direct employer postings. No fake listings, no duplicates, no expired roles from 2023 that somehow still appear (looking at you, every other platform). If it\u2019s on bigmovv, you can apply today.",
   },
   {
-    q: "I\u2019m outside Manila. Will this work for me?",
-    a: "Absolutely. 62% of our jobs are remote-friendly, so it doesn\u2019t matter if you\u2019re in Cebu, Davao, Iloilo, or anywhere else. We\u2019ve had users hired from across the Philippines. Our community section shows real people from cities all over the country.",
+    q: "I\u2019m not in Manila. Am I invisible here too?",
+    a: "Absolutely not. 62% of our jobs are remote. We have people hired from Cebu, Davao, Iloilo, Cagayan de Oro, and everywhere in between. Your location doesn\u2019t determine your talent. Your score does.",
   },
   {
-    q: "What if I don\u2019t have many skills yet?",
-    a: "That\u2019s exactly who our Skills Intelligence feature is for. We\u2019ll show you which skills are in demand, which ones would unlock the most jobs for you, and link you to free resources to learn them. Start with what you have \u2014 we\u2019ll help you grow.",
+    q: "What does my score actually mean?",
+    a: "It\u2019s the percentage of a job\u2019s required and preferred skills that match your profile. Score 92% and you match 92% of what the employer wants. Above 85% and you\u2019re a strong candidate. We also show you which skills would bump your score higher \u2014 so you know exactly what to learn next, not just what you\u2019re missing.",
   },
 ];
 
@@ -33,10 +33,15 @@ export function FaqSection() {
     <section className="lp-section" style={{ paddingTop: 0 }}>
       <div className="lp-section-inner">
         <ScrollReveal>
-          <div className="lp-section-label">{"// honest answers"}</div>
-          <div className="lp-section-title">Still not sure?</div>
+          <div className="lp-section-label">
+            {"// the fine print (there isn\u2019t any)"}
+          </div>
+          <div className="lp-section-title">
+            You have questions. We have answers.
+          </div>
           <div className="lp-section-sub">
-            Fair. Here are the questions everyone asks before signing up.
+            Here&apos;s what everyone asks right before they realize they
+            should&apos;ve signed up 5 minutes ago.
           </div>
           <div className="lp-faq-list">
             {faqs.map((faq, i) => (

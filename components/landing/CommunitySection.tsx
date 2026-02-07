@@ -4,19 +4,19 @@ import { TestimonialsSection } from "./TestimonialsSection";
 const stats = [
   { value: "12,400", label: "Job Seekers", yellow: true },
   { value: "3,200", label: "Hired This Year", yellow: false },
-  { value: "89%", label: "Avg. Match Score", yellow: true },
+  { value: "89%", label: "Avg. Score", yellow: true },
   { value: "14 days", label: "Avg. Time to Hire", yellow: false },
 ];
 
 const people = [
   { initials: "MA", name: "Maria A.", role: "Product Designer", loc: "Makati", skills: ["Figma", "UI", "UX"], stat: "hired", statText: "\u2713 Hired at Spotify", avatar: 1 },
   { initials: "JR", name: "Juan R.", role: "Frontend Developer", loc: "Cebu", skills: ["React", "TS", "Next.js"], stat: "hired", statText: "\u2713 Hired at Vercel", avatar: 2 },
-  { initials: "KC", name: "KC D.", role: "Full-Stack Developer", loc: "Manila", skills: ["Node", "React", "AWS"], stat: "matched", statText: "92% Match", avatar: 3 },
+  { initials: "KC", name: "KC D.", role: "Full-Stack Dev", loc: "Manila", skills: ["Node", "React", "AWS"], stat: "matched", statText: "Bigmovv: 92%", avatar: 3 },
   { initials: "AL", name: "Alyssa L.", role: "UX Researcher", loc: "Davao", skills: ["Research", "Figma"], stat: "hired", statText: "\u2713 Hired at Canva", avatar: 4 },
-  { initials: "RM", name: "Rico M.", role: "Mobile Developer", loc: "Quezon City", skills: ["Flutter", "Dart", "Firebase"], stat: "matched", statText: "88% Match", avatar: 1 },
-  { initials: "SG", name: "Sarah G.", role: "Shopify Developer", loc: "Iloilo", skills: ["Shopify", "Liquid", "CSS"], stat: "hired", statText: "\u2713 Hired at Stripe", avatar: 2 },
+  { initials: "RM", name: "Rico M.", role: "Mobile Dev", loc: "Quezon City", skills: ["Flutter", "Dart", "Firebase"], stat: "matched", statText: "Bigmovv: 88%", avatar: 1 },
+  { initials: "SG", name: "Sarah G.", role: "Shopify Dev", loc: "Iloilo", skills: ["Shopify", "Liquid", "CSS"], stat: "hired", statText: "\u2713 Hired at Stripe", avatar: 2 },
   { initials: "DT", name: "Dan T.", role: "Data Analyst", loc: "Taguig", skills: ["Python", "SQL", "Tableau"], stat: "active", statText: "Interviewing", avatar: 3 },
-  { initials: "JP", name: "Joy P.", role: "Design Engineer", loc: "Pasig", skills: ["React", "CSS", "Figma"], stat: "matched", statText: "91% Match", avatar: 4 },
+  { initials: "JP", name: "Joy P.", role: "Design Engineer", loc: "Pasig", skills: ["React", "CSS", "Figma"], stat: "matched", statText: "Bigmovv: 91%", avatar: 4 },
 ];
 
 export function CommunitySection() {
@@ -25,14 +25,14 @@ export function CommunitySection() {
       <div className="lp-section-inner">
         <ScrollReveal>
           <div className="lp-section-label">
-            {"// real people, real results"}
+            {"// receipts, not promises"}
           </div>
           <div className="lp-section-title" style={{ color: "#F5F5F0" }}>
-            Meet the community
+            12,000+ Filipinos making moves. Big ones.
           </div>
           <div className="lp-section-sub">
-            12,000+ Filipino professionals using bigmovv to find better work.
-            Here&apos;s some of them.
+            From Makati devs to Davao designers. Here&apos;s what happens when
+            you stop scrolling and start scoring.
           </div>
 
           <div className="lp-proof-stats" style={{ marginBottom: 32 }}>

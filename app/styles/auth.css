@@ -57,9 +57,10 @@
   font-size: 24px;
   font-weight: 800;
   letter-spacing: -0.04em;
+  font-style: italic;
   color: #F5F5F0;
 }
-.auth-lp-period {
+.auth-lp-vv {
   color: #FBBF24;
 }
 

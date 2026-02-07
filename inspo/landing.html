@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jobboard — Find Work That Fits You</title>
+<title>Bigmovv — Your Career's About to Get Interesting</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
@@ -15,7 +15,7 @@
   .nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,10,10,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:#F5F5F0;border-bottom:2px solid rgba(255,255,255,.04)}
   .nav-inner{max-width:1120px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px}
   .nav-brand{display:flex;align-items:center;gap:10px}
-  .nav-logo{width:30px;height:30px;background:#FBBF24;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:#0A0A0A}
+  .nav-logo{width:30px;height:30px;background:#FBBF24;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:#0A0A0A;letter-spacing:-.03em}
   .nav-wordmark{font-size:15px;font-weight:800;letter-spacing:-.03em}
   .nav-links{display:flex;align-items:center;gap:24px}
   .nav-link{font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.3);transition:color .15s}
@@ -28,7 +28,7 @@
 
   /* ============ SOCIAL PROOF TICKER ============ */
   .ticker{background:#0A0A0A;border-bottom:2px solid rgba(255,255,255,.04);overflow:hidden;height:36px;margin-top:56px;position:relative}
-  .ticker-track{display:flex;align-items:center;height:100%;animation:tickerScroll 40s linear infinite;width:max-content}
+  .ticker-track{display:flex;align-items:center;height:100%;animation:tickerScroll 45s linear infinite;width:max-content}
   @keyframes tickerScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
   .ticker-item{display:flex;align-items:center;gap:8px;padding:0 28px;white-space:nowrap;border-right:1px solid rgba(255,255,255,.04);height:100%}
   .ticker-dot{width:6px;height:6px;background:#FBBF24;flex-shrink:0;animation:pulse 2s ease-in-out infinite}
@@ -61,20 +61,14 @@
   .btn-ghost{padding:15px 24px;background:0;color:rgba(255,255,255,.35);font-family:'Space Mono',monospace;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;border:1.5px solid rgba(255,255,255,.08);cursor:pointer;transition:all .15s}
   .btn-ghost:hover{color:#F5F5F0;border-color:rgba(255,255,255,.25)}
   .hero-note{font-family:'Space Mono',monospace;font-size:9px;color:rgba(255,255,255,.18);text-transform:uppercase;letter-spacing:.04em;margin-top:14px}
-
-  /* Hero avatar stack */
   .hero-avatars{display:flex;align-items:center;gap:0;margin-top:20px}
   @media(max-width:800px){.hero-avatars{justify-content:center}}
   .hero-av{width:32px;height:32px;border:2px solid #0A0A0A;margin-left:-8px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;flex-shrink:0}
   .hero-av:first-child{margin-left:0}
-  .hero-av-1{background:#FBBF24;color:#0A0A0A}
-  .hero-av-2{background:#E0DDD8;color:#555}
-  .hero-av-3{background:#0A0A0A;color:#FBBF24;border-color:rgba(255,255,255,.1)}
-  .hero-av-4{background:#C8C5BE;color:#333}
-  .hero-av-5{background:#FBBF24;color:#0A0A0A}
+  .ha1{background:#FBBF24;color:#0A0A0A}.ha2{background:#E0DDD8;color:#555}.ha3{background:#0A0A0A;color:#FBBF24;border-color:rgba(255,255,255,.1)}.ha4{background:#C8C5BE;color:#333}.ha5{background:#FBBF24;color:#0A0A0A}
   .hero-av-text{font-family:'Space Mono',monospace;font-size:9px;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.03em;margin-left:10px}
 
-  /* Hero product preview */
+  /* Hero preview */
   .hero-preview{border:3px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);padding:16px;position:relative}
   .hero-preview::after{content:'';position:absolute;inset:-10px;border:2px dashed rgba(255,255,255,.025);z-index:-1}
   .fake-ui{display:flex;flex-direction:column;gap:8px}
@@ -91,11 +85,9 @@
   .fc-tags{display:flex;gap:3px;margin-top:2px}
   .fc-tag{font-family:'Space Mono',monospace;font-size:7px;padding:2px 5px;border:1px solid rgba(255,255,255,.05);color:rgba(255,255,255,.2);text-transform:uppercase}
   .fc-match{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:4px 9px}
-  .fc-match-hi{background:#FBBF24;color:#0A0A0A}
-  .fc-match-md{background:rgba(251,191,36,.15);color:#FBBF24}
-  .fc-match-lo{background:rgba(255,255,255,.05);color:rgba(255,255,255,.25)}
+  .fc-hi{background:#FBBF24;color:#0A0A0A}.fc-md{background:rgba(251,191,36,.15);color:#FBBF24}.fc-lo{background:rgba(255,255,255,.05);color:rgba(255,255,255,.25)}
 
-  /* ============ SECTION SYSTEM ============ */
+  /* ============ SECTIONS ============ */
   .section{padding:80px 24px}
   .section-dark{background:#0A0A0A;color:#F5F5F0}
   .section-yellow{background:#FBBF24;color:#0A0A0A}
@@ -106,8 +98,7 @@
   @media(max-width:600px){.section-title{font-size:28px}}
   .section-sub{font-size:14px;line-height:1.6;color:#888;max-width:500px;margin-bottom:48px}
   .section-dark .section-sub{color:rgba(255,255,255,.3)}
-  .reveal{opacity:0;transform:translateY(20px);transition:all .6s cubic-bezier(.22,1,.36,1)}
-  .reveal.visible{opacity:1;transform:translateY(0)}
+  .reveal{opacity:0;transform:translateY(20px);transition:all .6s cubic-bezier(.22,1,.36,1)}.reveal.visible{opacity:1;transform:translateY(0)}
 
   /* ============ LOGOS ============ */
   .logo-strip{padding:48px 24px;border-bottom:2px solid rgba(0,0,0,.04);border-top:2px solid rgba(0,0,0,.04)}
@@ -117,10 +108,10 @@
   .logo-item{padding:16px 32px;border:1px solid rgba(0,0,0,.04);font-size:18px;font-weight:800;letter-spacing:-.02em;color:#ccc;transition:color .2s;cursor:default;display:flex;align-items:center;gap:8px}
   .logo-item:hover{color:#0A0A0A}
   .logo-item span{font-family:'Space Mono',monospace;font-size:9px;font-weight:400;color:#ddd;text-transform:uppercase;letter-spacing:.04em}
-  @media(max-width:600px){.logo-item{padding:12px 20px;font-size:14px}}
+  @media(max-width:600px){.logo-item{padding:12px 18px;font-size:14px}}
 
-  /* ============ INTERACTIVE DEMO ============ */
-  .demo{border:3px solid #0A0A0A;margin-bottom:0}
+  /* ============ DEMO ============ */
+  .demo{border:3px solid #0A0A0A}
   .demo-header{background:#0A0A0A;color:#F5F5F0;padding:28px 32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
   .demo-title{font-size:20px;font-weight:800;letter-spacing:-.03em}
   .demo-title span{color:#FBBF24}
@@ -158,22 +149,14 @@
   .ba-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px}
   .ba-icon-x{background:#E0DDD8;color:#888}
   .ba-icon-check{background:#FBBF24;color:#0A0A0A}
-  .ba-card-old{background:#F5F5F0}
-  .ba-card-new{background:#0A0A0A;color:#F5F5F0}
-  .ba-card-new .ba-item{color:rgba(255,255,255,.45)}
+  .ba-old{background:#F5F5F0}
+  .ba-new{background:#0A0A0A;color:#F5F5F0}
+  .ba-new .ba-item{color:rgba(255,255,255,.45)}
 
-  /* ============ PAIN POINTS ============ */
-  .pain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
-  @media(max-width:700px){.pain-grid{grid-template-columns:1fr}}
-  .pain-card{border:2px solid rgba(255,255,255,.06);margin-top:-2px;margin-left:-2px;padding:32px;display:flex;flex-direction:column;gap:12px}
-  .pain-icon{width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(251,191,36,.08)}
-  .pain-strike{font-size:13px;color:rgba(255,255,255,.2);line-height:1.5;text-decoration:line-through;text-decoration-color:rgba(255,255,255,.08)}
-  .pain-fix{font-size:15px;font-weight:700;letter-spacing:-.02em;line-height:1.3;color:#F5F5F0}
-
-  /* ============ HOW IT WORKS ============ */
+  /* ============ STEPS ============ */
   .steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
   @media(max-width:700px){.steps-grid{grid-template-columns:1fr}}
-  .step-card{border:2px solid #0A0A0A;margin-top:-2px;margin-left:-2px;padding:32px;display:flex;flex-direction:column;gap:12px;position:relative}
+  .step{border:2px solid #0A0A0A;margin-top:-2px;margin-left:-2px;padding:32px;display:flex;flex-direction:column;gap:12px;position:relative}
   .step-num{font-family:'Space Mono',monospace;font-size:48px;font-weight:700;color:rgba(0,0,0,.04);line-height:1;position:absolute;top:12px;right:16px}
   .step-icon{font-size:28px}
   .step-title{font-size:17px;font-weight:800;letter-spacing:-.03em}
@@ -183,7 +166,7 @@
   /* ============ STATS ============ */
   .proof-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-bottom:48px}
   @media(max-width:600px){.proof-stats{grid-template-columns:repeat(2,1fr)}}
-  .ps{border:2px solid #0A0A0A;margin-top:-2px;margin-left:-2px;padding:24px;text-align:center}
+  .ps{border:2px solid;margin-top:-2px;margin-left:-2px;padding:24px;text-align:center}
   .ps-val{font-size:32px;font-weight:800;letter-spacing:-.04em;line-height:1}
   .ps-val.y{color:#FBBF24}
   .ps-label{font-family:'Space Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.05em;color:#888;margin-top:3px}
@@ -192,23 +175,19 @@
   .community-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
   @media(max-width:800px){.community-grid{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:500px){.community-grid{grid-template-columns:1fr}}
-  .person{border:2px solid #0A0A0A;margin-top:-2px;margin-left:-2px;padding:28px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;transition:all .15s;cursor:default}
-  .person:hover{background:#EEEEE8;z-index:2;position:relative}
+  .person{border:2px solid rgba(255,255,255,.06);margin-top:-2px;margin-left:-2px;padding:28px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;transition:all .15s;cursor:default}
+  .person:hover{background:rgba(255,255,255,.02);z-index:2;position:relative}
   .person-avatar{width:56px;height:56px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:18px;font-weight:700}
-  .pa-1{background:#FBBF24;color:#0A0A0A}
-  .pa-2{background:#0A0A0A;color:#FBBF24}
-  .pa-3{background:#C8C5BE;color:#0A0A0A}
-  .pa-4{background:#0A0A0A;color:#F5F5F0}
-  .person-name{font-size:15px;font-weight:700;letter-spacing:-.02em}
-  .person-role{font-family:'Space Mono',monospace;font-size:9px;color:#888;text-transform:uppercase;letter-spacing:.04em}
-  .person-loc{font-family:'Space Mono',monospace;font-size:8px;color:#bbb;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;gap:4px}
+  .pa1{background:#FBBF24;color:#0A0A0A}.pa2{background:rgba(255,255,255,.06);color:#F5F5F0}.pa3{background:#C8C5BE;color:#0A0A0A}.pa4{background:rgba(255,255,255,.08);color:#F5F5F0}
+  .person-name{font-size:15px;font-weight:700;color:#F5F5F0;letter-spacing:-.02em}
+  .person-role{font-family:'Space Mono',monospace;font-size:9px;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.04em}
+  .person-loc{font-family:'Space Mono',monospace;font-size:8px;color:rgba(255,255,255,.15);text-transform:uppercase;letter-spacing:.04em}
   .person-skills{display:flex;flex-wrap:wrap;gap:3px;justify-content:center}
-  .person-skill{font-family:'Space Mono',monospace;font-size:7.5px;padding:2px 7px;border:1px solid rgba(0,0,0,.08);color:#888;text-transform:uppercase;letter-spacing:.02em}
-  .person-stat{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:3px 10px;margin-top:auto}
-  .person-stat-hired{background:#FBBF24;color:#0A0A0A}
-  .person-stat-matched{background:#0A0A0A;color:#FBBF24}
-  .person-stat-active{border:1.5px solid rgba(0,0,0,.1);color:#555}
-  .person-quote{font-size:11px;color:#888;line-height:1.5;font-style:italic}
+  .person-skill{font-family:'Space Mono',monospace;font-size:7.5px;padding:2px 7px;border:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.2);text-transform:uppercase}
+  .person-badge{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:3px 10px;margin-top:auto}
+  .badge-hired{background:#FBBF24;color:#0A0A0A}
+  .badge-score{background:rgba(255,255,255,.06);color:#FBBF24}
+  .badge-active{border:1.5px solid rgba(255,255,255,.08);color:rgba(255,255,255,.3)}
 
   /* ============ TESTIMONIALS ============ */
   .testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
@@ -218,9 +197,7 @@
   .testi-quote{font-size:13px;line-height:1.65;color:rgba(255,255,255,.45);flex:1}
   .testi-author{display:flex;align-items:center;gap:10px;border-top:1px solid rgba(255,255,255,.04);padding-top:14px}
   .testi-av{width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;flex-shrink:0}
-  .ta-1{background:#FBBF24;color:#0A0A0A}
-  .ta-2{background:rgba(255,255,255,.06);color:#F5F5F0}
-  .ta-3{background:#FBBF24;color:#0A0A0A}
+  .ta1{background:#FBBF24;color:#0A0A0A}.ta2{background:rgba(255,255,255,.06);color:#F5F5F0}.ta3{background:#FBBF24;color:#0A0A0A}
   .testi-name{font-size:12px;font-weight:700;color:#F5F5F0}
   .testi-role{font-family:'Space Mono',monospace;font-size:8px;color:rgba(255,255,255,.2);text-transform:uppercase;letter-spacing:.04em}
 
@@ -256,7 +233,7 @@
   .final-btn:hover{box-shadow:6px 6px 0 #0A0A0A;transform:translate(-3px,-3px);background:#1A1A1A}
   .final-note{font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.04em;opacity:.35}
 
-  /* ============ STICKY CTA ============ */
+  /* ============ STICKY ============ */
   .sticky-cta{position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,10,.96);backdrop-filter:blur(12px);border-top:2px solid rgba(255,255,255,.06);padding:12px 24px;z-index:90;transform:translateY(100%);transition:transform .3s cubic-bezier(.22,1,.36,1);display:flex;justify-content:center}
   .sticky-cta.visible{transform:translateY(0)}
   .sticky-inner{max-width:1120px;width:100%;display:flex;justify-content:space-between;align-items:center}
@@ -272,7 +249,6 @@
   .footer-inner{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:2fr repeat(3,1fr);gap:40px}
   @media(max-width:700px){.footer-inner{grid-template-columns:1fr 1fr;gap:24px}}
   .footer-brand{display:flex;flex-direction:column;gap:12px}
-  .footer-brand-row{display:flex;align-items:center;gap:10px}
   .footer-desc{font-size:12px;line-height:1.6;color:rgba(255,255,255,.2);max-width:280px}
   .footer-col-title{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.15);margin-bottom:12px}
   .footer-links{display:flex;flex-direction:column;gap:8px}
@@ -289,411 +265,259 @@
 
 <!-- NAV -->
 <nav class="nav"><div class="nav-inner">
-  <a class="nav-brand" href="#"><div class="nav-logo">JB</div><span class="nav-wordmark">Jobboard</span></a>
+  <a class="nav-brand" href="#"><div class="nav-logo">VV</div><span class="nav-wordmark">Bigmovv</span></a>
   <div class="nav-links">
     <a class="nav-link" href="#how">How It Works</a>
     <a class="nav-link" href="#features">Features</a>
     <button class="nav-signin">Sign In</button>
-    <button class="nav-cta">Get Started</button>
+    <button class="nav-cta">Make Your Move →</button>
   </div>
 </div></nav>
 
-<!-- LIVE TICKER -->
-<div class="ticker">
-  <div class="ticker-track" id="tickerTrack"></div>
-</div>
+<!-- TICKER -->
+<div class="ticker"><div class="ticker-track" id="tickerTrack"></div></div>
 
 <!-- ===== HERO ===== -->
 <section class="hero" id="heroSection">
   <div class="hero-inner">
     <div class="hero-left">
-      <div class="hero-eyebrow">For Filipino Professionals</div>
-      <h1 class="hero-title">Stop scrolling.<br>Start <span>matching.</span></h1>
-      <p class="hero-sub">We analyze your skills and match you with jobs that actually fit. Real salary ranges. Real match scores. Built for Filipinos.</p>
+      <div class="hero-eyebrow">Career intelligence that actually works</div>
+      <h1 class="hero-title">Your career called.<br>It wants a <span>big movv.</span></h1>
+      <p class="hero-sub">We score your skills against real jobs and show you the ones that are embarrassingly good matches. Transparent salaries in PHP. Zero guesswork. Your next role is already here — you just haven't seen the score yet.</p>
       <div class="hero-ctas">
-        <button class="btn-primary">Get Matched Free →</button>
+        <button class="btn-primary">Make Your Bigmovv →</button>
         <button class="btn-ghost">See How It Works</button>
       </div>
-      <div class="hero-note">Free forever · No credit card · 60-second setup</div>
+      <div class="hero-note">Free forever · No resume needed · 60 seconds to your score</div>
       <div class="hero-avatars">
-        <div class="hero-av hero-av-1">MA</div>
-        <div class="hero-av hero-av-2">JR</div>
-        <div class="hero-av hero-av-3">KC</div>
-        <div class="hero-av hero-av-4">AL</div>
-        <div class="hero-av hero-av-5">RM</div>
-        <span class="hero-av-text">12,000+ Filipinos already matched</span>
+        <div class="hero-av ha1">MA</div><div class="hero-av ha2">JR</div><div class="hero-av ha3">KC</div><div class="hero-av ha4">AL</div><div class="hero-av ha5">RM</div>
+        <span class="hero-av-text">12,000+ Filipinos already scored</span>
       </div>
     </div>
     <div class="hero-right">
       <div class="hero-preview">
         <div class="fake-ui">
-          <div class="fake-bar"><div class="fake-dot"></div><div class="fake-dot y"></div><div class="fake-dot"></div><span style="font-family:'Space Mono',monospace;font-size:8px;color:rgba(255,255,255,.15);text-transform:uppercase;letter-spacing:.04em;margin-left:auto">Your Feed · 32 Jobs</span></div>
-          <div class="fake-card"><div class="fc-left"><div class="fc-logo">🎵</div><div class="fc-info"><div class="fc-company">Spotify · Remote</div><div class="fc-title">Senior Product Designer</div><div class="fc-tags"><span class="fc-tag">Full-Time</span><span class="fc-tag">₱85K-120K</span></div></div></div><div class="fc-match fc-match-hi">95%</div></div>
-          <div class="fake-card"><div class="fc-left"><div class="fc-logo">💜</div><div class="fc-info"><div class="fc-company">Stripe · Remote</div><div class="fc-title">Design Engineer</div><div class="fc-tags"><span class="fc-tag">Full-Time</span><span class="fc-tag">₱90K-140K</span></div></div></div><div class="fc-match fc-match-hi">89%</div></div>
-          <div class="fake-card"><div class="fc-left"><div class="fc-logo">▲</div><div class="fc-info"><div class="fc-company">Vercel · Remote</div><div class="fc-title">Frontend Developer</div><div class="fc-tags"><span class="fc-tag">Full-Time</span><span class="fc-tag">₱75K-110K</span></div></div></div><div class="fc-match fc-match-md">82%</div></div>
-          <div class="fake-card"><div class="fc-left"><div class="fc-logo">🟢</div><div class="fc-info"><div class="fc-company">Shopify · Remote</div><div class="fc-title">UX Engineer</div><div class="fc-tags"><span class="fc-tag">Full-Time</span><span class="fc-tag">₱70K-100K</span></div></div></div><div class="fc-match fc-match-lo">74%</div></div>
+          <div class="fake-bar"><div class="fake-dot"></div><div class="fake-dot y"></div><div class="fake-dot"></div><span style="font-family:'Space Mono',monospace;font-size:8px;color:rgba(255,255,255,.15);text-transform:uppercase;letter-spacing:.04em;margin-left:auto">Your Bigmovv Score · 32 Jobs</span></div>
+          <div class="fake-card"><div class="fc-left"><div class="fc-logo">🎵</div><div class="fc-info"><div class="fc-company">Spotify · Remote</div><div class="fc-title">Senior Product Designer</div><div class="fc-tags"><span class="fc-tag">Full-Time</span><span class="fc-tag">₱85K-120K</span></div></div></div><div class="fc-match fc-hi">95%</div></div>
+          <div class="fake-card"><div class="fc-left"><div class="fc-logo">💜</div><div class="fc-info"><div class="fc-company">Stripe · Remote</div><div class="fc-title">Design Engineer</div><div class="fc-tags"><span class="fc-tag">Full-Time</span><span class="fc-tag">₱90K-140K</span></div></div></div><div class="fc-match fc-hi">89%</div></div>
+          <div class="fake-card"><div class="fc-left"><div class="fc-logo">▲</div><div class="fc-info"><div class="fc-company">Vercel · Remote</div><div class="fc-title">Frontend Developer</div><div class="fc-tags"><span class="fc-tag">Full-Time</span><span class="fc-tag">₱75K-110K</span></div></div></div><div class="fc-match fc-md">82%</div></div>
+          <div class="fake-card"><div class="fc-left"><div class="fc-logo">🟢</div><div class="fc-info"><div class="fc-company">Shopify · Remote</div><div class="fc-title">UX Engineer</div><div class="fc-tags"><span class="fc-tag">Full-Time</span><span class="fc-tag">₱70K-100K</span></div></div></div><div class="fc-match fc-lo">74%</div></div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- EMPLOYER LOGOS -->
-<div class="logo-strip reveal">
-  <div class="logo-inner">
-    <div class="logo-label">Companies hiring through Jobboard</div>
-    <div class="logo-row">
-      <div class="logo-item">Spotify</div>
-      <div class="logo-item">Stripe</div>
-      <div class="logo-item">Vercel</div>
-      <div class="logo-item">Shopify</div>
-      <div class="logo-item">Figma</div>
-      <div class="logo-item">Canva</div>
-      <div class="logo-item">Linear</div>
-      <div class="logo-item" style="color:#FBBF24;border-color:rgba(251,191,36,.1)">+340 <span>more</span></div>
-    </div>
+<!-- LOGOS -->
+<div class="logo-strip reveal"><div class="logo-inner">
+  <div class="logo-label">Companies where Bigmovv users got hired (and celebrated loudly)</div>
+  <div class="logo-row">
+    <div class="logo-item">Spotify</div><div class="logo-item">Stripe</div><div class="logo-item">Vercel</div><div class="logo-item">Shopify</div><div class="logo-item">Figma</div><div class="logo-item">Canva</div><div class="logo-item">Linear</div>
+    <div class="logo-item" style="color:#FBBF24;border-color:rgba(251,191,36,.1)">+340 <span>more</span></div>
   </div>
-</div>
+</div></div>
 
-<!-- ===== INTERACTIVE DEMO ===== -->
-<section class="section">
-  <div class="section-inner reveal">
-    <div class="section-label">// try it yourself</div>
-    <div class="section-title">See how many jobs match you</div>
-    <div class="section-sub">Pick a few skills — no signup needed. Just tap and see what happens.</div>
-
-    <div class="demo">
-      <div class="demo-header">
-        <div class="demo-title">Pick your <span>skills</span></div>
-        <div class="demo-hint">Tap 3+ to see results</div>
+<!-- ===== DEMO ===== -->
+<section class="section"><div class="section-inner reveal">
+  <div class="section-label">// go ahead, try it</div>
+  <div class="section-title">What's your Bigmovv score?</div>
+  <div class="section-sub">Pick a few skills below — no signup, no catch. Watch real jobs appear and try not to update your LinkedIn immediately.</div>
+  <div class="demo">
+    <div class="demo-header"><div class="demo-title">Pick your <span>skills</span></div><div class="demo-hint">Tap 3+ to see your score</div></div>
+    <div class="demo-body">
+      <div class="demo-pills" id="demoPills">
+        <div class="demo-pill" onclick="demoToggle(this)" data-jobs="28"><span class="dpill-check">✓</span>React</div>
+        <div class="demo-pill" onclick="demoToggle(this)" data-jobs="22"><span class="dpill-check">✓</span>JavaScript</div>
+        <div class="demo-pill" onclick="demoToggle(this)" data-jobs="18"><span class="dpill-check">✓</span>Figma</div>
+        <div class="demo-pill" onclick="demoToggle(this)" data-jobs="15"><span class="dpill-check">✓</span>Python</div>
+        <div class="demo-pill" onclick="demoToggle(this)" data-jobs="12"><span class="dpill-check">✓</span>TypeScript</div>
+        <div class="demo-pill" onclick="demoToggle(this)" data-jobs="20"><span class="dpill-check">✓</span>UI Design</div>
+        <div class="demo-pill" onclick="demoToggle(this)" data-jobs="14"><span class="dpill-check">✓</span>Node.js</div>
+        <div class="demo-pill" onclick="demoToggle(this)" data-jobs="10"><span class="dpill-check">✓</span>Next.js</div>
+        <div class="demo-pill" onclick="demoToggle(this)" data-jobs="16"><span class="dpill-check">✓</span>Product Design</div>
+        <div class="demo-pill" onclick="demoToggle(this)" data-jobs="8"><span class="dpill-check">✓</span>Shopify</div>
+        <div class="demo-pill" onclick="demoToggle(this)" data-jobs="11"><span class="dpill-check">✓</span>PHP / Laravel</div>
+        <div class="demo-pill" onclick="demoToggle(this)" data-jobs="9"><span class="dpill-check">✓</span>Vue.js</div>
       </div>
-      <div class="demo-body">
-        <div class="demo-pills" id="demoPills">
-          <div class="demo-pill" onclick="demoToggle(this)" data-jobs="28"><span class="dpill-check">✓</span>React</div>
-          <div class="demo-pill" onclick="demoToggle(this)" data-jobs="22"><span class="dpill-check">✓</span>JavaScript</div>
-          <div class="demo-pill" onclick="demoToggle(this)" data-jobs="18"><span class="dpill-check">✓</span>Figma</div>
-          <div class="demo-pill" onclick="demoToggle(this)" data-jobs="15"><span class="dpill-check">✓</span>Python</div>
-          <div class="demo-pill" onclick="demoToggle(this)" data-jobs="12"><span class="dpill-check">✓</span>TypeScript</div>
-          <div class="demo-pill" onclick="demoToggle(this)" data-jobs="20"><span class="dpill-check">✓</span>UI Design</div>
-          <div class="demo-pill" onclick="demoToggle(this)" data-jobs="14"><span class="dpill-check">✓</span>Node.js</div>
-          <div class="demo-pill" onclick="demoToggle(this)" data-jobs="10"><span class="dpill-check">✓</span>Next.js</div>
-          <div class="demo-pill" onclick="demoToggle(this)" data-jobs="16"><span class="dpill-check">✓</span>Product Design</div>
-          <div class="demo-pill" onclick="demoToggle(this)" data-jobs="8"><span class="dpill-check">✓</span>Shopify</div>
-          <div class="demo-pill" onclick="demoToggle(this)" data-jobs="11"><span class="dpill-check">✓</span>PHP / Laravel</div>
-          <div class="demo-pill" onclick="demoToggle(this)" data-jobs="9"><span class="dpill-check">✓</span>Vue.js</div>
-        </div>
-        <div class="demo-result" id="demoResult">
-          <div class="dr-empty" id="drEmpty">← Select skills to see your matches</div>
-          <div class="dr-left" id="drLeft" style="display:none">
-            <div class="dr-big" id="drNum">0</div>
-            <div class="dr-sub">jobs match your skills right now</div>
-          </div>
-          <button class="dr-cta" id="drCta">Sign Up to See Them →</button>
-        </div>
+      <div class="demo-result" id="demoResult">
+        <div class="dr-empty" id="drEmpty">← Pick some skills. We dare you.</div>
+        <div class="dr-left" id="drLeft" style="display:none"><div class="dr-big" id="drNum">0</div><div class="dr-sub">jobs match your skills right now</div></div>
+        <button class="dr-cta" id="drCta">Get Your Full Score →</button>
       </div>
     </div>
   </div>
-</section>
+</div></section>
 
 <!-- ===== BEFORE/AFTER ===== -->
-<section class="section" style="padding-top:0">
-  <div class="section-inner reveal">
-    <div class="section-label">// the difference</div>
-    <div class="section-title">What changes when you switch</div>
-    <div class="section-sub">Same you. Same skills. Completely different experience.</div>
-    <div class="ba-grid">
-      <div class="ba-card ba-card-old">
-        <div class="ba-label ba-label-old">✕ Without Jobboard</div>
-        <div class="ba-title">Spray and pray</div>
-        <div class="ba-items">
-          <div class="ba-item"><div class="ba-icon ba-icon-x">✕</div>Scroll through 500+ irrelevant listings daily</div>
-          <div class="ba-item"><div class="ba-icon ba-icon-x">✕</div>Salary hidden until the interview — or never</div>
-          <div class="ba-item"><div class="ba-icon ba-icon-x">✕</div>Apply to 40 jobs, hear back from 0</div>
-          <div class="ba-item"><div class="ba-icon ba-icon-x">✕</div>No idea which skills to learn next</div>
-          <div class="ba-item"><div class="ba-icon ba-icon-x">✕</div>Same generic results for everyone</div>
-        </div>
+<section class="section" style="padding-top:0"><div class="section-inner reveal">
+  <div class="section-label">// the awkward truth</div>
+  <div class="section-title">Your current job search is broken</div>
+  <div class="section-sub">Don't take it personally. Every job platform just forgot to care about you. We remembered.</div>
+  <div class="ba-grid">
+    <div class="ba-card ba-old">
+      <div class="ba-label ba-label-old">✕ JobStreet vibes</div>
+      <div class="ba-title">Apply to everything, hear from nothing</div>
+      <div class="ba-items">
+        <div class="ba-item"><div class="ba-icon ba-icon-x">✕</div>Scroll 500+ listings like it's a sad dating app</div>
+        <div class="ba-item"><div class="ba-icon ba-icon-x">✕</div>Salary? "Competitive." (Translation: disappointing)</div>
+        <div class="ba-item"><div class="ba-icon ba-icon-x">✕</div>Apply to 40 jobs, ghost of Christmas past at all 40</div>
+        <div class="ba-item"><div class="ba-icon ba-icon-x">✕</div>No clue which skills would actually get you hired</div>
+        <div class="ba-item"><div class="ba-icon ba-icon-x">✕</div>Same generic results for literally everyone alive</div>
       </div>
-      <div class="ba-card ba-card-new">
-        <div class="ba-label ba-label-new">✓ With Jobboard</div>
-        <div class="ba-title" style="color:#F5F5F0">Apply with confidence</div>
-        <div class="ba-items">
-          <div class="ba-item"><div class="ba-icon ba-icon-check">✓</div>32 matched jobs ranked by relevance to you</div>
-          <div class="ba-item"><div class="ba-icon ba-icon-check">✓</div>Every job shows salary range in PHP upfront</div>
-          <div class="ba-item"><div class="ba-icon ba-icon-check">✓</div>Apply to 5 high-match jobs, get 3 interviews</div>
-          <div class="ba-item"><div class="ba-icon ba-icon-check">✓</div>Skills page shows exactly what to learn and why</div>
-          <div class="ba-item"><div class="ba-icon ba-icon-check">✓</div>Feed personalized to your skills and preferences</div>
-        </div>
+    </div>
+    <div class="ba-card ba-new">
+      <div class="ba-label ba-label-new">✓ With Bigmovv</div>
+      <div class="ba-title" style="color:#F5F5F0">Apply less. Land more. Know your worth.</div>
+      <div class="ba-items">
+        <div class="ba-item"><div class="ba-icon ba-icon-check">✓</div>32 jobs scored and ranked — only the ones that actually want you</div>
+        <div class="ba-item"><div class="ba-icon ba-icon-check">✓</div>Salary in PHP. Upfront. No awkward third-interview surprises</div>
+        <div class="ba-item"><div class="ba-icon ba-icon-check">✓</div>Apply to 5 high-score jobs, get 3 interviews (real numbers)</div>
+        <div class="ba-item"><div class="ba-icon ba-icon-check">✓</div>Skill gap shows you exactly what to learn and why it matters</div>
+        <div class="ba-item"><div class="ba-icon ba-icon-check">✓</div>Your feed. Your skills. Your matches. Nobody else's.</div>
       </div>
     </div>
   </div>
-</section>
+</div></section>
 
 <!-- ===== HOW IT WORKS ===== -->
-<section class="section" id="how">
-  <div class="section-inner reveal">
-    <div class="section-label">// how it works</div>
-    <div class="section-title">Three steps. Under a minute.</div>
-    <div class="section-sub">No resume needed. No long forms. Just tell us what you know and what you want.</div>
-    <div class="steps-grid">
-      <div class="step-card"><div class="step-num">01</div><div class="step-icon">✌️</div><div class="step-title">Sign up & pick skills</div><div class="step-desc">Create an account and tap the skills you know. Takes literally 15 seconds.</div><div class="step-time">15 seconds</div></div>
-      <div class="step-card"><div class="step-num">02</div><div class="step-icon">🎯</div><div class="step-title">Set preferences</div><div class="step-desc">What roles do you want? Remote or on-site? Salary range? All optional.</div><div class="step-time">20 seconds</div></div>
-      <div class="step-card"><div class="step-num">03</div><div class="step-icon">🎉</div><div class="step-title">Get matched instantly</div><div class="step-desc">We analyze thousands of jobs and show you the ones that actually fit.</div><div class="step-time">Instant</div></div>
-    </div>
+<section class="section" id="how"><div class="section-inner reveal">
+  <div class="section-label">// embarrassingly easy</div>
+  <div class="section-title">Three steps. Under a minute. No, really.</div>
+  <div class="section-sub">We timed it. Your ramen takes longer to cook than your Bigmovv setup.</div>
+  <div class="steps-grid">
+    <div class="step"><div class="step-num">01</div><div class="step-icon">✌️</div><div class="step-title">Pick your skills</div><div class="step-desc">Tap what you know. No resume uploads, no 20-field forms, no existential crisis required.</div><div class="step-time">15 seconds</div></div>
+    <div class="step"><div class="step-num">02</div><div class="step-icon">🎯</div><div class="step-title">Tell us what you want</div><div class="step-desc">Remote? On-site? Salary range? Dream company? All optional. Change your mind anytime.</div><div class="step-time">20 seconds</div></div>
+    <div class="step"><div class="step-num">03</div><div class="step-icon">📊</div><div class="step-title">See your score (try not to screenshot it)</div><div class="step-desc">We score you against thousands of jobs and show your top matches. Most people share their score within 5 minutes.</div><div class="step-time">Instant</div></div>
   </div>
-</section>
+</div></section>
 
-<!-- ===== COMMUNITY / PEOPLE ===== -->
-<section class="section section-dark">
-  <div class="section-inner reveal">
-    <div class="section-label">// real people, real results</div>
-    <div class="section-title" style="color:#F5F5F0">Meet the community</div>
-    <div class="section-sub">12,000+ Filipino professionals using Jobboard to find better work. Here's some of them.</div>
+<!-- ===== COMMUNITY ===== -->
+<section class="section section-dark"><div class="section-inner reveal">
+  <div class="section-label">// receipts, not promises</div>
+  <div class="section-title" style="color:#F5F5F0">12,000+ Filipinos making moves. Big ones.</div>
+  <div class="section-sub">From Makati devs to Davao designers. Here's what happens when you stop scrolling and start scoring.</div>
 
-    <div class="proof-stats" style="margin-bottom:32px">
-      <div class="ps" style="border-color:rgba(255,255,255,.06)"><div class="ps-val y">12,400</div><div class="ps-label">Job Seekers</div></div>
-      <div class="ps" style="border-color:rgba(255,255,255,.06)"><div class="ps-val">3,200</div><div class="ps-label">Hired This Year</div></div>
-      <div class="ps" style="border-color:rgba(255,255,255,.06)"><div class="ps-val y">89%</div><div class="ps-label">Avg. Match Score</div></div>
-      <div class="ps" style="border-color:rgba(255,255,255,.06)"><div class="ps-val">14 days</div><div class="ps-label">Avg. Time to Hire</div></div>
-    </div>
-
-    <div class="community-grid" style="border-color:rgba(255,255,255,.06)">
-      <div class="person" style="border-color:rgba(255,255,255,.06)">
-        <div class="person-avatar pa-1">MA</div>
-        <div class="person-name" style="color:#F5F5F0">Maria A.</div>
-        <div class="person-role">Product Designer</div>
-        <div class="person-loc" style="color:rgba(255,255,255,.2)">📍 Makati</div>
-        <div class="person-skills"><span class="person-skill" style="border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.25)">Figma</span><span class="person-skill" style="border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.25)">UI</span><span class="person-skill" style="border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.25)">UX</span></div>
-        <div class="person-stat person-stat-hired">✓ Hired at Spotify</div>
-      </div>
-      <div class="person" style="border-color:rgba(255,255,255,.06)">
-        <div class="person-avatar pa-2">JR</div>
-        <div class="person-name" style="color:#F5F5F0">Juan R.</div>
-        <div class="person-role">Frontend Developer</div>
-        <div class="person-loc" style="color:rgba(255,255,255,.2)">📍 Cebu</div>
-        <div class="person-skills"><span class="person-skill" style="border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.25)">React</span><span class="person-skill" style="border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.25)">TS</span><span class="person-skill" style="border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.25)">Next.js</span></div>
-        <div class="person-stat person-stat-hired">✓ Hired at Vercel</div>
-      </div>
-      <div class="person" style="border-color:rgba(255,255,255,.06)">
-        <div class="person-avatar pa-3">KC</div>
-        <div class="person-name" style="color:#F5F5F0">KC D.</div>
-        <div class="person-role">Full-Stack Developer</div>
-        <div class="person-loc" style="color:rgba(255,255,255,.2)">📍 Manila</div>
-        <div class="person-skills"><span class="person-skill" style="border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.25)">Node</span><span class="person-skill" style="border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.25)">React</span><span class="person-skill" style="border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.25)">AWS</span></div>
-        <div class="person-stat person-stat-matched">92% Match</div>
-      </div>
-      <div class="person" style="border-color:rgba(255,255,255,.06)">
-        <div class="person-avatar pa-4">AL</div>
-        <div class="person-name" style="color:#F5F5F0">Alyssa L.</div>
-        <div class="person-role">UX Researcher</div>
-        <div class="person-loc" style="color:rgba(255,255,255,.2)">📍 Davao</div>
-        <div class="person-skills"><span class="person-skill" style="border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.25)">Research</span><span class="person-skill" style="border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.25)">Figma</span></div>
-        <div class="person-stat person-stat-hired">✓ Hired at Canva</div>
-      </div>
-      <div class="person" style="border-color:rgba(255,255,255,.06)">
-        <div class="person-avatar pa-1">RM</div>
-        <div class="person-name" style="color:#F5F5F0">Rico M.</div>
-        <div class="person-role">Mobile Developer</div>
-        <div class="person-loc" style="color:rgba(255,255,255,.2)">📍 Quezon City</div>
-        <div class="person-skills"><span class="person-skill" style="border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.25)">Flutter</span><span class="person-skill" style="border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.25)">Dart</span><span class="person-skill" style="border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.25)">Firebase</span></div>
-        <div class="person-stat person-stat-matched">88% Match</div>
-      </div>
-      <div class="person" style="border-color:rgba(255,255,255,.06)">
-        <div class="person-avatar pa-2">SG</div>
-        <div class="person-name" style="color:#F5F5F0">Sarah G.</div>
-        <div class="person-role">Shopify Developer</div>
-        <div class="person-loc" style="color:rgba(255,255,255,.2)">📍 Iloilo</div>
-        <div class="person-skills"><span class="person-skill" style="border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.25)">Shopify</span><span class="person-skill" style="border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.25)">Liquid</span><span class="person-skill" style="border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.25)">CSS</span></div>
-        <div class="person-stat person-stat-hired">✓ Hired at Stripe</div>
-      </div>
-      <div class="person" style="border-color:rgba(255,255,255,.06)">
-        <div class="person-avatar pa-3">DT</div>
-        <div class="person-name" style="color:#F5F5F0">Dan T.</div>
-        <div class="person-role">Data Analyst</div>
-        <div class="person-loc" style="color:rgba(255,255,255,.2)">📍 Taguig</div>
-        <div class="person-skills"><span class="person-skill" style="border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.25)">Python</span><span class="person-skill" style="border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.25)">SQL</span><span class="person-skill" style="border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.25)">Tableau</span></div>
-        <div class="person-stat person-stat-active" style="border-color:rgba(255,255,255,.08);color:rgba(255,255,255,.35)">Interviewing</div>
-      </div>
-      <div class="person" style="border-color:rgba(255,255,255,.06)">
-        <div class="person-avatar pa-4">JP</div>
-        <div class="person-name" style="color:#F5F5F0">Joy P.</div>
-        <div class="person-role">Design Engineer</div>
-        <div class="person-loc" style="color:rgba(255,255,255,.2)">📍 Pasig</div>
-        <div class="person-skills"><span class="person-skill" style="border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.25)">React</span><span class="person-skill" style="border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.25)">CSS</span><span class="person-skill" style="border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.25)">Figma</span></div>
-        <div class="person-stat person-stat-matched">91% Match</div>
-      </div>
-    </div>
-
-    <!-- Testimonials -->
-    <div class="testi-grid" style="margin-top:-2px">
-      <div class="testi">
-        <div class="testi-stars">★★★★★</div>
-        <div class="testi-quote">I was applying to 10+ jobs a day on other platforms. Here, I got 3 interviews from 5 applications. The match scores actually mean something.</div>
-        <div class="testi-author"><div class="testi-av ta-1">MA</div><div><div class="testi-name">Maria A.</div><div class="testi-role">Product Designer · Makati</div></div></div>
-      </div>
-      <div class="testi">
-        <div class="testi-stars">★★★★★</div>
-        <div class="testi-quote">Finally a job platform that shows salaries upfront in pesos. No more guessing. The skill gap feature told me to learn TypeScript — got hired 3 weeks later.</div>
-        <div class="testi-author"><div class="testi-av ta-2">KC</div><div><div class="testi-name">KC D.</div><div class="testi-role">Full-Stack Dev · Manila</div></div></div>
-      </div>
-      <div class="testi">
-        <div class="testi-stars">★★★★★</div>
-        <div class="testi-quote">I'm from Davao and always felt left out of Manila-centric platforms. Jobboard showed me remote roles I never knew existed. Hired at Canva within 2 weeks.</div>
-        <div class="testi-author"><div class="testi-av ta-3">AL</div><div><div class="testi-name">Alyssa L.</div><div class="testi-role">UX Researcher · Davao</div></div></div>
-      </div>
-    </div>
+  <div class="proof-stats" style="margin-bottom:32px">
+    <div class="ps" style="border-color:rgba(255,255,255,.06)"><div class="ps-val y">12,400</div><div class="ps-label">Job Seekers</div></div>
+    <div class="ps" style="border-color:rgba(255,255,255,.06)"><div class="ps-val" style="color:#F5F5F0">3,200</div><div class="ps-label">Hired This Year</div></div>
+    <div class="ps" style="border-color:rgba(255,255,255,.06)"><div class="ps-val y">89%</div><div class="ps-label">Avg. Score</div></div>
+    <div class="ps" style="border-color:rgba(255,255,255,.06)"><div class="ps-val" style="color:#F5F5F0">14 days</div><div class="ps-label">Avg. Time to Hire</div></div>
   </div>
-</section>
+
+  <div class="community-grid">
+    <div class="person"><div class="person-avatar pa1">MA</div><div class="person-name">Maria A.</div><div class="person-role">Product Designer</div><div class="person-loc">📍 Makati</div><div class="person-skills"><span class="person-skill">Figma</span><span class="person-skill">UI</span><span class="person-skill">UX</span></div><div class="person-badge badge-hired">✓ Hired at Spotify</div></div>
+    <div class="person"><div class="person-avatar pa2">JR</div><div class="person-name">Juan R.</div><div class="person-role">Frontend Developer</div><div class="person-loc">📍 Cebu</div><div class="person-skills"><span class="person-skill">React</span><span class="person-skill">TS</span><span class="person-skill">Next.js</span></div><div class="person-badge badge-hired">✓ Hired at Vercel</div></div>
+    <div class="person"><div class="person-avatar pa3">KC</div><div class="person-name">KC D.</div><div class="person-role">Full-Stack Dev</div><div class="person-loc">📍 Manila</div><div class="person-skills"><span class="person-skill">Node</span><span class="person-skill">React</span><span class="person-skill">AWS</span></div><div class="person-badge badge-score">Bigmovv: 92%</div></div>
+    <div class="person"><div class="person-avatar pa4">AL</div><div class="person-name">Alyssa L.</div><div class="person-role">UX Researcher</div><div class="person-loc">📍 Davao</div><div class="person-skills"><span class="person-skill">Research</span><span class="person-skill">Figma</span></div><div class="person-badge badge-hired">✓ Hired at Canva</div></div>
+    <div class="person"><div class="person-avatar pa1">RM</div><div class="person-name">Rico M.</div><div class="person-role">Mobile Dev</div><div class="person-loc">📍 Quezon City</div><div class="person-skills"><span class="person-skill">Flutter</span><span class="person-skill">Dart</span><span class="person-skill">Firebase</span></div><div class="person-badge badge-score">Bigmovv: 88%</div></div>
+    <div class="person"><div class="person-avatar pa2">SG</div><div class="person-name">Sarah G.</div><div class="person-role">Shopify Dev</div><div class="person-loc">📍 Iloilo</div><div class="person-skills"><span class="person-skill">Shopify</span><span class="person-skill">Liquid</span><span class="person-skill">CSS</span></div><div class="person-badge badge-hired">✓ Hired at Stripe</div></div>
+    <div class="person"><div class="person-avatar pa3">DT</div><div class="person-name">Dan T.</div><div class="person-role">Data Analyst</div><div class="person-loc">📍 Taguig</div><div class="person-skills"><span class="person-skill">Python</span><span class="person-skill">SQL</span><span class="person-skill">Tableau</span></div><div class="person-badge badge-active">Interviewing</div></div>
+    <div class="person"><div class="person-avatar pa4">JP</div><div class="person-name">Joy P.</div><div class="person-role">Design Engineer</div><div class="person-loc">📍 Pasig</div><div class="person-skills"><span class="person-skill">React</span><span class="person-skill">CSS</span><span class="person-skill">Figma</span></div><div class="person-badge badge-score">Bigmovv: 91%</div></div>
+  </div>
+
+  <div class="testi-grid" style="margin-top:-2px">
+    <div class="testi"><div class="testi-stars">★★★★★</div><div class="testi-quote">Scored 95% for a Spotify role. Applied on Monday, had 3 interviews by Friday. My mom still thinks I'm lying about how fast this happened.</div><div class="testi-author"><div class="testi-av ta1">MA</div><div><div class="testi-name">Maria A.</div><div class="testi-role">Product Designer · Makati</div></div></div></div>
+    <div class="testi"><div class="testi-stars">★★★★★</div><div class="testi-quote">The skill gap feature said "learn TypeScript, unlock 28 more jobs." So I did. My score jumped from 74% to 89%. Got hired in 3 weeks. Wish I'd known sooner.</div><div class="testi-author"><div class="testi-av ta2">KC</div><div><div class="testi-name">KC D.</div><div class="testi-role">Full-Stack Dev · Manila</div></div></div></div>
+    <div class="testi"><div class="testi-stars">★★★★★</div><div class="testi-quote">From Davao, always felt invisible on Manila-centric platforms. Bigmovv showed me remote roles I didn't know existed. Hired at Canva in 2 weeks. My commute is now 12 steps to my desk.</div><div class="testi-author"><div class="testi-av ta3">AL</div><div><div class="testi-name">Alyssa L.</div><div class="testi-role">UX Researcher · Davao</div></div></div></div>
+  </div>
+</div></section>
 
 <!-- ===== FEATURES ===== -->
-<section class="section" id="features">
-  <div class="section-inner reveal">
-    <div class="section-label">// what you get</div>
-    <div class="section-title">Built different. On purpose.</div>
-    <div class="section-sub">Every feature exists because we asked: does this help someone get hired faster?</div>
-    <div class="feat-grid">
-      <div class="feat"><div class="feat-icon">🎯</div><div class="feat-title">Skill-Based Matching</div><div class="feat-desc">We map your skills to job requirements and give you a real match percentage. 92% means 92%.</div><div class="feat-tag">Core Feature</div></div>
-      <div class="feat"><div class="feat-icon">💰</div><div class="feat-title">Salary in PHP</div><div class="feat-desc">Every job shows salary ranges in pesos. Plus market data so you know your worth before you apply.</div><div class="feat-tag">Always Visible</div></div>
-      <div class="feat"><div class="feat-icon">📊</div><div class="feat-title">Skill Intelligence</div><div class="feat-desc">See what skills the market wants, what you're missing, and exactly how many jobs they'd unlock.</div><div class="feat-tag">Unique to Jobboard</div></div>
-      <div class="feat"><div class="feat-icon">🌍</div><div class="feat-title">Remote-First</div><div class="feat-desc">62% of our jobs are remote. Filter by setup, see which companies truly hire from the Philippines.</div><div class="feat-tag">62% Remote</div></div>
-      <div class="feat"><div class="feat-icon">⚡</div><div class="feat-title">60-Second Setup</div><div class="feat-desc">No resume upload. No 20-field forms. Pick skills, set preferences, see matches. Under a minute.</div><div class="feat-tag">Zero Friction</div></div>
-      <div class="feat"><div class="feat-icon">🇵🇭</div><div class="feat-title">Built for Filipinos</div><div class="feat-desc">PHP salaries, PH market data, roles popular here, companies that actually hire remotely from PH.</div><div class="feat-tag">Local-First</div></div>
-    </div>
+<section class="section" id="features"><div class="section-inner reveal">
+  <div class="section-label">// the good stuff</div>
+  <div class="section-title">Built different. And we can prove it.</div>
+  <div class="section-sub">Every feature exists because the current way of finding jobs is honestly embarrassing for 2026.</div>
+  <div class="feat-grid">
+    <div class="feat"><div class="feat-icon">📊</div><div class="feat-title">Your Bigmovv Score</div><div class="feat-desc">A match percentage for every job. 92% means 92% of required skills match. Not vibes — math.</div><div class="feat-tag">Core Feature</div></div>
+    <div class="feat"><div class="feat-icon">💰</div><div class="feat-title">Salary in PHP. Always.</div><div class="feat-desc">Every job shows real salary ranges in pesos. Know your worth before you apply, not after 3 interviews and a case study.</div><div class="feat-tag">Always Visible</div></div>
+    <div class="feat"><div class="feat-icon">🎯</div><div class="feat-title">Skill Intelligence</div><div class="feat-desc">See which skills boost your score the most. We show the gap, the impact, and free resources to close it. Your career GPS.</div><div class="feat-tag">Only on Bigmovv</div></div>
+    <div class="feat"><div class="feat-icon">🌍</div><div class="feat-title">Remote-First</div><div class="feat-desc">62% of jobs are remote. Filter by setup. Find companies that actually hire from the Philippines, not just say they do.</div><div class="feat-tag">62% Remote</div></div>
+    <div class="feat"><div class="feat-icon">⚡</div><div class="feat-title">60-Second Setup</div><div class="feat-desc">No resume. No 20-field forms. No uploading a PDF you made in 2019. Pick skills, get scored. Done.</div><div class="feat-tag">Zero Friction</div></div>
+    <div class="feat"><div class="feat-icon">🇵🇭</div><div class="feat-title">Built for PH. Actually.</div><div class="feat-desc">PHP salaries. PH market data. Companies that genuinely hire from the Philippines, not just have a Manila office for tax purposes.</div><div class="feat-tag">Local-First</div></div>
   </div>
-</section>
+</div></section>
 
 <!-- ===== FAQ ===== -->
-<section class="section" style="padding-top:0">
-  <div class="section-inner reveal">
-    <div class="section-label">// honest answers</div>
-    <div class="section-title">Still not sure?</div>
-    <div class="section-sub">Fair. Here are the questions everyone asks before signing up.</div>
-    <div class="faq-list">
-      <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-q"><div class="faq-q-text">Is this actually free?</div><div class="faq-toggle">+</div></div>
-        <div class="faq-a"><div class="faq-a-inner">Yes. Completely free for job seekers. No hidden fees, no premium tier, no credit card required. We make money from employers who pay to post jobs and access our matching platform. You'll never pay a single peso.</div></div>
-      </div>
-      <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-q"><div class="faq-q-text">How is this different from JobStreet or LinkedIn?</div><div class="faq-toggle">+</div></div>
-        <div class="faq-a"><div class="faq-a-inner">Those platforms show you everything and let you sort through thousands of listings. We do the opposite — we analyze your skills and only show you jobs where you're a strong match. Plus we show salaries in PHP upfront, give you a match score for every job, and tell you exactly which skills to learn to unlock more opportunities.</div></div>
-      </div>
-      <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-q"><div class="faq-q-text">Are these real jobs from real companies?</div><div class="faq-toggle">+</div></div>
-        <div class="faq-a"><div class="faq-a-inner">Every job on our platform is verified. We aggregate from company career pages, partner APIs, and direct employer postings. No fake listings, no duplicates, no expired roles. If a job is on Jobboard, you can apply to it today.</div></div>
-      </div>
-      <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-q"><div class="faq-q-text">I'm outside Manila. Will this work for me?</div><div class="faq-toggle">+</div></div>
-        <div class="faq-a"><div class="faq-a-inner">Absolutely. 62% of our jobs are remote-friendly, so it doesn't matter if you're in Cebu, Davao, Iloilo, or anywhere else. We've had users hired from across the Philippines. Our community section shows real people from cities all over the country.</div></div>
-      </div>
-      <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-q"><div class="faq-q-text">What if I don't have many skills yet?</div><div class="faq-toggle">+</div></div>
-        <div class="faq-a"><div class="faq-a-inner">That's exactly who our Skills Intelligence feature is for. We'll show you which skills are in demand, which ones would unlock the most jobs for you, and link you to free resources to learn them. Start with what you have — we'll help you grow.</div></div>
-      </div>
-    </div>
+<section class="section" style="padding-top:0"><div class="section-inner reveal">
+  <div class="section-label">// the fine print (there isn't any)</div>
+  <div class="section-title">You have questions. We have answers.</div>
+  <div class="section-sub">Here's what everyone asks right before they realize they should've signed up 5 minutes ago.</div>
+  <div class="faq-list">
+    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q"><div class="faq-q-text">Wait, this is actually free?</div><div class="faq-toggle">+</div></div><div class="faq-a"><div class="faq-a-inner">Free as in "free free." Not free-trial-free or free-but-we'll-upsell-you-free. 100% free for job seekers, forever. Employers pay to post and access our matching. You never pay a peso. We promise. Pinky swear.</div></div></div>
+    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q"><div class="faq-q-text">How is this different from JobStreet or LinkedIn?</div><div class="faq-toggle">+</div></div><div class="faq-a"><div class="faq-a-inner">They throw 500 listings at you and wish you luck. We score your skills against every job and only show matches where you'd actually get hired. Plus transparent PHP salaries (not "competitive") and a skill gap feature that tells you exactly what to learn next. It's like going from Google Maps to a personal driver.</div></div></div>
+    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q"><div class="faq-q-text">Are these real jobs or are you catfishing me?</div><div class="faq-toggle">+</div></div><div class="faq-a"><div class="faq-a-inner">Every single job is verified. We pull from company career pages, partner APIs, and direct employer postings. No fake listings, no duplicates, no expired roles from 2023 that somehow still appear (looking at you, every other platform). If it's on Bigmovv, you can apply today.</div></div></div>
+    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q"><div class="faq-q-text">I'm not in Manila. Am I invisible here too?</div><div class="faq-toggle">+</div></div><div class="faq-a"><div class="faq-a-inner">Absolutely not. 62% of our jobs are remote. We have people hired from Cebu, Davao, Iloilo, Cagayan de Oro, and everywhere in between. Your location doesn't determine your talent. Your score does.</div></div></div>
+    <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q"><div class="faq-q-text">What does my score actually mean?</div><div class="faq-toggle">+</div></div><div class="faq-a"><div class="faq-a-inner">It's the percentage of a job's required and preferred skills that match your profile. Score 92% and you match 92% of what the employer wants. Above 85% and you're a strong candidate. We also show you which skills would bump your score higher — so you know exactly what to learn next, not just what you're missing.</div></div></div>
   </div>
-</section>
+</div></section>
 
 <!-- ===== FINAL CTA ===== -->
-<section class="section section-yellow">
-  <div class="section-inner">
-    <div class="final-section reveal">
-      <div class="section-label" style="color:rgba(10,10,10,.25)">// your next role is waiting</div>
-      <div class="final-title">32 new jobs posted <span>today</span></div>
-      <div class="final-sub" style="color:rgba(10,10,10,.45)">Create your free account and see which ones match your skills. Takes 60 seconds.</div>
-      <button class="final-btn">Get Matched Free →</button>
-      <div class="final-note">Free forever · 2,400+ jobs · Loved by 12K+ Filipinos</div>
-    </div>
+<section class="section section-yellow"><div class="section-inner">
+  <div class="final-section reveal">
+    <div class="section-label" style="color:rgba(10,10,10,.25)">// still scrolling? just sign up already</div>
+    <div class="final-title">32 jobs scored for you <span>today</span></div>
+    <div class="final-sub" style="color:rgba(10,10,10,.45)">Free account. 60 seconds. No resume. No catch. Just your skills vs. the job market. Spoiler: you're doing better than you think.</div>
+    <button class="final-btn">Make Your Bigmovv →</button>
+    <div class="final-note">Free forever · 2,400+ jobs · 12K+ Filipinos already here</div>
   </div>
-</section>
+</div></section>
 
 <!-- FOOTER -->
 <footer class="footer">
   <div class="footer-inner">
-    <div class="footer-brand"><div class="footer-brand-row"><div class="nav-logo">JB</div><span class="nav-wordmark">Jobboard</span></div><div class="footer-desc">Smart job matching for Filipino professionals. Find work that fits your skills, not just your search query.</div></div>
-    <div><div class="footer-col-title">Product</div><div class="footer-links"><a class="footer-link">How It Works</a><a class="footer-link">Features</a><a class="footer-link">Skills Intelligence</a><a class="footer-link">For Employers</a></div></div>
+    <div class="footer-brand"><div class="footer-desc" style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div class="nav-logo">VV</div><span style="font-size:15px;font-weight:800;letter-spacing:-.03em">Bigmovv</span></div><div class="footer-desc">Career intelligence for Filipino professionals who refuse to settle. Make your big move.</div></div>
+    <div><div class="footer-col-title">Product</div><div class="footer-links"><a class="footer-link">How It Works</a><a class="footer-link">Features</a><a class="footer-link">Skill Intelligence</a><a class="footer-link">For Employers</a></div></div>
     <div><div class="footer-col-title">Company</div><div class="footer-links"><a class="footer-link">About</a><a class="footer-link">Blog</a><a class="footer-link">Careers</a><a class="footer-link">Contact</a></div></div>
     <div><div class="footer-col-title">Legal</div><div class="footer-links"><a class="footer-link">Privacy Policy</a><a class="footer-link">Terms of Service</a><a class="footer-link">Cookie Policy</a></div></div>
   </div>
-  <div class="footer-bottom"><div class="footer-copy">© 2026 Jobboard · Made in the Philippines 🇵🇭</div><div class="footer-socials"><div class="footer-social">𝕏</div><div class="footer-social">in</div><div class="footer-social">fb</div></div></div>
+  <div class="footer-bottom"><div class="footer-copy">© 2026 Bigmovv. Built in Manila, used everywhere 🇵🇭</div><div class="footer-socials"><div class="footer-social">𝕏</div><div class="footer-social">in</div><div class="footer-social">fb</div></div></div>
 </footer>
 
-<!-- STICKY CTA BAR -->
-<div class="sticky-cta" id="stickyCta">
-  <div class="sticky-inner">
-    <div class="sticky-text"><div class="sticky-pulse"></div><strong>32 new jobs</strong> <span>posted today matching your skills</span></div>
-    <button class="sticky-btn">Get Matched Free →</button>
-  </div>
-</div>
+<!-- STICKY -->
+<div class="sticky-cta" id="stickyCta"><div class="sticky-inner">
+  <div class="sticky-text"><div class="sticky-pulse"></div><strong>32 jobs scored</strong> <span>for your skills right now</span></div>
+  <button class="sticky-btn">Make Your Move →</button>
+</div></div>
 
 <script>
-  // === TICKER ===
-  const tickerData = [
-    {name:'Maria A.',city:'Makati',action:'matched with 28 jobs',time:'2m ago'},
-    {name:'Juan R.',city:'Cebu',action:'hired at Vercel',time:'1h ago'},
-    {name:'KC D.',city:'Manila',action:'got 3 interview invites',time:'3h ago'},
-    {name:'Alyssa L.',city:'Davao',action:'hired at Canva',time:'5h ago'},
-    {name:'Rico M.',city:'QC',action:'matched with 34 jobs',time:'12m ago'},
-    {name:'Sarah G.',city:'Iloilo',action:'hired at Stripe',time:'8h ago'},
-    {name:'Dan T.',city:'Taguig',action:'started 2 interviews',time:'45m ago'},
-    {name:'Joy P.',city:'Pasig',action:'matched with 22 jobs',time:'18m ago'},
-    {name:'Mark S.',city:'Cebu',action:'hired at Shopify',time:'1d ago'},
-    {name:'Ana C.',city:'Makati',action:'got 5 interview invites',time:'2h ago'},
-    {name:'Leo V.',city:'Manila',action:'matched with 41 jobs',time:'8m ago'},
-    {name:'Gem R.',city:'Davao',action:'hired at Linear',time:'6h ago'},
+  // Ticker
+  const td=[
+    {n:'Maria A.',c:'Makati',a:'scored 95% — hired at Spotify (her mom cried)',t:'2m'},
+    {n:'Juan R.',c:'Cebu',a:'scored 89% — 3 interviews in one week',t:'1h'},
+    {n:'KC D.',c:'Manila',a:'score jumped from 74% to 89% after learning TS',t:'3h'},
+    {n:'Alyssa L.',c:'Davao',a:'hired at Canva in 14 days. From Davao.',t:'5h'},
+    {n:'Rico M.',c:'QC',a:'matched with 34 jobs at 85%+ — had to pick one',t:'12m'},
+    {n:'Sarah G.',c:'Iloilo',a:'scored 91% — hired at Stripe. Remote.',t:'8h'},
+    {n:'Dan T.',c:'Taguig',a:'scored 88% — interviewing at 3 companies rn',t:'45m'},
+    {n:'Joy P.',c:'Pasig',a:'22 high-score jobs — "this can\'t be real" she said',t:'18m'},
+    {n:'Mark S.',c:'Cebu',a:'scored 93% — hired at Shopify. No degree needed.',t:'1d'},
+    {n:'Ana C.',c:'Makati',a:'5 interview invites at 90%+ match. In one day.',t:'2h'},
+    {n:'Leo V.',c:'Manila',a:'scored 87% across 41 jobs — career crisis solved',t:'8m'},
+    {n:'Gem R.',c:'Davao',a:'scored 90% — hired at Linear. Still can\'t believe it.',t:'6h'},
   ];
-  const track = document.getElementById('tickerTrack');
-  const tickerHTML = tickerData.map(t =>
-    `<div class="ticker-item"><div class="ticker-dot"></div><div class="ticker-text"><strong>${t.name}</strong> from ${t.city} ${t.action}</div><div class="ticker-time">${t.time}</div></div>`
-  ).join('');
-  track.innerHTML = tickerHTML + tickerHTML; // duplicate for seamless loop
+  const track=document.getElementById('tickerTrack');
+  const html=td.map(t=>`<div class="ticker-item"><div class="ticker-dot"></div><div class="ticker-text"><strong>${t.n}</strong> from ${t.c} — ${t.a}</div><div class="ticker-time">${t.t} ago</div></div>`).join('');
+  track.innerHTML=html+html;
 
-  // === DEMO ===
-  const jobMap = {React:28,JavaScript:22,Figma:18,Python:15,TypeScript:12,'UI Design':20,'Node.js':14,'Next.js':10,'Product Design':16,Shopify:8,'PHP / Laravel':11,'Vue.js':9};
-  function demoToggle(el) {
+  // Demo
+  function demoToggle(el){
     el.classList.toggle('selected');
-    const selected = document.querySelectorAll('.demo-pill.selected');
-    const result = document.getElementById('demoResult');
-    const empty = document.getElementById('drEmpty');
-    const left = document.getElementById('drLeft');
-    const num = document.getElementById('drNum');
-    const cta = document.getElementById('drCta');
-
-    if (selected.length === 0) {
-      result.classList.remove('active');
-      empty.style.display = '';
-      left.style.display = 'none';
-      cta.classList.remove('visible');
-    } else {
-      let total = 0;
-      selected.forEach(p => total += parseInt(p.dataset.jobs));
-      // Diminishing returns to feel realistic
-      total = Math.round(total * 0.7 + selected.length * 3);
-      result.classList.add('active');
-      empty.style.display = 'none';
-      left.style.display = '';
-      num.textContent = total;
-      cta.classList.toggle('visible', selected.length >= 3);
-    }
+    const sel=document.querySelectorAll('.demo-pill.selected');
+    const res=document.getElementById('demoResult'),empty=document.getElementById('drEmpty'),left=document.getElementById('drLeft'),num=document.getElementById('drNum'),cta=document.getElementById('drCta');
+    if(!sel.length){res.classList.remove('active');empty.style.display='';left.style.display='none';cta.classList.remove('visible')}
+    else{let t=0;sel.forEach(p=>t+=parseInt(p.dataset.jobs));t=Math.round(t*.7+sel.length*3);res.classList.add('active');empty.style.display='none';left.style.display='';num.textContent=t;cta.classList.toggle('visible',sel.length>=3)}
   }
 
-  // === FAQ ===
-  function toggleFaq(el) {
-    el.classList.toggle('open');
-  }
+  // FAQ
+  function toggleFaq(el){el.classList.toggle('open')}
 
-  // === STICKY CTA ===
-  const sticky = document.getElementById('stickyCta');
-  const hero = document.getElementById('heroSection');
-  window.addEventListener('scroll', () => {
-    const heroBottom = hero.getBoundingClientRect().bottom;
-    sticky.classList.toggle('visible', heroBottom < -100);
-  });
+  // Sticky
+  const sticky=document.getElementById('stickyCta'),hero=document.getElementById('heroSection');
+  window.addEventListener('scroll',()=>{sticky.classList.toggle('visible',hero.getBoundingClientRect().bottom<-100)});
 
-  // === SCROLL REVEAL ===
-  const reveals = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
-  }, {threshold: 0.12});
-  reveals.forEach(el => observer.observe(el));
+  // Reveal
+  const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')})},{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 </script>
 </body>
 </html>
