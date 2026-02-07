@@ -38,8 +38,10 @@ export async function updateSession(request: NextRequest) {
   const isAuthCallback = pathname === "/auth/callback";
   const isSignOut = pathname === "/auth/signout";
 
-  // Skip protection for API routes and auth callback
-  if (isPublicApi || isAuthCallback || isSignOut) {
+  const isLandingPage = pathname === "/";
+
+  // Skip protection for API routes, auth callback, and landing page
+  if (isPublicApi || isAuthCallback || isSignOut || isLandingPage) {
     return supabaseResponse;
   }
 
@@ -53,7 +55,7 @@ export async function updateSession(request: NextRequest) {
   // Authenticated users on auth pages → redirect to home
   if (user && isAuthRoute) {
     const url = request.nextUrl.clone();
-    url.pathname = "/";
+    url.pathname = "/home";
     return NextResponse.redirect(url);
   }
 

@@ -1,112 +1,20 @@
-import { Suspense } from "react";
-import { redirect } from "next/navigation";
-import { colors } from "@/lib/constants/colors";
-import { Navbar } from "@/components/layout";
-import { SearchStrip, HomeClient } from "@/components/home";
-import { WelcomeWalkthrough } from "@/components/walkthrough/WelcomeWalkthrough";
-import {
-  getCategoryJobCounts,
-  getTrendingRoles,
-  getTopHiringCompanies,
-  getRecentlyViewed,
-} from "@/lib/jobs";
 import { createClient } from "@/lib/supabase/server";
-import { industrySkillDemand } from "@/lib/constants/industrySkillDemand";
-import type { SkillDemandItem } from "@/lib/types/home";
-import { fetchCategoryData } from "./actions";
+import { redirect } from "next/navigation";
+import { LandingPage } from "@/components/landing";
 
-export const dynamic = "force-dynamic";
+export const metadata = {
+  title: "HanapBuhay \u2014 Find Work That Fits You",
+  description:
+    "Smart job matching for Filipino professionals. Get matched with jobs that fit your skills, see salaries in PHP, and land your next role in days.",
+};
 
-function computeSkillDemand(userSkills: string[]): SkillDemandItem[] {
-  if (!userSkills || userSkills.length === 0) return [];
-
-  const results: SkillDemandItem[] = [];
-
-  for (const skill of userSkills) {
-    const lowerSkill = skill.toLowerCase();
-    let totalDemand = 0;
-    let industryCount = 0;
-
-    for (const industrySkills of Object.values(industrySkillDemand)) {
-      if (industrySkills[lowerSkill]) {
-        totalDemand += industrySkills[lowerSkill];
-        industryCount++;
-      }
-    }
-
-    if (industryCount > 0) {
-      const avgDemand = Math.round(totalDemand / industryCount);
-      const label: "High" | "Med" | "Low" =
-        avgDemand >= 70 ? "High" : avgDemand >= 40 ? "Med" : "Low";
-      results.push({ skill, demandPercent: avgDemand, label });
-    }
-  }
-
-  // Sort by demand descending, take top 6
-  results.sort((a, b) => b.demandPercent - a.demandPercent);
-  return results.slice(0, 6);
-}
-
-export default async function Dashboard() {
+export default async function RootPage() {
   const supabase = await createClient();
-
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect("/login");
-  }
+  if (user) redirect("/home");
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
-
-  // Find the first category with jobs to use as default
-  const categories = await getCategoryJobCounts();
-  const firstWithJobs = categories.find((c) => c.count > 0);
-  const defaultCategory = firstWithJobs?.id ?? categories[0]?.id ?? "tech_it";
-
-  const [initialRoles, initialCompanies, recentlyViewed] = await Promise.all([
-    getTrendingRoles(defaultCategory),
-    getTopHiringCompanies(defaultCategory),
-    getRecentlyViewed(user.id),
-  ]);
-
-  const userSkills = profile?.skills ?? [];
-  const skillDemand = computeSkillDemand(userSkills);
-
-  return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: colors.bg,
-        color: colors.text,
-      }}
-    >
-      <Navbar
-        fullName={profile?.full_name || user.user_metadata?.full_name || ""}
-        email={user.email || ""}
-      />
-
-      <SearchStrip />
-
-      <HomeClient
-        categories={categories}
-        initialRoles={initialRoles}
-        initialCompanies={initialCompanies}
-        recentlyViewed={recentlyViewed}
-        skillDemand={skillDemand}
-        fetchCategoryData={fetchCategoryData}
-      />
-
-      <Suspense fallback={null}>
-        <WelcomeWalkthrough
-          firstName={profile?.full_name?.split(" ")[0] || ""}
-        />
-      </Suspense>
-    </div>
-  );
+  return <LandingPage />;
 }

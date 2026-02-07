@@ -127,7 +127,7 @@ export function OnboardingWizard({ initialProfile }: OnboardingWizardProps) {
         setSaving(false);
         return;
       }
-      router.push("/?welcome=1");
+      router.push("/home?welcome=1");
     } catch {
       setError("Something went wrong. Please try again.");
     }

@@ -14,7 +14,7 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: "Home", href: "/", shortLabel: "Home" },
+  { label: "Home", href: "/home", shortLabel: "Home" },
   { label: "Explore", href: "/explore", shortLabel: "Exp" },
   { label: "Notifications", href: "/notifications", shortLabel: "Notif" },
   { label: "Learn", href: "/learn", shortLabel: "Learn" },
@@ -34,7 +34,7 @@ export function Navbar({ fullName, email }: NavbarProps) {
   }, [pathname]);
 
   function isActive(href: string) {
-    if (href === "/") return pathname === href;
+    if (href === "/home") return pathname === href;
     return pathname.startsWith(href);
   }
 
@@ -58,7 +58,7 @@ export function Navbar({ fullName, email }: NavbarProps) {
       >
         {/* Brand */}
         <Link
-          href="/"
+          href="/home"
           className="nav-padding"
           style={{
             display: "flex",

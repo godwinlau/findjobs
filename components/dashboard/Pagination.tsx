@@ -9,7 +9,7 @@ interface PaginationProps {
   onPageChange?: (page: number) => void;
 }
 
-export function Pagination({ page, totalPages, basePath = "/", onPageChange }: PaginationProps) {
+export function Pagination({ page, totalPages, basePath = "/home", onPageChange }: PaginationProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 

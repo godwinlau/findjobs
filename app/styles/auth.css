@@ -1,0 +1,461 @@
+/* ═══════════════════════════════════════════════════════
+   AUTH — Brutalist Split-Panel Login / Signup
+   ═══════════════════════════════════════════════════════ */
+
+/* ============ LAYOUT ============ */
+.auth-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+}
+.auth-page ::selection {
+  background: #FBBF24;
+  color: #0A0A0A;
+}
+@media (max-width: 800px) {
+  .auth-page {
+    grid-template-columns: 1fr;
+  }
+  .auth-left-panel {
+    display: none;
+  }
+}
+
+/* ============ LEFT — BRAND PANEL ============ */
+.auth-left-panel {
+  background: #0A0A0A;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 48px;
+  position: relative;
+  overflow: hidden;
+  border-right: 3px solid rgba(255, 255, 255, 0.04);
+}
+.auth-left-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+.auth-lp-top {
+  position: relative;
+  z-index: 1;
+}
+.auth-lp-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 80px;
+}
+.auth-lp-logo {
+  width: 40px;
+  height: 40px;
+  background: #FBBF24;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Space Mono', monospace;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0A0A0A;
+}
+.auth-lp-wordmark {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #F5F5F0;
+}
+
+.auth-lp-headline {
+  font-size: 48px;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  margin-bottom: 16px;
+  color: #F5F5F0;
+}
+.auth-lp-headline span {
+  color: #FBBF24;
+}
+.auth-lp-sub {
+  font-size: 15px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.35);
+  max-width: 380px;
+}
+@media (max-width: 1000px) {
+  .auth-lp-headline {
+    font-size: 36px;
+  }
+}
+
+/* Stats at bottom */
+.auth-lp-stats {
+  display: flex;
+  gap: 0;
+  position: relative;
+  z-index: 1;
+}
+.auth-lp-stat {
+  padding: 16px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  min-width: 100px;
+}
+.auth-lp-stat:first-child {
+  border-left: 1.5px solid rgba(255, 255, 255, 0.08);
+}
+.auth-lp-stat-val {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #F5F5F0;
+}
+.auth-lp-stat-val.auth-yellow {
+  color: #FBBF24;
+}
+.auth-lp-stat-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
+  color: rgba(255, 255, 255, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+/* Decorative shapes */
+.auth-lp-deco {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+}
+.auth-lp-circle {
+  width: 300px;
+  height: 300px;
+  border: 2px dashed rgba(255, 255, 255, 0.03);
+  border-radius: 50%;
+  bottom: -80px;
+  right: -80px;
+  animation: auth-spin 40s linear infinite;
+}
+@keyframes auth-spin {
+  to { transform: rotate(360deg); }
+}
+.auth-lp-block {
+  width: 140px;
+  height: 140px;
+  background: rgba(251, 191, 36, 0.04);
+  bottom: 60px;
+  right: 60px;
+  transform: rotate(12deg);
+}
+.auth-lp-sq1 {
+  width: 12px;
+  height: 12px;
+  background: #FBBF24;
+  opacity: 0.1;
+  top: 40%;
+  right: 20%;
+}
+.auth-lp-sq2 {
+  width: 8px;
+  height: 8px;
+  background: #FBBF24;
+  opacity: 0.06;
+  top: 55%;
+  right: 35%;
+  transform: rotate(45deg);
+}
+
+/* ============ RIGHT — AUTH PANEL ============ */
+.auth-right-panel {
+  background: #F5F5F0;
+  color: #0A0A0A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+}
+.auth-box {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Mobile brand (shows when left panel hidden) */
+.auth-mobile-brand {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 40px;
+}
+.auth-mobile-brand .auth-lp-logo {
+  width: 36px;
+  height: 36px;
+  font-size: 14px;
+}
+.auth-mobile-brand .auth-lp-wordmark {
+  color: #0A0A0A;
+  font-size: 18px;
+}
+@media (max-width: 800px) {
+  .auth-mobile-brand {
+    display: flex;
+  }
+}
+
+.auth-title {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+.auth-sub {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 32px;
+}
+
+/* Social buttons */
+.auth-social-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.auth-social-btn {
+  width: 100%;
+  padding: 14px 20px;
+  border: 2px solid #0A0A0A;
+  background: #F5F5F0;
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0A0A0A;
+  cursor: pointer;
+  transition: all 0.12s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.auth-social-btn:hover {
+  background: #EEEEE8;
+  box-shadow: 3px 3px 0 #0A0A0A;
+  transform: translate(-1px, -1px);
+}
+.auth-social-btn:active {
+  box-shadow: none;
+  transform: none;
+}
+.auth-social-btn svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Divider */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.auth-divider-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.08);
+}
+.auth-divider-text {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #bbb;
+}
+
+/* Email form */
+.auth-email-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.auth-email-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #555;
+}
+.auth-email-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #0A0A0A;
+  background: #F5F5F0;
+  font-family: 'Sora', sans-serif;
+  font-size: 15px;
+  color: #0A0A0A;
+  outline: none;
+  transition: all 0.15s;
+}
+.auth-email-input:focus {
+  border-color: #FBBF24;
+  box-shadow: 3px 3px 0 #FBBF24;
+}
+.auth-email-input::placeholder {
+  color: #ccc;
+}
+
+/* Submit */
+.auth-submit-btn {
+  width: 100%;
+  padding: 16px;
+  margin-top: 4px;
+  background: #0A0A0A;
+  color: #F5F5F0;
+  border: none;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.auth-submit-btn:hover {
+  background: #FBBF24;
+  color: #0A0A0A;
+  box-shadow: 4px 4px 0 #0A0A0A;
+  transform: translate(-2px, -2px);
+}
+.auth-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.auth-submit-btn:disabled:hover {
+  background: #0A0A0A;
+  color: #F5F5F0;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Footer / toggle */
+.auth-footer {
+  margin-top: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.auth-toggle {
+  font-size: 13px;
+  color: #888;
+}
+.auth-toggle a {
+  color: #0A0A0A;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s;
+}
+.auth-toggle a:hover {
+  border-bottom-color: #FBBF24;
+}
+
+/* Terms */
+.auth-terms {
+  font-family: 'Space Mono', monospace;
+  font-size: 8.5px;
+  color: #bbb;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1.6;
+  margin-top: 24px;
+  text-align: center;
+}
+.auth-terms a {
+  color: #888;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+.auth-terms a:hover {
+  color: #0A0A0A;
+}
+
+/* ============ ERROR STATE ============ */
+.auth-error-msg {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: #EF4444;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 12px;
+}
+.auth-field-error .auth-email-input {
+  border-color: #EF4444;
+  box-shadow: none;
+}
+
+/* ============ SENT VIEW (CHECK YOUR EMAIL) ============ */
+.auth-sent-view {
+  text-align: center;
+}
+.auth-sent-icon {
+  width: 64px;
+  height: 64px;
+  background: #FBBF24;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+}
+.auth-sent-icon svg {
+  width: 28px;
+  height: 28px;
+  color: #0A0A0A;
+}
+.auth-sent-title {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  margin-bottom: 8px;
+}
+.auth-sent-sub {
+  font-size: 13px;
+  color: #888;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+.auth-sent-email {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0A0A0A;
+  margin-bottom: 24px;
+}
+.auth-sent-retry {
+  font-size: 13px;
+  color: #888;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Sora', sans-serif;
+  padding: 0;
+}
+.auth-sent-retry span {
+  color: #0A0A0A;
+  font-weight: 700;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s;
+}
+.auth-sent-retry span:hover {
+  border-bottom-color: #FBBF24;
+}

@@ -1,26 +1,32 @@
 "use server";
 
-import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
-export async function login(formData: FormData) {
-  const supabase = await createClient();
+export async function sendMagicLink(formData: FormData) {
+  const email = (formData.get("email") as string)?.trim();
 
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-
-  if (!email || !password) {
-    return { error: "Email and password are required." };
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { error: "Please enter a valid email address." };
   }
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const headerList = await headers();
+  const forwardedHost = headerList.get("x-forwarded-host");
+  const host = headerList.get("host");
+  const protocol = headerList.get("x-forwarded-proto") ?? "http";
+  const origin = `${protocol}://${forwardedHost ?? host}`;
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signInWithOtp({
     email,
-    password,
+    options: {
+      emailRedirectTo: `${origin}/auth/callback`,
+    },
   });
 
   if (error) {
     return { error: error.message };
   }
 
-  redirect("/");
+  return { success: true };
 }

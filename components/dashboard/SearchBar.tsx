@@ -10,7 +10,7 @@ interface SearchBarProps {
   basePath?: string;
 }
 
-export function SearchBar({ total, searchQuery, basePath = "/" }: SearchBarProps) {
+export function SearchBar({ total, searchQuery, basePath = "/home" }: SearchBarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [value, setValue] = useState(searchQuery);

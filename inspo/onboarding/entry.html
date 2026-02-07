@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jobboard — Sign Up</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0A0A0A;font-family:'Sora',sans-serif;color:#F5F5F0;min-height:100vh;display:flex;flex-direction:column}
+  ::selection{background:#FBBF24;color:#0A0A0A}
+
+  /* ============ LAYOUT ============ */
+  .page{display:grid;grid-template-columns:1fr 1fr;min-height:100vh}
+  @media(max-width:800px){.page{grid-template-columns:1fr}.left-panel{display:none}}
+
+  /* ============ LEFT — BRAND PANEL ============ */
+  .left-panel{background:#0A0A0A;display:flex;flex-direction:column;justify-content:space-between;padding:48px;position:relative;overflow:hidden;border-right:3px solid rgba(255,255,255,.04)}
+  .left-panel::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+
+  .lp-top{position:relative;z-index:1}
+  .lp-brand{display:flex;align-items:center;gap:12px;margin-bottom:80px}
+  .lp-logo{width:40px;height:40px;background:#FBBF24;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:16px;font-weight:700;color:#0A0A0A}
+  .lp-wordmark{font-size:20px;font-weight:800;letter-spacing:-.03em}
+
+  .lp-headline{font-size:48px;font-weight:800;letter-spacing:-.05em;line-height:1;margin-bottom:16px}
+  .lp-headline span{color:#FBBF24}
+  .lp-sub{font-size:15px;line-height:1.65;color:rgba(255,255,255,.35);max-width:380px}
+  @media(max-width:1000px){.lp-headline{font-size:36px}}
+
+  /* Stats at bottom */
+  .lp-stats{display:flex;gap:0;position:relative;z-index:1}
+  .lp-stat{padding:16px 20px;border:1px solid rgba(255,255,255,.06);min-width:100px}
+  .lp-stat:first-child{border-left:1.5px solid rgba(255,255,255,.08)}
+  .lp-stat-val{font-size:22px;font-weight:800;letter-spacing:-.03em}
+  .lp-stat-val.yellow{color:#FBBF24}
+  .lp-stat-label{font-family:'Space Mono',monospace;font-size:8px;color:rgba(255,255,255,.2);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+
+  /* Decorative shapes */
+  .lp-deco{position:absolute;pointer-events:none;z-index:0}
+  .lp-circle{width:300px;height:300px;border:2px dashed rgba(255,255,255,.03);border-radius:50%;bottom:-80px;right:-80px;animation:spin 40s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .lp-block{width:140px;height:140px;background:rgba(251,191,36,.04);bottom:60px;right:60px;transform:rotate(12deg)}
+  .lp-sq1{width:12px;height:12px;background:#FBBF24;opacity:.1;top:40%;right:20%}
+  .lp-sq2{width:8px;height:8px;background:#FBBF24;opacity:.06;top:55%;right:35%;transform:rotate(45deg)}
+
+  /* ============ RIGHT — AUTH PANEL ============ */
+  .right-panel{background:#F5F5F0;color:#0A0A0A;display:flex;align-items:center;justify-content:center;padding:48px 24px}
+  .auth-box{width:100%;max-width:400px}
+
+  /* Mobile brand (shows when left panel hidden) */
+  .mobile-brand{display:none;align-items:center;gap:10px;margin-bottom:40px}
+  .mobile-brand .lp-logo{width:36px;height:36px;font-size:14px}
+  .mobile-brand .lp-wordmark{color:#0A0A0A;font-size:18px}
+  @media(max-width:800px){.mobile-brand{display:flex}}
+
+  .auth-title{font-size:28px;font-weight:800;letter-spacing:-.04em;line-height:1.1;margin-bottom:6px}
+  .auth-sub{font-size:13px;color:#888;margin-bottom:32px}
+
+  /* Social buttons */
+  .social-btns{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
+  .social-btn{
+    width:100%;padding:14px 20px;
+    border:2px solid #0A0A0A;background:#F5F5F0;
+    font-family:'Sora',sans-serif;font-size:14px;font-weight:600;color:#0A0A0A;
+    cursor:pointer;transition:all .12s;
+    display:flex;align-items:center;justify-content:center;gap:10px;
+  }
+  .social-btn:hover{background:#EEEEE8;box-shadow:3px 3px 0 #0A0A0A;transform:translate(-1px,-1px)}
+  .social-btn:active{box-shadow:none;transform:none}
+  .social-btn svg{width:18px;height:18px;flex-shrink:0}
+
+  /* Divider */
+  .divider{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+  .divider-line{flex:1;height:1px;background:rgba(0,0,0,.08)}
+  .divider-text{font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#bbb}
+
+  /* Email form */
+  .email-field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+  .email-label{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#555}
+  .email-input{
+    width:100%;padding:14px 16px;
+    border:2px solid #0A0A0A;background:#F5F5F0;
+    font-family:'Sora',sans-serif;font-size:15px;color:#0A0A0A;
+    outline:none;transition:all .15s;
+  }
+  .email-input:focus{border-color:#FBBF24;box-shadow:3px 3px 0 #FBBF24}
+  .email-input::placeholder{color:#ccc}
+
+  /* Password field (for sign in mode) */
+  .password-field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;max-height:0;overflow:hidden;opacity:0;transition:all .3s cubic-bezier(.22,1,.36,1)}
+  .password-field.visible{max-height:100px;opacity:1;margin-bottom:12px}
+  .pw-row{display:flex;align-items:center;gap:0}
+  .pw-input{
+    flex:1;padding:14px 16px;
+    border:2px solid #0A0A0A;border-right:0;background:#F5F5F0;
+    font-family:'Sora',sans-serif;font-size:15px;color:#0A0A0A;
+    outline:none;transition:border-color .15s;
+  }
+  .pw-input:focus{border-color:#FBBF24}
+  .pw-input::placeholder{color:#ccc}
+  .pw-toggle{
+    width:50px;padding:14px 0;
+    border:2px solid #0A0A0A;background:#F5F5F0;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;transition:all .15s;color:#888;
+  }
+  .pw-toggle:hover{background:#EEEEE8;color:#0A0A0A}
+  .pw-toggle svg{width:18px;height:18px}
+
+  /* Submit */
+  .submit-btn{
+    width:100%;padding:16px;margin-top:4px;
+    background:#0A0A0A;color:#F5F5F0;border:none;
+    font-family:'Space Mono',monospace;font-size:13px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.06em;
+    cursor:pointer;transition:all .15s;
+  }
+  .submit-btn:hover{background:#FBBF24;color:#0A0A0A;box-shadow:4px 4px 0 #0A0A0A;transform:translate(-2px,-2px)}
+
+  /* Forgot / toggle */
+  .auth-footer{margin-top:20px;text-align:center;display:flex;flex-direction:column;gap:8px}
+  .auth-toggle{font-size:13px;color:#888}
+  .auth-toggle a{color:#0A0A0A;font-weight:700;text-decoration:none;cursor:pointer;border-bottom:1px solid transparent;transition:border-color .15s}
+  .auth-toggle a:hover{border-bottom-color:#FBBF24}
+  .auth-forgot{font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:#bbb;cursor:pointer;border:0;background:0;transition:color .15s;display:none}
+  .auth-forgot.visible{display:inline}
+  .auth-forgot:hover{color:#0A0A0A}
+
+  /* Terms */
+  .terms{font-family:'Space Mono',monospace;font-size:8.5px;color:#bbb;text-transform:uppercase;letter-spacing:.03em;line-height:1.6;margin-top:24px;text-align:center}
+  .terms a{color:#888;text-decoration:none;border-bottom:1px solid rgba(0,0,0,.1)}
+  .terms a:hover{color:#0A0A0A}
+
+  /* ============ ERROR STATE ============ */
+  .field-error .email-input,
+  .field-error .pw-input{border-color:#EF4444;box-shadow:none}
+  .error-msg{font-family:'Space Mono',monospace;font-size:9px;color:#EF4444;text-transform:uppercase;letter-spacing:.04em;margin-top:4px;display:none}
+  .field-error .error-msg{display:block}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- LEFT PANEL — BRAND -->
+  <div class="left-panel">
+    <div class="lp-top">
+      <div class="lp-brand">
+        <div class="lp-logo">JB</div>
+        <div class="lp-wordmark">Jobboard</div>
+      </div>
+      <div class="lp-headline">Find work that <span>fits you</span></div>
+      <p class="lp-sub">Smart job matching powered by your skills. Join thousands of Filipino professionals landing better roles, faster.</p>
+    </div>
+    <div class="lp-stats">
+      <div class="lp-stat"><div class="lp-stat-val yellow">2,400+</div><div class="lp-stat-label">Active Jobs</div></div>
+      <div class="lp-stat"><div class="lp-stat-val">89%</div><div class="lp-stat-label">Avg. Match</div></div>
+      <div class="lp-stat"><div class="lp-stat-val yellow">12K</div><div class="lp-stat-label">Users</div></div>
+    </div>
+    <div class="lp-deco lp-circle"></div>
+    <div class="lp-deco lp-block"></div>
+    <div class="lp-deco lp-sq1"></div>
+    <div class="lp-deco lp-sq2"></div>
+  </div>
+
+  <!-- RIGHT PANEL — AUTH -->
+  <div class="right-panel">
+    <div class="auth-box">
+
+      <div class="mobile-brand">
+        <div class="lp-logo">JB</div>
+        <div class="lp-wordmark">Jobboard</div>
+      </div>
+
+      <div class="auth-title" id="authTitle">Create your account</div>
+      <div class="auth-sub" id="authSub">Takes less than a minute. No credit card needed.</div>
+
+      <!-- Social -->
+      <div class="social-btns">
+        <button class="social-btn" onclick="socialAuth('google')">
+          <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 001 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Continue with Google
+        </button>
+        <button class="social-btn" onclick="socialAuth('apple')">
+          <svg viewBox="0 0 24 24" fill="#0A0A0A"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.51-3.23 0-1.44.64-2.2.46-3.06-.4C3.79 16.17 4.36 9.53 8.8 9.28c1.27.06 2.15.72 2.9.76.97-.2 1.9-.77 2.93-.7 1.24.1 2.17.58 2.78 1.49-2.55 1.53-1.95 4.89.58 5.83-.47 1.22-.97 2.41-1.94 3.62zM12.05 9.22c-.12-2.19 1.68-4.06 3.73-4.22.28 2.35-2.12 4.39-3.73 4.22z"/></svg>
+          Continue with Apple
+        </button>
+      </div>
+
+      <!-- Divider -->
+      <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-text">or</div>
+        <div class="divider-line"></div>
+      </div>
+
+      <!-- Email -->
+      <div class="email-field" id="emailField">
+        <label class="email-label">Email address</label>
+        <input class="email-input" type="email" id="emailInput" placeholder="you@email.com" onkeydown="if(event.key==='Enter')handleSubmit()" oninput="clearError('emailField')">
+        <div class="error-msg">Please enter a valid email address</div>
+      </div>
+
+      <!-- Password (sign in only) -->
+      <div class="password-field" id="passwordField">
+        <label class="email-label">Password</label>
+        <div class="pw-row">
+          <input class="pw-input" type="password" id="pwInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')handleSubmit()">
+          <button class="pw-toggle" onclick="togglePw()" id="pwToggle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="error-msg">Password is required</div>
+      </div>
+
+      <!-- Submit -->
+      <button class="submit-btn" id="submitBtn" onclick="handleSubmit()">Continue with Email →</button>
+
+      <!-- Footer -->
+      <div class="auth-footer">
+        <button class="auth-forgot" id="forgotBtn" onclick="alert('→ Password reset email sent')">Forgot password?</button>
+        <div class="auth-toggle" id="authToggle">Already have an account? <a onclick="toggleMode()">Sign in</a></div>
+      </div>
+
+      <div class="terms">By continuing, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let isSignIn = false;
+  let pwVisible = false;
+
+  function toggleMode() {
+    isSignIn = !isSignIn;
+    const title = document.getElementById('authTitle');
+    const sub = document.getElementById('authSub');
+    const btn = document.getElementById('submitBtn');
+    const toggle = document.getElementById('authToggle');
+    const pwField = document.getElementById('passwordField');
+    const forgot = document.getElementById('forgotBtn');
+
+    if (isSignIn) {
+      title.textContent = 'Welcome back';
+      sub.textContent = 'Sign in to see your matches and applications.';
+      btn.textContent = 'Sign In →';
+      toggle.innerHTML = 'Don\'t have an account? <a onclick="toggleMode()">Sign up</a>';
+      pwField.classList.add('visible');
+      forgot.classList.add('visible');
+    } else {
+      title.textContent = 'Create your account';
+      sub.textContent = 'Takes less than a minute. No credit card needed.';
+      btn.textContent = 'Continue with Email →';
+      toggle.innerHTML = 'Already have an account? <a onclick="toggleMode()">Sign in</a>';
+      pwField.classList.remove('visible');
+      forgot.classList.remove('visible');
+    }
+
+    clearError('emailField');
+    clearError('passwordField');
+  }
+
+  function handleSubmit() {
+    const email = document.getElementById('emailInput').value.trim();
+    const emailField = document.getElementById('emailField');
+
+    // Validate email
+    if (!email || !email.includes('@') || !email.includes('.')) {
+      emailField.classList.add('field-error');
+      return;
+    }
+
+    if (isSignIn) {
+      const pw = document.getElementById('pwInput').value;
+      if (!pw) {
+        document.getElementById('passwordField').classList.add('field-error');
+        return;
+      }
+      alert('→ Signing in as ' + email);
+    } else {
+      alert('→ Check your email for a magic link, ' + email);
+    }
+  }
+
+  function clearError(id) {
+    document.getElementById(id).classList.remove('field-error');
+  }
+
+  function togglePw() {
+    pwVisible = !pwVisible;
+    const input = document.getElementById('pwInput');
+    const btn = document.getElementById('pwToggle');
+    input.type = pwVisible ? 'text' : 'password';
+    btn.innerHTML = pwVisible
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+  }
+
+  function socialAuth(provider) {
+    alert('→ Redirecting to ' + provider.charAt(0).toUpperCase() + provider.slice(1) + '…');
+  }
+</script>
+</body>
+</html>

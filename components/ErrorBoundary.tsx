@@ -121,7 +121,7 @@ export default function ErrorBoundary({ error, reset }: ErrorBoundaryProps) {
             Try again
           </button>
           <button
-            onClick={() => (window.location.href = "/")}
+            onClick={() => (window.location.href = "/home")}
             style={{
               padding: "10px 20px",
               borderRadius: 8,
