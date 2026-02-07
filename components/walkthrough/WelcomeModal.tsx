@@ -74,7 +74,7 @@ export function WelcomeModal({
             marginBottom: 8,
           }}
         >
-          Welcome to HanapBuhay{firstName ? `, ${firstName}` : ""}!
+          Welcome to bigmovv{firstName ? `, ${firstName}` : ""}!
         </h2>
 
         <p

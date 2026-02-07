@@ -1,13 +1,10 @@
-import Link from "next/link";
-
 export function LandingFooter() {
   return (
     <footer className="lp-footer">
       <div className="lp-footer-inner">
         <div className="lp-footer-brand">
           <div className="lp-footer-brand-row">
-            <div className="lp-nav-logo">HB</div>
-            <span className="lp-nav-wordmark">HanapBuhay</span>
+            <span className="lp-nav-wordmark">bigmovv<span className="lp-nav-period">.</span></span>
           </div>
           <div className="lp-footer-desc">
             Smart job matching for Filipino professionals. Find work that fits
@@ -19,7 +16,7 @@ export function LandingFooter() {
           <div className="lp-footer-links">
             <a className="lp-footer-link" href="#how">How It Works</a>
             <a className="lp-footer-link" href="#features">Features</a>
-            <Link className="lp-footer-link" href="/learn">Skills Intelligence</Link>
+            <a className="lp-footer-link" href="#features">Skills Intelligence</a>
             <a className="lp-footer-link">For Employers</a>
           </div>
         </div>
@@ -43,7 +40,7 @@ export function LandingFooter() {
       </div>
       <div className="lp-footer-bottom">
         <div className="lp-footer-copy">
-          &copy; 2026 HanapBuhay &middot; Made in the Philippines
+          &copy; 2026 bigmovv &middot; Made in the Philippines
         </div>
         <div className="lp-footer-socials">
           <a className="lp-footer-social" aria-label="Twitter">X</a>

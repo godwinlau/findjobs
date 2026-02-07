@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bigmovv — Logo Variations Round 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#111;font-family:'Sora',sans-serif;color:#F5F5F0;padding:48px 24px}
+  .page{max-width:1280px;margin:0 auto}
+  .page-header{margin-bottom:56px}
+  .page-eyebrow{font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.15);margin-bottom:8px}
+  .page-title{font-size:42px;font-weight:800;letter-spacing:-.05em;line-height:1}
+  .page-title span{color:#FBBF24}
+  .page-sub{font-size:13px;color:rgba(255,255,255,.25);margin-top:12px;max-width:500px;line-height:1.6}
+
+  .section{margin-bottom:64px}
+  .s-label{font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#FBBF24;margin-bottom:4px}
+  .s-title{font-size:22px;font-weight:800;letter-spacing:-.03em;margin-bottom:4px}
+  .s-desc{font-size:11px;color:rgba(255,255,255,.2);margin-bottom:24px;max-width:520px;line-height:1.6}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:2px}
+  .grid-wide{grid-template-columns:repeat(auto-fill,minmax(380px,1fr))}
+  .card{padding:48px 40px;display:flex;align-items:center;justify-content:center;min-height:200px;position:relative;border:1px solid rgba(255,255,255,.04);transition:border-color .15s}
+  .card:hover{border-color:rgba(255,255,255,.1)}
+  .card.dark{background:#0A0A0A}
+  .card.light{background:#F5F5F0}
+  .card.yellow{background:#FBBF24}
+  .card.charcoal{background:#1A1A1A}
+  .card.offwhite{background:#EEEEE8}
+  .tag{position:absolute;top:12px;left:14px;font-family:'Space Mono',monospace;font-size:7px;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.12)}
+  .card.light .tag,.card.yellow .tag,.card.offwhite .tag{color:rgba(0,0,0,.15)}
+
+  /* ============================================
+     V12: BOLD ITALIC — MOTION ENERGY
+     ============================================ */
+  .v12{font-size:38px;font-weight:800;letter-spacing:-.04em;font-style:italic;line-height:1}
+  .v12 .vv{color:#FBBF24}
+  .v12-d{color:#F5F5F0}
+  .v12-l{color:#0A0A0A}
+
+  /* ============================================
+     V13: VV CHECKMARK — DOUBLE CHECK
+     ============================================ */
+  .v13{display:flex;align-items:center;gap:14px}
+  .v13-icon{width:48px;height:48px;background:#FBBF24;display:flex;align-items:center;justify-content:center;position:relative}
+  .v13-icon svg{width:28px;height:28px}
+  .v13-icon-inv{background:#0A0A0A;border:2px solid rgba(255,255,255,.06)}
+  .v13-icon-inv svg path{stroke:#FBBF24}
+  .v13-text{font-size:28px;font-weight:800;letter-spacing:-.04em}
+  .v13-d{color:#F5F5F0}
+  .v13-l{color:#0A0A0A}
+
+  /* ============================================
+     V14: KNOCKOUT — WHITE ON YELLOW BAR
+     ============================================ */
+  .v14{display:inline-flex;align-items:center;line-height:1}
+  .v14-inner{font-size:34px;font-weight:800;letter-spacing:-.04em;padding:10px 20px;background:#FBBF24;color:#0A0A0A}
+  .v14-inner-inv{background:#0A0A0A;color:#F5F5F0}
+  .v14-inner .vv{opacity:.4}
+  .v14-inner-inv .vv{color:#FBBF24}
+
+  /* ============================================
+     V15: SPACE GROTESK — MODERN SANS
+     ============================================ */
+  .v15{font-family:'Space Grotesk',sans-serif;font-size:36px;font-weight:700;letter-spacing:-.03em;line-height:1}
+  .v15 .vv{color:#FBBF24}
+  .v15-d{color:#F5F5F0}
+  .v15-l{color:#0A0A0A}
+
+  /* ============================================
+     V16: CIRCLE VV MARK
+     ============================================ */
+  .v16{display:flex;align-items:center;gap:14px}
+  .v16-circle{width:48px;height:48px;border-radius:50%;background:#FBBF24;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#0A0A0A;letter-spacing:-.04em}
+  .v16-circle-inv{background:transparent;border:3px solid #FBBF24;color:#FBBF24}
+  .v16-circle-dark{background:transparent;border:3px solid #0A0A0A;color:#0A0A0A}
+  .v16-text{font-size:28px;font-weight:800;letter-spacing:-.04em}
+  .v16-d{color:#F5F5F0}
+  .v16-l{color:#0A0A0A}
+
+  /* ============================================
+     V17: SLASH SEPARATOR
+     ============================================ */
+  .v17{font-size:34px;font-weight:800;letter-spacing:-.04em;line-height:1}
+  .v17 .slash{color:#FBBF24;margin:0 4px;font-weight:400}
+  .v17-d{color:#F5F5F0}
+  .v17-l{color:#0A0A0A}
+
+  /* ============================================
+     V18: WEIGHT CONTRAST — thin BIG bold MOVV
+     ============================================ */
+  .v18{font-size:36px;letter-spacing:-.04em;line-height:1}
+  .v18 .thin{font-weight:300;opacity:.5}
+  .v18 .bold{font-weight:800}
+  .v18 .bold .vv{color:#FBBF24}
+  .v18-d{color:#F5F5F0}
+  .v18-l{color:#0A0A0A}
+
+  /* ============================================
+     V19: STACKED OFFSET — OVERLAPPING
+     ============================================ */
+  .v19{position:relative;height:64px;width:220px}
+  .v19-back{position:absolute;top:0;left:0;font-size:42px;font-weight:800;letter-spacing:-.05em;line-height:1;color:#FBBF24;opacity:.2}
+  .v19-front{position:absolute;top:16px;left:8px;font-size:42px;font-weight:800;letter-spacing:-.05em;line-height:1}
+  .v19-d .v19-front{color:#F5F5F0}
+  .v19-l .v19-front{color:#0A0A0A}
+
+  /* ============================================
+     V20: BRACKET WRAP
+     ============================================ */
+  .v20{display:flex;align-items:center;gap:6px}
+  .v20-bracket{font-size:40px;font-weight:300;color:#FBBF24;line-height:1}
+  .v20-bracket-d{color:#0A0A0A}
+  .v20-name{font-size:30px;font-weight:800;letter-spacing:-.04em;line-height:1}
+  .v20-d{color:#F5F5F0}
+  .v20-l{color:#0A0A0A}
+
+  /* ============================================
+     V21: ARROW INTEGRATED IN V
+     ============================================ */
+  .v21{font-size:36px;font-weight:800;letter-spacing:-.04em;line-height:1;position:relative}
+  .v21 .vv-arrow{color:#FBBF24;position:relative;display:inline-block}
+  .v21 .vv-arrow::after{content:'↗';position:absolute;top:-14px;right:-10px;font-size:12px;color:#FBBF24;font-weight:400}
+  .v21-d{color:#F5F5F0}
+  .v21-l{color:#0A0A0A}
+
+  /* ============================================
+     V22: DOUBLE UNDERLINE VV
+     ============================================ */
+  .v22{display:flex;flex-direction:column;gap:0;align-items:flex-start}
+  .v22-text{font-size:34px;font-weight:800;letter-spacing:-.04em;line-height:1.2}
+  .v22 .vv{color:#FBBF24;text-decoration:none;border-bottom:4px solid #FBBF24;padding-bottom:2px}
+  .v22-d{color:#F5F5F0}
+  .v22-l{color:#0A0A0A}
+  .card.light .v22 .vv,.card.offwhite .v22 .vv{border-color:#0A0A0A;color:#0A0A0A}
+
+  /* ============================================
+     V23: ROTATED VV MARK — ABSTRACT W
+     ============================================ */
+  .v23{display:flex;align-items:center;gap:14px}
+  .v23-mark{width:48px;height:48px;background:#FBBF24;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .v23-mark-inner{font-size:36px;font-weight:800;color:#0A0A0A;letter-spacing:-.08em;transform:translateY(-6px);line-height:1;font-family:'Sora',sans-serif}
+  .v23-mark-inv{background:#0A0A0A}
+  .v23-mark-inv .v23-mark-inner{color:#FBBF24}
+  .v23-text{font-size:28px;font-weight:800;letter-spacing:-.04em}
+  .v23-d{color:#F5F5F0}
+  .v23-l{color:#0A0A0A}
+
+  /* ============================================
+     V24: GRADIENT VV — FADE EFFECT
+     ============================================ */
+  .v24{font-size:36px;font-weight:800;letter-spacing:-.04em;line-height:1}
+  .v24 .v1st{color:#FBBF24}
+  .v24 .v2nd{color:#FBBF24;opacity:.4}
+  .v24-d{color:#F5F5F0}
+  .v24-l{color:#0A0A0A}
+
+  /* ============================================
+     V25: PILL SHAPE ICON
+     ============================================ */
+  .v25{display:flex;align-items:center;gap:14px}
+  .v25-pill{height:44px;padding:0 18px;border-radius:22px;background:#FBBF24;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#0A0A0A;letter-spacing:-.02em}
+  .v25-pill-inv{background:#0A0A0A;color:#FBBF24;border-radius:22px}
+  .v25-text{font-size:28px;font-weight:800;letter-spacing:-.04em}
+  .v25-d{color:#F5F5F0}
+  .v25-l{color:#0A0A0A}
+
+  /* ============================================
+     V26: MINIMAL — LOWERCASE + PERIOD
+     ============================================ */
+  .v26{font-size:34px;font-weight:800;letter-spacing:-.04em;line-height:1}
+  .v26 .period{color:#FBBF24}
+  .v26-d{color:#F5F5F0}
+  .v26-l{color:#0A0A0A}
+
+  /* ============================================
+     CONTEXTUAL MOCKUPS
+     ============================================ */
+  .mockup{border:1px solid rgba(255,255,255,.04);overflow:hidden}
+
+  /* Mobile app header */
+  .app-mock{width:100%;max-width:375px;margin:0 auto}
+  .app-header{background:#0A0A0A;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.06)}
+  .app-logo{font-size:18px;font-weight:800;letter-spacing:-.04em;color:#F5F5F0}
+  .app-logo .vv{color:#FBBF24}
+  .app-avatar{width:28px;height:28px;background:#FBBF24;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#0A0A0A}
+  .app-body{background:#0A0A0A;padding:20px}
+  .app-greeting{font-size:13px;color:rgba(255,255,255,.3);margin-bottom:4px}
+  .app-score-label{font-size:22px;font-weight:800;letter-spacing:-.03em;color:#F5F5F0;margin-bottom:16px}
+  .app-score-label span{color:#FBBF24}
+  .app-card{border:1.5px solid rgba(255,255,255,.06);padding:14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .app-card-left{display:flex;align-items:center;gap:10px}
+  .app-card-icon{width:32px;height:32px;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;font-size:14px}
+  .app-card-info{display:flex;flex-direction:column;gap:1px}
+  .app-card-company{font-family:'Space Mono',monospace;font-size:8px;color:rgba(255,255,255,.2);text-transform:uppercase;letter-spacing:.04em}
+  .app-card-role{font-size:12px;font-weight:700;color:#F5F5F0}
+  .app-card-meta{font-family:'Space Mono',monospace;font-size:7px;color:rgba(255,255,255,.15);text-transform:uppercase}
+  .app-card-score{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;padding:4px 8px}
+  .score-hi{background:#FBBF24;color:#0A0A0A}
+  .score-md{background:rgba(251,191,36,.15);color:#FBBF24}
+  .app-tab{display:flex;border-top:1px solid rgba(255,255,255,.06)}
+  .app-tab-item{flex:1;padding:10px;text-align:center;font-family:'Space Mono',monospace;font-size:7px;text-transform:uppercase;letter-spacing:.04em;color:rgba(255,255,255,.15)}
+  .app-tab-item.active{color:#FBBF24;border-top:2px solid #FBBF24;margin-top:-1px}
+
+  /* Email header */
+  .email-mock{background:#F5F5F0;padding:32px;max-width:500px;margin:0 auto}
+  .email-header{display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #0A0A0A}
+  .email-logo-mark{width:28px;height:28px;background:#FBBF24;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#0A0A0A;letter-spacing:-.02em}
+  .email-logo-text{font-size:16px;font-weight:800;letter-spacing:-.03em;color:#0A0A0A}
+  .email-subject{font-size:18px;font-weight:800;letter-spacing:-.03em;color:#0A0A0A;margin-bottom:8px}
+  .email-body{font-size:12px;line-height:1.7;color:#555}
+  .email-score{display:inline-flex;align-items:center;gap:4px;background:#0A0A0A;color:#FBBF24;padding:2px 8px;font-family:'Space Mono',monospace;font-size:11px;font-weight:700}
+  .email-cta{display:inline-block;margin-top:16px;padding:12px 28px;background:#FBBF24;color:#0A0A0A;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+
+  /* Loading splash */
+  .splash-mock{background:#0A0A0A;padding:80px 40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;max-width:375px;margin:0 auto}
+  .splash-logo{font-size:32px;font-weight:800;letter-spacing:-.05em;color:#F5F5F0}
+  .splash-logo .vv{color:#FBBF24}
+  .splash-bar{width:120px;height:3px;background:rgba(255,255,255,.06);overflow:hidden;position:relative}
+  .splash-bar::after{content:'';position:absolute;left:0;top:0;bottom:0;width:40%;background:#FBBF24;animation:splashLoad 1.5s ease-in-out infinite}
+  @keyframes splashLoad{0%{left:-40%}100%{left:100%}}
+  .splash-tag{font-family:'Space Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.12)}
+
+  /* Merch mockup */
+  .merch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:2px}
+  .merch-card{padding:40px 24px;display:flex;align-items:center;justify-content:center;min-height:160px;border:1px solid rgba(255,255,255,.04)}
+  .merch-hoodie{background:#1A1A1A;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .merch-hoodie-text{font-size:24px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#F5F5F0}
+  .merch-hoodie-text .vv{color:#FBBF24}
+  .merch-hoodie-sub{font-family:'Space Mono',monospace;font-size:7px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.1)}
+  .merch-cap{background:#0A0A0A;display:flex;align-items:center;justify-content:center}
+  .merch-cap-text{font-size:14px;font-weight:800;color:#FBBF24;letter-spacing:-.02em}
+  .merch-sticker{background:#FBBF24;display:flex;align-items:center;justify-content:center}
+  .merch-sticker-text{font-size:20px;font-weight:800;color:#0A0A0A;letter-spacing:-.04em;transform:rotate(-5deg)}
+  .merch-tote{background:#F5F5F0;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .merch-tote-text{font-size:22px;font-weight:800;letter-spacing:-.04em;color:#0A0A0A}
+  .merch-tote-text .vv{color:#FBBF24}
+  .merch-tote-sub{font-family:'Space Mono',monospace;font-size:7px;text-transform:uppercase;letter-spacing:.06em;color:rgba(0,0,0,.2)}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="page-header">
+  <div class="page-eyebrow">Brand Identity · Round 2</div>
+  <div class="page-title"><span>Bigmovv</span> Extended Explorations</div>
+  <div class="page-sub">15 more logo directions pushing typography, iconography, and context. Plus real-world mockups showing the brand in the wild.</div>
+</div>
+
+<!-- V12: BOLD ITALIC -->
+<div class="section">
+  <div class="s-label">12 · Italic Wordmark</div>
+  <div class="s-title">Speed & motion</div>
+  <div class="s-desc">Italic implies forward movement. You're not standing still — you're in motion. The lean says "momentum." Most athletic-feeling execution. Nike energy.</div>
+  <div class="grid">
+    <div class="card dark"><div class="tag">Dark</div><div class="v12 v12-d">bigmo<span class="vv">vv</span></div></div>
+    <div class="card light"><div class="tag">Light</div><div class="v12 v12-l">bigmo<span class="vv">vv</span></div></div>
+    <div class="card yellow"><div class="tag">Brand</div><div class="v12" style="color:#0A0A0A">bigmo<span class="vv" style="opacity:.35">vv</span></div></div>
+    <div class="card dark"><div class="tag">Caps</div><div class="v12 v12-d" style="text-transform:uppercase;letter-spacing:0">bigmo<span class="vv">vv</span></div></div>
+  </div>
+</div>
+
+<!-- V13: DOUBLE CHECK -->
+<div class="section">
+  <div class="s-label">13 · Double Check</div>
+  <div class="s-title">VV as ✓✓</div>
+  <div class="s-desc">The double V reimagined as a double checkmark — double verified, double confirmed. "You're not just matched, you're double-checked." WhatsApp blue ticks energy but for your career.</div>
+  <div class="grid">
+    <div class="card dark"><div class="tag">Dark</div><div class="v13"><div class="v13-icon"><svg viewBox="0 0 28 28" fill="none"><path d="M4 14L10 20L24 6" stroke="#0A0A0A" stroke-width="3" stroke-linecap="square"/><path d="M10 14L16 20L28 6" stroke="#0A0A0A" stroke-width="3" stroke-linecap="square" opacity=".35"/></svg></div><div class="v13-text v13-d">Bigmovv</div></div></div>
+    <div class="card light"><div class="tag">Light</div><div class="v13"><div class="v13-icon"><svg viewBox="0 0 28 28" fill="none"><path d="M4 14L10 20L24 6" stroke="#0A0A0A" stroke-width="3" stroke-linecap="square"/><path d="M10 14L16 20L28 6" stroke="#0A0A0A" stroke-width="3" stroke-linecap="square" opacity=".35"/></svg></div><div class="v13-text v13-l">Bigmovv</div></div></div>
+    <div class="card dark"><div class="tag">Inverted</div><div class="v13"><div class="v13-icon v13-icon-inv"><svg viewBox="0 0 28 28" fill="none"><path d="M4 14L10 20L24 6" stroke="#FBBF24" stroke-width="3" stroke-linecap="square"/><path d="M10 14L16 20L28 6" stroke="#FBBF24" stroke-width="3" stroke-linecap="square" opacity=".35"/></svg></div><div class="v13-text v13-d">Bigmovv</div></div></div>
+  </div>
+</div>
+
+<!-- V14: KNOCKOUT BAR -->
+<div class="section">
+  <div class="s-label">14 · Knockout Bar</div>
+  <div class="s-title">Full highlight</div>
+  <div class="s-desc">The entire name inside a colored bar. Maximum impact, zero subtlety. The name punches you in the face. Supreme box logo energy.</div>
+  <div class="grid">
+    <div class="card dark"><div class="tag">Yellow Bar</div><div class="v14"><div class="v14-inner">bigmo<span class="vv">vv</span></div></div></div>
+    <div class="card light"><div class="tag">Dark Bar</div><div class="v14"><div class="v14-inner v14-inner-inv">bigmo<span class="vv">vv</span></div></div></div>
+    <div class="card charcoal"><div class="tag">Yellow Caps</div><div class="v14"><div class="v14-inner" style="text-transform:uppercase;letter-spacing:-.02em">bigmo<span class="vv">vv</span></div></div></div>
+  </div>
+</div>
+
+<!-- V15: SPACE GROTESK -->
+<div class="section">
+  <div class="s-label">15 · Space Grotesk</div>
+  <div class="s-title">Modern geometric sans</div>
+  <div class="s-desc">Space Grotesk — a geometric sans-serif with character. More contemporary than Sora, more personality than Inter. The letterforms have subtle quirkiness that makes the brand feel designed, not defaulted.</div>
+  <div class="grid">
+    <div class="card dark"><div class="tag">Dark</div><div class="v15 v15-d">bigmo<span class="vv">vv</span></div></div>
+    <div class="card light"><div class="tag">Light</div><div class="v15 v15-l">bigmo<span class="vv">vv</span></div></div>
+    <div class="card dark"><div class="tag">Caps</div><div class="v15 v15-d" style="text-transform:uppercase;letter-spacing:-.01em">bigmo<span class="vv">vv</span></div></div>
+  </div>
+</div>
+
+<!-- V16: CIRCLE MARK -->
+<div class="section">
+  <div class="s-label">16 · Circle Mark</div>
+  <div class="s-title">Rounded VV</div>
+  <div class="s-desc">VV inside a circle — softer, warmer, more approachable. Breaks the brutalist square grid intentionally. The circle says "we're human" while the typography says "we're serious."</div>
+  <div class="grid">
+    <div class="card dark"><div class="tag">Filled</div><div class="v16"><div class="v16-circle">VV</div><div class="v16-text v16-d">Bigmovv</div></div></div>
+    <div class="card dark"><div class="tag">Outlined</div><div class="v16"><div class="v16-circle v16-circle-inv">VV</div><div class="v16-text v16-d">Bigmovv</div></div></div>
+    <div class="card light"><div class="tag">Light</div><div class="v16"><div class="v16-circle">VV</div><div class="v16-text v16-l">Bigmovv</div></div></div>
+    <div class="card offwhite"><div class="tag">Off-white</div><div class="v16"><div class="v16-circle v16-circle-dark">VV</div><div class="v16-text v16-l">Bigmovv</div></div></div>
+  </div>
+</div>
+
+<!-- V17: SLASH -->
+<div class="section">
+  <div class="s-label">17 · Slash Separator</div>
+  <div class="s-title">big/movv</div>
+  <div class="s-desc">A forward slash separates the words. The slash implies division AND forward movement. URL-native — "big/movv" reads like a path. Developer energy meets editorial style.</div>
+  <div class="grid">
+    <div class="card dark"><div class="tag">Dark</div><div class="v17 v17-d">big<span class="slash">/</span>movv</div></div>
+    <div class="card light"><div class="tag">Light</div><div class="v17 v17-l">big<span class="slash" style="color:#0A0A0A;opacity:.2">/</span>movv</div></div>
+    <div class="card dark"><div class="tag">Caps</div><div class="v17 v17-d" style="text-transform:uppercase;letter-spacing:-.02em">big<span class="slash">/</span>movv</div></div>
+  </div>
+</div>
+
+<!-- V18: WEIGHT CONTRAST -->
+<div class="section">
+  <div class="s-label">18 · Weight Contrast</div>
+  <div class="s-title">Light big, heavy movv</div>
+  <div class="s-desc">Thin weight "big" transitions to heavy "movv." The visual weight shift represents the transformation — from lightweight browsing to heavy-hitting matches. The VV in yellow anchors the heavy end.</div>
+  <div class="grid">
+    <div class="card dark"><div class="tag">Dark</div><div class="v18 v18-d"><span class="thin">big</span><span class="bold">mo<span class="vv">vv</span></span></div></div>
+    <div class="card light"><div class="tag">Light</div><div class="v18 v18-l"><span class="thin">big</span><span class="bold">mo<span class="vv">vv</span></span></div></div>
+    <div class="card dark"><div class="tag">Reversed</div><div class="v18 v18-d"><span class="bold">big</span><span class="thin" style="opacity:.3">movv</span></div></div>
+  </div>
+</div>
+
+<!-- V19: OFFSET SHADOW -->
+<div class="section">
+  <div class="s-label">19 · Shadow Offset</div>
+  <div class="s-title">Depth layer</div>
+  <div class="s-desc">A yellow ghost sits behind the white wordmark — a shadow/echo effect. Creates depth and visual impact. The offset suggests motion, like the brand is moving forward and leaving a trail.</div>
+  <div class="grid">
+    <div class="card dark"><div class="tag">Dark</div><div class="v19 v19-d"><div class="v19-back">bigmovv</div><div class="v19-front">bigmovv</div></div></div>
+    <div class="card charcoal"><div class="tag">Charcoal</div><div class="v19 v19-d"><div class="v19-back">bigmovv</div><div class="v19-front">bigmovv</div></div></div>
+  </div>
+</div>
+
+<!-- V20: BRACKET WRAP -->
+<div class="section">
+  <div class="s-label">20 · Bracket Wrap</div>
+  <div class="s-title">[bigmovv]</div>
+  <div class="s-desc">Square brackets frame the name. Array notation, code syntax, editorial reference — all at once. The brackets say "this is the variable that changes your career." Developer-native.</div>
+  <div class="grid">
+    <div class="card dark"><div class="tag">Dark</div><div class="v20"><div class="v20-bracket">[</div><div class="v20-name v20-d">bigmovv</div><div class="v20-bracket">]</div></div></div>
+    <div class="card light"><div class="tag">Light</div><div class="v20"><div class="v20-bracket v20-bracket-d">[</div><div class="v20-name v20-l">bigmovv</div><div class="v20-bracket v20-bracket-d">]</div></div></div>
+  </div>
+</div>
+
+<!-- V21: ARROW ON VV -->
+<div class="section">
+  <div class="s-label">21 · Arrow Accent</div>
+  <div class="s-title">Subtle direction</div>
+  <div class="s-desc">A small ↗ arrow sits above the VV — a subtle indicator of upward movement. The lightest possible touch of "momentum" without changing the wordmark. Works in small sizes.</div>
+  <div class="grid">
+    <div class="card dark"><div class="tag">Dark</div><div class="v21 v21-d">bigmo<span class="vv-arrow">vv</span></div></div>
+    <div class="card light"><div class="tag">Light</div><div class="v21 v21-l">bigmo<span class="vv-arrow" style="color:#0A0A0A">vv</span></div></div>
+  </div>
+</div>
+
+<!-- V22: UNDERLINE VV -->
+<div class="section">
+  <div class="s-label">22 · VV Underline</div>
+  <div class="s-title">Emphasis mark</div>
+  <div class="s-desc">The VV gets a thick underline — like highlighting the most important part of a document. The underline is the score bar, the emphasis, the "look here." Editorial meets data.</div>
+  <div class="grid">
+    <div class="card dark"><div class="tag">Dark</div><div class="v22"><div class="v22-text v22-d">bigmo<span class="vv">vv</span></div></div></div>
+    <div class="card light"><div class="tag">Light</div><div class="v22"><div class="v22-text v22-l">bigmo<span class="vv">vv</span></div></div></div>
+  </div>
+</div>
+
+<!-- V23: CROPPED VV ICON -->
+<div class="section">
+  <div class="s-label">23 · Cropped VV</div>
+  <div class="s-title">Oversized, cropped</div>
+  <div class="s-desc">A massive VV overflows the square — only the bottom half is visible. Creates intrigue and visual tension. The brand is bigger than its container. Ambition overflowing.</div>
+  <div class="grid">
+    <div class="card dark"><div class="tag">Dark</div><div class="v23"><div class="v23-mark"><div class="v23-mark-inner">VV</div></div><div class="v23-text v23-d">Bigmovv</div></div></div>
+    <div class="card light"><div class="tag">Light</div><div class="v23"><div class="v23-mark"><div class="v23-mark-inner">VV</div></div><div class="v23-text v23-l">Bigmovv</div></div></div>
+    <div class="card dark"><div class="tag">Inverted</div><div class="v23"><div class="v23-mark v23-mark-inv"><div class="v23-mark-inner">VV</div></div><div class="v23-text v23-d">Bigmovv</div></div></div>
+  </div>
+</div>
+
+<!-- V24: FADING VV -->
+<div class="section">
+  <div class="s-label">24 · Fading VV</div>
+  <div class="s-title">Echo effect</div>
+  <div class="s-desc">The first V is full opacity, the second V fades. Like an echo, an afterimage, momentum trailing behind you. Your big move reverberates.</div>
+  <div class="grid">
+    <div class="card dark"><div class="tag">Dark</div><div class="v24 v24-d">bigmo<span class="v1st">v</span><span class="v2nd">v</span></div></div>
+    <div class="card light"><div class="tag">Light</div><div class="v24 v24-l">bigmo<span class="v1st" style="color:#0A0A0A">v</span><span class="v2nd" style="color:#0A0A0A">v</span></div></div>
+    <div class="card dark"><div class="tag">Reversed Fade</div><div class="v24 v24-d">bigmo<span class="v2nd">v</span><span class="v1st">v</span></div></div>
+  </div>
+</div>
+
+<!-- V25: PILL ICON -->
+<div class="section">
+  <div class="s-label">25 · Pill Mark</div>
+  <div class="s-title">Rounded container</div>
+  <div class="s-desc">VV in a pill/capsule shape. Friendliest icon option — approachable, modern, warm. Breaking from the brutalist squares deliberately to signal "we're for humans, not machines."</div>
+  <div class="grid">
+    <div class="card dark"><div class="tag">Dark</div><div class="v25"><div class="v25-pill">VV</div><div class="v25-text v25-d">Bigmovv</div></div></div>
+    <div class="card light"><div class="tag">Light</div><div class="v25"><div class="v25-pill">VV</div><div class="v25-text v25-l">Bigmovv</div></div></div>
+    <div class="card dark"><div class="tag">Inverted</div><div class="v25"><div class="v25-pill v25-pill-inv">VV</div><div class="v25-text v25-d">Bigmovv</div></div></div>
+  </div>
+</div>
+
+<!-- V26: PERIOD END -->
+<div class="section">
+  <div class="s-label">26 · Terminal Period</div>
+  <div class="s-title">bigmovv.</div>
+  <div class="s-desc">A yellow period at the end. The period is definitive — a full stop. "This is it. Period." The simplest possible brand mark that says "we're done talking, we deliver." Basecamp energy.</div>
+  <div class="grid">
+    <div class="card dark"><div class="tag">Dark</div><div class="v26 v26-d">bigmovv<span class="period">.</span></div></div>
+    <div class="card light"><div class="tag">Light</div><div class="v26 v26-l">bigmovv<span class="period">.</span></div></div>
+    <div class="card dark"><div class="tag">Caps</div><div class="v26 v26-d" style="text-transform:uppercase;letter-spacing:-.02em">bigmovv<span class="period">.</span></div></div>
+    <div class="card yellow"><div class="tag">Brand</div><div class="v26" style="color:#0A0A0A">bigmovv<span class="period" style="color:#0A0A0A;opacity:.3">.</span></div></div>
+  </div>
+</div>
+
+<!-- ============ CONTEXTUAL MOCKUPS ============ -->
+
+<div class="section">
+  <div class="s-label">Mockups</div>
+  <div class="s-title">In the wild</div>
+  <div class="s-desc">How Bigmovv looks in real product contexts — mobile app, email, splash screen, and merchandise.</div>
+
+  <div class="grid grid-wide" style="margin-bottom:2px">
+    <!-- Mobile App -->
+    <div class="card dark" style="padding:24px;align-items:flex-start"><div class="tag">Mobile App</div>
+      <div class="app-mock" style="margin-top:16px">
+        <div class="app-header">
+          <div class="app-logo">bigmo<span class="vv">vv</span></div>
+          <div class="app-avatar">GW</div>
+        </div>
+        <div class="app-body">
+          <div class="app-greeting">Good morning, Godwin</div>
+          <div class="app-score-label">Your score: <span>92%</span></div>
+          <div class="app-card"><div class="app-card-left"><div class="app-card-icon">🎵</div><div class="app-card-info"><div class="app-card-company">Spotify · Remote</div><div class="app-card-role">Senior Product Designer</div><div class="app-card-meta">₱85K–120K · Full-Time</div></div></div><div class="app-card-score score-hi">95%</div></div>
+          <div class="app-card"><div class="app-card-left"><div class="app-card-icon">💜</div><div class="app-card-info"><div class="app-card-company">Stripe · Remote</div><div class="app-card-role">Design Engineer</div><div class="app-card-meta">₱90K–140K · Full-Time</div></div></div><div class="app-card-score score-hi">89%</div></div>
+          <div class="app-card"><div class="app-card-left"><div class="app-card-icon">▲</div><div class="app-card-info"><div class="app-card-company">Vercel · Remote</div><div class="app-card-role">Frontend Developer</div><div class="app-card-meta">₱75K–110K · Full-Time</div></div></div><div class="app-card-score score-md">82%</div></div>
+        </div>
+        <div class="app-tab">
+          <div class="app-tab-item active">Matches</div>
+          <div class="app-tab-item">Skills</div>
+          <div class="app-tab-item">Explore</div>
+          <div class="app-tab-item">Profile</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Email -->
+    <div class="card dark" style="padding:24px;align-items:flex-start"><div class="tag">Email Digest</div>
+      <div class="email-mock" style="margin-top:16px">
+        <div class="email-header">
+          <div class="email-logo-mark">VV</div>
+          <div class="email-logo-text">Bigmovv</div>
+        </div>
+        <div class="email-subject">Your weekly score update 📊</div>
+        <div class="email-body">
+          Hey Godwin,<br><br>
+          Your Bigmovv score went up this week. You now match <div class="email-score">92%</div> with 32 roles including Senior Product Designer at Spotify and Design Engineer at Stripe.<br><br>
+          Learning TypeScript would unlock 28 more jobs and push your score above 95%.
+          <br><br>
+          <div class="email-cta">See Your Matches →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-wide" style="margin-bottom:2px">
+    <!-- Splash -->
+    <div class="card dark" style="padding:24px;align-items:flex-start"><div class="tag">App Splash</div>
+      <div class="splash-mock" style="margin-top:16px">
+        <div class="splash-logo">bigmo<span class="vv">vv</span></div>
+        <div class="splash-bar"></div>
+        <div class="splash-tag">Make your big move</div>
+      </div>
+    </div>
+
+    <!-- Merch -->
+    <div class="card dark" style="padding:24px;align-items:flex-start"><div class="tag">Merchandise</div>
+      <div class="merch-grid" style="margin-top:16px;width:100%">
+        <div class="merch-card merch-hoodie"><div class="merch-hoodie-text">BIGMO<span class="vv">VV</span></div><div class="merch-hoodie-sub">Make your big move</div></div>
+        <div class="merch-card merch-cap"><div class="merch-cap-text">VV</div></div>
+        <div class="merch-card merch-sticker"><div class="merch-sticker-text">bigmovv</div></div>
+        <div class="merch-card merch-tote"><div class="merch-tote-text">bigmo<span class="vv">vv</span></div><div class="merch-tote-sub">Career intelligence</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</div>
+</body>
+</html>

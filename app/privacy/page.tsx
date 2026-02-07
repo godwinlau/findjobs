@@ -1,7 +1,7 @@
 import { colors } from "@/lib/constants/colors";
 
 export const metadata = {
-  title: "Privacy Policy | HanapBuhay",
+  title: "Privacy Policy | bigmovv",
 };
 
 export default function PrivacyPage() {

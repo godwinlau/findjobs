@@ -14,6 +14,7 @@ import {
   EDUCATION_LEVELS,
   EMPLOYMENT_TYPES,
   WORK_CATEGORIES,
+  VISIBLE_WORK_CATEGORIES,
 } from "@/lib/constants/onboarding";
 import { updateProfile } from "@/app/profile/actions";
 import type { Profile, SkillProficiency } from "@/lib/types";
@@ -257,7 +258,7 @@ function WorkCategoryChipSelector({
         Work categories
       </label>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-        {WORK_CATEGORIES.map((cat) => {
+        {VISIBLE_WORK_CATEGORIES.map((cat) => {
           const isSelected = selected.includes(cat.value);
           return (
             <button

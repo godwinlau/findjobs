@@ -11,15 +11,20 @@ import { FaqSection } from "./FaqSection";
 import { FinalCta } from "./FinalCta";
 import { StickyCta } from "./StickyCta";
 import { LandingFooter } from "./LandingFooter";
+import type { SkillCount } from "@/lib/data/skill-counts";
 
-export function LandingPage() {
+interface LandingPageProps {
+  skillCounts?: SkillCount[];
+}
+
+export function LandingPage({ skillCounts }: LandingPageProps) {
   return (
     <div style={{ background: "#F5F5F0", color: "#0A0A0A", overflowX: "hidden" }}>
       <LandingNav />
       <Ticker />
       <HeroSection />
       <LogoStrip />
-      <SkillDemo />
+      <SkillDemo skillCounts={skillCounts} />
       <BeforeAfter />
       <HowItWorks />
       <CommunitySection />

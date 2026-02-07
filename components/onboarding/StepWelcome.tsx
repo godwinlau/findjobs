@@ -27,7 +27,7 @@ export function StepWelcome({
   return (
     <div className="ob-main">
       <div className="ob-content">
-        <div className="ob-welcome-tag">Welcome to HanapBuhay</div>
+        <div className="ob-welcome-tag">Welcome to bigmovv</div>
         <div className="ob-title">
           Let&apos;s set up <span>your feed</span>
         </div>

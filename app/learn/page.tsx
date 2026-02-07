@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { SKILL_CATEGORIES } from "@/lib/constants/onboarding";
+import { VISIBLE_SKILL_CATEGORIES } from "@/lib/constants/onboarding";
+import { FOCUS_ASSESSMENT_CATEGORIES } from "@/lib/constants/focusVerticals";
 import { Navbar } from "@/components/layout";
 import { buildSkillsSnapshot, selectQuestions } from "@/lib/learn";
 import {
@@ -51,19 +52,22 @@ export default async function LearnPage() {
   const userSkills: string[] = profile?.skills ?? [];
   const experienceLevel: ProfileExperienceLevel =
     profile?.experience_level ?? "fresh_graduate";
-  const snapshot = buildSkillsSnapshot(userSkills, SKILL_CATEGORIES);
+  const snapshot = buildSkillsSnapshot(userSkills, VISIBLE_SKILL_CATEGORIES);
 
   // Build tailored assessments with questions selected per user context
-  const tailoredAssessments: SkillAssessment[] = skillAssessments.map((a) => {
-    const pool = questionBank[a.categoryId] ?? [];
-    const categorySkills = SKILL_CATEGORIES[a.categoryId] ?? [];
-    const questions = selectQuestions(pool, {
-      experienceLevel,
-      userSkills,
-      categorySkills,
+  const focusAssessmentSet = new Set<string>(FOCUS_ASSESSMENT_CATEGORIES);
+  const tailoredAssessments: SkillAssessment[] = skillAssessments
+    .filter((a) => focusAssessmentSet.has(a.categoryId))
+    .map((a) => {
+      const pool = questionBank[a.categoryId] ?? [];
+      const categorySkills = VISIBLE_SKILL_CATEGORIES[a.categoryId] ?? [];
+      const questions = selectQuestions(pool, {
+        experienceLevel,
+        userSkills,
+        categorySkills,
+      });
+      return { ...a, questions };
     });
-    return { ...a, questions };
-  });
 
   // Build recommendation context
   const assessmentScores: Record<string, { score: number; total: number }> = {};
@@ -87,7 +91,7 @@ export default async function LearnPage() {
     profile,
     snapshot,
     assessmentScores,
-    SKILL_CATEGORIES
+    VISIBLE_SKILL_CATEGORIES
   );
 
   // Compute personalized data

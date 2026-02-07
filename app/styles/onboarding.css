@@ -5,8 +5,8 @@
 /* ============ TOP BAR ============ */
 .ob-topbar { background: #0A0A0A; color: #F5F5F0; padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
 .ob-topbar-left { display: flex; align-items: center; gap: 10px; }
-.ob-topbar-logo { width: 30px; height: 30px; background: #FBBF24; display: flex; align-items: center; justify-content: center; font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; color: #0A0A0A; }
-.ob-topbar-wordmark { font-size: 15px; font-weight: 800; letter-spacing: -0.03em; }
+.ob-topbar-wordmark { font-size: 18px; font-weight: 800; letter-spacing: -0.04em; }
+.ob-topbar-period { color: #FBBF24; }
 .ob-topbar-skip { font-family: 'Space Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(255,255,255,0.25); cursor: pointer; border: 0; background: 0; transition: color 0.15s; padding: 8px 0; }
 .ob-topbar-skip:hover { color: rgba(255,255,255,0.5); }
 

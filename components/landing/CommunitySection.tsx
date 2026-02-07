@@ -31,7 +31,7 @@ export function CommunitySection() {
             Meet the community
           </div>
           <div className="lp-section-sub">
-            12,000+ Filipino professionals using HanapBuhay to find better work.
+            12,000+ Filipino professionals using bigmovv to find better work.
             Here&apos;s some of them.
           </div>
 

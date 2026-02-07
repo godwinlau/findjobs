@@ -50,7 +50,7 @@ export function isProfileSufficient(profile: Profile | null): boolean {
 
 // ─── Skill normalization ───
 
-function normalizeSkill(raw: string): string {
+export function normalizeSkill(raw: string): string {
   const key = raw.toLowerCase().trim();
   return SKILL_ALIASES[key] ?? key;
 }

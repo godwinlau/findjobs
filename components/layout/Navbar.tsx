@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Logo } from "@/components/ui";
 import { UserMenu } from "./UserMenu";
 
 interface NavItem {
@@ -73,31 +72,16 @@ export function Navbar({ fullName, email }: NavbarProps) {
             transition: "opacity 0.15s",
           }}
         >
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              background: "#FBBF24",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: "var(--font-mono)",
-              fontSize: 14,
-              fontWeight: 700,
-              color: "#0A0A0A",
-            }}
-          >
-            HB
-          </div>
           <span
             style={{
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: 800,
-              letterSpacing: "-0.03em",
-              textTransform: "uppercase" as const,
+              letterSpacing: "-0.04em",
+              color: "#F5F5F0",
             }}
           >
-            HanapBuhay
+            bigmovv
+            <span style={{ color: "#FBBF24" }}>.</span>
           </span>
         </Link>
 

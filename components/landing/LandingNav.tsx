@@ -7,8 +7,7 @@ export function LandingNav() {
     <nav className="lp-nav">
       <div className="lp-nav-inner">
         <Link className="lp-nav-brand" href="/">
-          <div className="lp-nav-logo">HB</div>
-          <span className="lp-nav-wordmark">HanapBuhay</span>
+          <span className="lp-nav-wordmark">bigmovv<span className="lp-nav-period">.</span></span>
         </Link>
         <div className="lp-nav-links">
           <a className="lp-nav-link" href="#how">

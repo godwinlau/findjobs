@@ -8,8 +8,7 @@ export function TopBar({ onSkip }: TopBarProps) {
   return (
     <div className="ob-topbar">
       <div className="ob-topbar-left">
-        <div className="ob-topbar-logo">HB</div>
-        <span className="ob-topbar-wordmark">HanapBuhay</span>
+        <span className="ob-topbar-wordmark">bigmovv<span className="ob-topbar-period">.</span></span>
       </div>
       {onSkip && (
         <button className="ob-topbar-skip" onClick={onSkip}>

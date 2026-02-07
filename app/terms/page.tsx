@@ -1,7 +1,7 @@
 import { colors } from "@/lib/constants/colors";
 
 export const metadata = {
-  title: "Terms of Service | HanapBuhay",
+  title: "Terms of Service | bigmovv",
 };
 
 export default function TermsPage() {
@@ -26,7 +26,7 @@ export default function TermsPage() {
           1. Acceptance of Terms
         </h2>
         <p style={{ lineHeight: 1.7, color: colors.textSec }}>
-          By accessing and using HanapBuhay, you accept and agree to be bound by these
+          By accessing and using bigmovv, you accept and agree to be bound by these
           Terms of Service. If you do not agree to these terms, please do not use our
           service.
         </p>
@@ -37,7 +37,7 @@ export default function TermsPage() {
           2. Description of Service
         </h2>
         <p style={{ lineHeight: 1.7, color: colors.textSec }}>
-          HanapBuhay is a job matching platform that connects job seekers with
+          bigmovv is a job matching platform that connects job seekers with
           employment opportunities in the Philippines. We provide personalized job
           recommendations based on your skills, experience, and preferences.
         </p>
@@ -70,7 +70,7 @@ export default function TermsPage() {
           5. Job Listings
         </h2>
         <p style={{ lineHeight: 1.7, color: colors.textSec }}>
-          Job listings on HanapBuhay are aggregated from various sources. We do not
+          Job listings on bigmovv are aggregated from various sources. We do not
           guarantee the accuracy, completeness, or availability of any job posting.
           Always verify job details directly with the employer.
         </p>
@@ -81,7 +81,7 @@ export default function TermsPage() {
           6. Limitation of Liability
         </h2>
         <p style={{ lineHeight: 1.7, color: colors.textSec }}>
-          HanapBuhay is provided &quot;as is&quot; without warranties of any kind. We are not
+          bigmovv is provided &quot;as is&quot; without warranties of any kind. We are not
           liable for any damages arising from your use of our service or reliance on
           job listings displayed on our platform.
         </p>

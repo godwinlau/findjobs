@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { colors } from "@/lib/constants/colors";
-import { SKILL_CATEGORIES } from "@/lib/constants/onboarding";
+import { VISIBLE_SKILL_CATEGORIES } from "@/lib/constants/onboarding";
 import { SKILL_AFFINITIES } from "@/lib/constants/skillAffinities";
 import { CATEGORY_SKILL_MAP } from "@/lib/constants/categorySkillMap";
 import { SKILL_CLUSTERS } from "@/lib/constants/skillTaxonomy";
@@ -372,7 +372,7 @@ export function SkillChipSelector({
       )}
 
       {/* All skill categories (12 clusters, collapsible) */}
-      {Object.entries(SKILL_CATEGORIES).map(([category, skills]) => {
+      {Object.entries(VISIBLE_SKILL_CATEGORIES).map(([category, skills]) => {
         // Filter out excluded skills first, then apply search
         const availableSkills = skills.filter((s) => !excludeSet.has(s));
         const filteredSkills = search

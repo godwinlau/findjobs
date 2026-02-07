@@ -8,6 +8,7 @@ export { BeforeAfter } from "./BeforeAfter";
 export { HowItWorks } from "./HowItWorks";
 export { CommunitySection } from "./CommunitySection";
 export { TestimonialsSection } from "./TestimonialsSection";
+export { FeatureCard } from "./FeatureCard";
 export { FeaturesSection } from "./FeaturesSection";
 export { FaqSection } from "./FaqSection";
 export { FinalCta } from "./FinalCta";

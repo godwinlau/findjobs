@@ -14,11 +14,15 @@
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.94.0",
     "@vnedyalk0v/react19-simple-maps": "^2.0.2",
+    "clsx": "^2.1.1",
     "linkedin-jobs-api": "^1.0.7",
+    "lucide-react": "^0.563.0",
+    "motion": "^12.33.0",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "recharts": "^3.7.0",
+    "tailwind-merge": "^3.4.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

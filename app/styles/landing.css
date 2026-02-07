@@ -35,23 +35,14 @@
   color: #F5F5F0;
 }
 
-.lp-nav-logo {
-  width: 30px;
-  height: 30px;
-  background: #FBBF24;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Space Mono', monospace;
-  font-size: 13px;
-  font-weight: 700;
-  color: #0A0A0A;
+.lp-nav-wordmark {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -.04em;
 }
 
-.lp-nav-wordmark {
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: -.03em;
+.lp-nav-period {
+  color: #FBBF24;
 }
 
 .lp-nav-links {
@@ -891,6 +882,16 @@
   transform: translate(-1px, -1px);
 }
 
+.lp-dr-big.lp-dr-loading {
+  opacity: 0.5;
+  animation: lp-dr-pulse 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes lp-dr-pulse {
+  from { opacity: 0.3; }
+  to { opacity: 0.7; }
+}
+
 .lp-dr-empty {
   font-family: 'Space Mono', monospace;
   font-size: 10px;
@@ -1059,7 +1060,7 @@
   font-size: 9px;
   text-transform: uppercase;
   letter-spacing: .05em;
-  color: #FBBF24;
+  color: #B45309;
 }
 
 /* ============ STATS ============ */
@@ -1399,6 +1400,7 @@
   background: #FBBF24;
 }
 
+
 .lp-feat-title {
   font-size: 16px;
   font-weight: 800;
@@ -1416,7 +1418,7 @@
   font-size: 8px;
   text-transform: uppercase;
   letter-spacing: .05em;
-  color: #FBBF24;
+  color: #B45309;
   margin-top: auto;
   padding-top: 4px;
 }

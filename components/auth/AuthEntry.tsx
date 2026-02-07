@@ -30,7 +30,7 @@ export function AuthEntry({ initialMode }: { initialMode: Mode }) {
     setSent(false);
   }
 
-  function handleSocialAuth(provider: "google" | "apple") {
+  function handleSocialAuth(provider: "google") {
     const supabase = createClient();
     const redirectTo = `${window.location.origin}/auth/callback`;
     supabase.auth.signInWithOAuth({
@@ -72,8 +72,7 @@ export function AuthEntry({ initialMode }: { initialMode: Mode }) {
       <div className="auth-left-panel">
         <div className="auth-lp-top">
           <div className="auth-lp-brand">
-            <div className="auth-lp-logo">HB</div>
-            <div className="auth-lp-wordmark">HanapBuhay</div>
+            <div className="auth-lp-wordmark">bigmovv<span className="auth-lp-period">.</span></div>
           </div>
           <div className="auth-lp-headline">
             Find work that <span>fits you</span>
@@ -108,8 +107,7 @@ export function AuthEntry({ initialMode }: { initialMode: Mode }) {
         <div className="auth-box">
           {/* Mobile brand */}
           <div className="auth-mobile-brand">
-            <div className="auth-lp-logo">HB</div>
-            <div className="auth-lp-wordmark">HanapBuhay</div>
+            <div className="auth-lp-wordmark">bigmovv<span className="auth-lp-period">.</span></div>
           </div>
 
           {sent ? (
@@ -176,16 +174,6 @@ export function AuthEntry({ initialMode }: { initialMode: Mode }) {
                     />
                   </svg>
                   Continue with Google
-                </button>
-                <button
-                  className="auth-social-btn"
-                  type="button"
-                  onClick={() => handleSocialAuth("apple")}
-                >
-                  <svg viewBox="0 0 24 24" fill="#0A0A0A">
-                    <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.51-3.23 0-1.44.64-2.2.46-3.06-.4C3.79 16.17 4.36 9.53 8.8 9.28c1.27.06 2.15.72 2.9.76.97-.2 1.9-.77 2.93-.7 1.24.1 2.17.58 2.78 1.49-2.55 1.53-1.95 4.89.58 5.83-.47 1.22-.97 2.41-1.94 3.62zM12.05 9.22c-.12-2.19 1.68-4.06 3.73-4.22.28 2.35-2.12 4.39-3.73 4.22z" />
-                  </svg>
-                  Continue with Apple
                 </button>
               </div>
 

@@ -364,10 +364,10 @@ export function rankQuickWins(
 // ─── Free Resources Ranking ───
 
 const RESOURCE_CATEGORY_MAP: Record<string, string[]> = {
-  "General": ["Virtual Assistance & Admin", "BPO & Customer Service", "Sales & Business Dev"],
-  "Tech & Business": ["Software Development", "Data & Analytics", "Finance & Accounting"],
+  "General": ["Virtual Assistance & Admin", "BPO & Customer Service"],
+  "Tech & Business": ["Software Development"],
   "Tech & Dev": ["Software Development"],
-  "Business": ["Finance & Accounting", "Sales & Business Dev", "Virtual Assistance & Admin"],
+  "Business": ["Virtual Assistance & Admin"],
   "Design": ["Design & Creative"],
 };
 

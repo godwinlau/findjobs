@@ -7,7 +7,7 @@ export function LogoStrip() {
     <ScrollReveal className="lp-logo-strip">
       <div className="lp-logo-inner">
         <div className="lp-logo-label">
-          Companies hiring through HanapBuhay
+          Companies hiring through bigmovv
         </div>
         <div className="lp-logo-row">
           {logos.map((name) => (

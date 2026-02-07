@@ -17,7 +17,7 @@ const testimonials = [
   },
   {
     quote:
-      "I'm from Davao and always felt left out of Manila-centric platforms. HanapBuhay showed me remote roles I never knew existed. Hired at Canva within 2 weeks.",
+      "I'm from Davao and always felt left out of Manila-centric platforms. bigmovv showed me remote roles I never knew existed. Hired at Canva within 2 weeks.",
     name: "Alyssa L.",
     role: "UX Researcher \u00B7 Davao",
     initials: "AL",

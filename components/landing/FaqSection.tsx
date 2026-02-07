@@ -14,7 +14,7 @@ const faqs = [
   },
   {
     q: "Are these real jobs from real companies?",
-    a: "Every job on our platform is verified. We aggregate from company career pages, partner APIs, and direct employer postings. No fake listings, no duplicates, no expired roles. If a job is on HanapBuhay, you can apply to it today.",
+    a: "Every job on our platform is verified. We aggregate from company career pages, partner APIs, and direct employer postings. No fake listings, no duplicates, no expired roles. If a job is on bigmovv, you can apply to it today.",
   },
   {
     q: "I\u2019m outside Manila. Will this work for me?",

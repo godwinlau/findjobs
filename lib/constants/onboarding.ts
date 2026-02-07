@@ -163,6 +163,29 @@ export const EMPLOYMENT_TYPES = [
   { value: "any", label: "Any" },
 ] as const;
 
+// ─── Focus-vertical filtered views (UI only — originals stay intact) ───
+
+import { isFocusWorkCategory } from "@/lib/constants/focusVerticals";
+
+const FOCUS_SKILL_CATEGORY_KEYS = new Set([
+  "Software Development",
+  "Design & Creative",
+  "BPO & Customer Service",
+  "Marketing & Content",
+  "Virtual Assistance & Admin",
+]);
+
+export const VISIBLE_WORK_CATEGORIES = WORK_CATEGORIES.filter((c) =>
+  isFocusWorkCategory(c.value)
+);
+
+export const VISIBLE_SKILL_CATEGORIES: Record<string, string[]> =
+  Object.fromEntries(
+    Object.entries(SKILL_CATEGORIES).filter(([key]) =>
+      FOCUS_SKILL_CATEGORY_KEYS.has(key)
+    )
+  );
+
 // ─── Salary presets by experience level (monthly PHP) ───
 export const SALARY_PRESETS: Record<string, { min: number; max: number }> = {
   fresh_graduate: { min: 18000, max: 25000 },

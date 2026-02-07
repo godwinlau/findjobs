@@ -53,23 +53,14 @@
   gap: 12px;
   margin-bottom: 80px;
 }
-.auth-lp-logo {
-  width: 40px;
-  height: 40px;
-  background: #FBBF24;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Space Mono', monospace;
-  font-size: 16px;
-  font-weight: 700;
-  color: #0A0A0A;
-}
 .auth-lp-wordmark {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 800;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
   color: #F5F5F0;
+}
+.auth-lp-period {
+  color: #FBBF24;
 }
 
 .auth-lp-headline {
@@ -193,14 +184,9 @@
   gap: 10px;
   margin-bottom: 40px;
 }
-.auth-mobile-brand .auth-lp-logo {
-  width: 36px;
-  height: 36px;
-  font-size: 14px;
-}
 .auth-mobile-brand .auth-lp-wordmark {
   color: #0A0A0A;
-  font-size: 18px;
+  font-size: 20px;
 }
 @media (max-width: 800px) {
   .auth-mobile-brand {
