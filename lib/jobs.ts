@@ -100,7 +100,7 @@ const FEED_COLUMNS = [
 
 // Lightweight columns for scoring only (Phase 1) — no text-heavy fields.
 // ~200 bytes/row vs ~5KB/row with description_plain.
-const SCORING_COLUMNS = [
+export const SCORING_COLUMNS = [
   "id", "title", "skills_required",
   "salary_min", "salary_max",
   "location_city", "work_setup", "job_type", "experience_level",

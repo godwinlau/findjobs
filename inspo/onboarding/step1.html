@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onboarding — Welcome</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#F5F5F0;font-family:'Sora',sans-serif;color:#0A0A0A;min-height:100vh;display:flex;flex-direction:column}
+  ::selection{background:#0A0A0A;color:#F5F5F0}
+
+  /* ============ TOP BAR ============ */
+  .topbar{background:#0A0A0A;color:#F5F5F0;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between}
+  .topbar-left{display:flex;align-items:center;gap:10px}
+  .topbar-logo{width:30px;height:30px;background:#FBBF24;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:#0A0A0A}
+  .topbar-wordmark{font-size:15px;font-weight:800;letter-spacing:-.03em}
+
+  /* ============ PROGRESS ============ */
+  .progress-wrap{padding:0 24px;background:#F5F5F0}
+  .progress-inner{max-width:520px;margin:0 auto;padding:24px 0 0}
+  .progress-steps{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+  .prog-seg{flex:1;height:4px;background:#E0DDD8}
+  .prog-seg.active{background:#FBBF24}
+  .prog-label{font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#bbb}
+
+  /* ============ MAIN ============ */
+  .main{flex:1;display:flex;justify-content:center;padding:40px 24px 120px}
+  .content{width:100%;max-width:520px}
+
+  /* Welcome */
+  .welcome-tag{font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#888;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .welcome-tag::before{content:'';width:16px;height:2px;background:#FBBF24}
+  .ob-title{font-size:32px;font-weight:800;letter-spacing:-.04em;line-height:1.1;margin-bottom:6px}
+  .ob-title span{color:#FBBF24}
+  .ob-desc{font-size:14px;line-height:1.6;color:#888;margin-bottom:40px}
+  @media(max-width:500px){.ob-title{font-size:26px}}
+
+  /* ============ FIELD: NAME ============ */
+  .field{margin-bottom:36px}
+  .field-label{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#0A0A0A;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .field-label-num{width:22px;height:22px;background:#0A0A0A;color:#F5F5F0;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+
+  .name-input{
+    width:100%;padding:16px 20px;
+    border:2px solid #0A0A0A;background:#F5F5F0;
+    font-family:'Sora',sans-serif;font-size:20px;font-weight:700;
+    letter-spacing:-.02em;color:#0A0A0A;
+    outline:none;transition:all .15s;
+  }
+  .name-input:focus{border-color:#FBBF24;box-shadow:4px 4px 0 #FBBF24}
+  .name-input::placeholder{color:#ddd;font-weight:400}
+
+  /* Greeting preview */
+  .greeting{font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#bbb;margin-top:8px;height:16px;transition:all .2s}
+  .greeting.visible{color:#888}
+  .greeting span{color:#FBBF24;font-weight:700}
+
+  /* ============ FIELD: JOB TYPE ============ */
+  .type-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0}
+  @media(max-width:400px){.type-grid{grid-template-columns:1fr}}
+
+  .type-card{
+    border:2px solid #0A0A0A;margin-top:-2px;margin-left:-2px;
+    padding:24px 20px;cursor:pointer;transition:all .1s;
+    display:flex;flex-direction:column;gap:8px;user-select:none;
+    position:relative;overflow:hidden;
+  }
+  .type-card:hover{background:#EEEEE8}
+  .type-card:active{transform:scale(.99)}
+  .type-card.selected{background:#0A0A0A;color:#F5F5F0}
+  .type-card.selected .type-sub{color:rgba(255,255,255,.35)}
+  .type-card.selected .type-check{opacity:1;transform:scale(1)}
+  .type-card.selected .type-emoji{transform:scale(1.1)}
+
+  .type-emoji{font-size:28px;transition:transform .2s}
+  .type-name{font-size:16px;font-weight:700;letter-spacing:-.02em}
+  .type-sub{font-family:'Space Mono',monospace;font-size:9px;color:#888;text-transform:uppercase;letter-spacing:.04em;line-height:1.4}
+  .type-check{
+    position:absolute;top:12px;right:12px;
+    width:24px;height:24px;background:#FBBF24;color:#0A0A0A;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Space Mono',monospace;font-size:11px;font-weight:700;
+    opacity:0;transform:scale(.5);transition:all .15s;
+  }
+
+  /* ============ BOTTOM BAR ============ */
+  .bottom-bar{position:fixed;bottom:0;left:0;right:0;background:#F5F5F0;border-top:3px solid #0A0A0A;z-index:50}
+  .bottom-inner{max-width:520px;margin:0 auto;padding:16px 24px;display:flex;justify-content:space-between;align-items:center}
+  .bb-left{display:flex;align-items:center;gap:10px}
+  .bb-dots{display:flex;gap:4px}
+  .bb-dot{width:8px;height:8px;background:#E0DDD8;transition:all .2s}
+  .bb-dot.filled{background:#FBBF24}
+  .bb-hint{font-family:'Space Mono',monospace;font-size:9px;color:#bbb;text-transform:uppercase;letter-spacing:.04em}
+  .bb-next{padding:12px 28px;background:#0A0A0A;color:#F5F5F0;border:none;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px}
+  .bb-next:hover:not(:disabled){background:#FBBF24;color:#0A0A0A;box-shadow:4px 4px 0 #0A0A0A;transform:translate(-2px,-2px)}
+  .bb-next:disabled{opacity:.25;cursor:not-allowed}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">JB</div>
+    <span class="topbar-wordmark">Jobboard</span>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap"><div class="progress-inner">
+  <div class="progress-steps">
+    <div class="prog-seg active"></div>
+    <div class="prog-seg"></div>
+    <div class="prog-seg"></div>
+    <div class="prog-seg"></div>
+  </div>
+  <div class="prog-label">Step 1 of 4</div>
+</div></div>
+
+<!-- MAIN -->
+<div class="main"><div class="content">
+
+  <div class="welcome-tag">Welcome to Jobboard</div>
+  <div class="ob-title">Let's set up <span>your feed</span></div>
+  <p class="ob-desc">Two quick questions so we can show you relevant jobs right away.</p>
+
+  <!-- ===== 1. NAME ===== -->
+  <div class="field">
+    <div class="field-label"><span class="field-label-num">1</span> Your first name</div>
+    <input class="name-input" type="text" id="nameInput" placeholder="e.g. Godwin" maxlength="30" oninput="onNameChange()" autofocus>
+    <div class="greeting" id="greeting"></div>
+  </div>
+
+  <!-- ===== 2. LOOKING FOR ===== -->
+  <div class="field">
+    <div class="field-label"><span class="field-label-num">2</span> I'm looking for</div>
+    <div class="type-grid" id="typeGrid">
+      <div class="type-card" onclick="selectType(this, 'fulltime')">
+        <div class="type-check">✓</div>
+        <div class="type-emoji">💼</div>
+        <div class="type-name">Full-time job</div>
+        <div class="type-sub">Permanent position with a company</div>
+      </div>
+      <div class="type-card" onclick="selectType(this, 'freelance')">
+        <div class="type-check">✓</div>
+        <div class="type-emoji">⚡</div>
+        <div class="type-name">Freelance / Contract</div>
+        <div class="type-sub">Project-based or short-term work</div>
+      </div>
+      <div class="type-card" onclick="selectType(this, 'intern')">
+        <div class="type-check">✓</div>
+        <div class="type-emoji">🎓</div>
+        <div class="type-name">Internship</div>
+        <div class="type-sub">Entry-level or student opportunity</div>
+      </div>
+      <div class="type-card" onclick="selectType(this, 'browse')">
+        <div class="type-check">✓</div>
+        <div class="type-emoji">👀</div>
+        <div class="type-name">Just browsing</div>
+        <div class="type-sub">Exploring what's out there</div>
+      </div>
+    </div>
+  </div>
+
+</div></div>
+
+<!-- BOTTOM BAR -->
+<div class="bottom-bar"><div class="bottom-inner">
+  <div class="bb-left">
+    <div class="bb-dots">
+      <div class="bb-dot" id="dot1"></div>
+      <div class="bb-dot" id="dot2"></div>
+    </div>
+    <div class="bb-hint" id="bbHint">Fill in both to continue</div>
+  </div>
+  <button class="bb-next" id="bbNext" disabled>Continue →</button>
+</div></div>
+
+<script>
+  let hasName = false;
+  let hasType = false;
+
+  function onNameChange() {
+    const input = document.getElementById('nameInput');
+    const val = input.value.trim();
+    const greeting = document.getElementById('greeting');
+
+    hasName = val.length > 0;
+
+    if (hasName) {
+      greeting.innerHTML = `Hey <span>${val}</span> — let's find you some great jobs`;
+      greeting.classList.add('visible');
+    } else {
+      greeting.textContent = '';
+      greeting.classList.remove('visible');
+    }
+
+    validate();
+  }
+
+  function selectType(el, type) {
+    document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    hasType = true;
+    validate();
+  }
+
+  function validate() {
+    const dot1 = document.getElementById('dot1');
+    const dot2 = document.getElementById('dot2');
+    const btn = document.getElementById('bbNext');
+    const hint = document.getElementById('bbHint');
+
+    dot1.classList.toggle('filled', hasName);
+    dot2.classList.toggle('filled', hasType);
+
+    const ready = hasName && hasType;
+    btn.disabled = !ready;
+
+    if (ready) {
+      hint.textContent = 'Ready!';
+      hint.style.color = '#FBBF24';
+    } else if (hasName && !hasType) {
+      hint.textContent = 'Pick one below';
+      hint.style.color = '#bbb';
+    } else if (!hasName && hasType) {
+      hint.textContent = 'Enter your name';
+      hint.style.color = '#bbb';
+    } else {
+      hint.textContent = 'Fill in both to continue';
+      hint.style.color = '#bbb';
+    }
+  }
+
+  // Auto-focus name input
+  document.getElementById('nameInput').focus();
+</script>
+</body>
+</html>

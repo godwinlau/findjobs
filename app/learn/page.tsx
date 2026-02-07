@@ -13,6 +13,7 @@ import {
   buildDemandTrends,
   buildGapResourceLinks,
   buildUserSkillBars,
+  computeMatchPotential,
 } from "@/lib/learn-page-helpers";
 import { LearnPageClient } from "@/components/learn";
 import { skillAssessments } from "@/lib/data/learnMockData";
@@ -93,8 +94,13 @@ export default async function LearnPage() {
   const scoredCourses = scoreAndRankCourses(courseCatalog, recContext);
   const skillROIs = computeSkillROI(recContext, courseCatalog);
 
+  // Compute real match potential against the jobs database
+  const matchPotential = profile
+    ? await computeMatchPotential(profile, skillROIs)
+    : null;
+
   // Build new page data
-  const heroData = buildInsightHeroData(snapshot, skillROIs, userSkills);
+  const heroData = buildInsightHeroData(snapshot, skillROIs, userSkills, matchPotential);
   const matchProgression = buildMatchProgression(snapshot, skillROIs);
   const demandTrends = buildDemandTrends(
     profile?.preferred_industries ?? [],
@@ -121,6 +127,7 @@ export default async function LearnPage() {
           skillROIs={skillROIs}
           resourceLinksMap={resourceLinksMap}
           matchProgression={matchProgression}
+          matchPotential={matchPotential}
           demandTrends={demandTrends}
           userSkillBars={userSkillBars}
           assessments={tailoredAssessments}

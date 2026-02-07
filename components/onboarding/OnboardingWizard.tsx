@@ -1,31 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { colors } from "@/lib/constants/colors";
-import { ProgressBar } from "./ProgressBar";
-import { StepWorkType } from "./StepWorkType";
-import { StepLocation } from "./StepLocation";
-import { StepSkills } from "./StepSkills";
-import { StepExperience } from "./StepExperience";
-import { StepSalary } from "./StepSalary";
-import { StepIdentity } from "./StepIdentity";
-import { StepTopMatches } from "./StepTopMatches";
-import { SALARY_PRESETS } from "@/lib/constants/onboarding";
+import { TopBar } from "./TopBar";
+import { ProgressBarNew } from "./ProgressBarNew";
+import { BottomBar } from "./BottomBar";
+import { StepWelcome } from "./StepWelcome";
+import { StepSkillsNew } from "./StepSkillsNew";
+import { StepPreferences } from "./StepPreferences";
+import { StepMatches } from "./StepMatches";
+import { rolesToIndustries } from "@/lib/constants/onboardingRoles";
 import { saveOnboardingStep, completeOnboarding } from "@/app/onboarding/actions";
-import type { Profile } from "@/lib/types";
+import type { Profile, WorkPreference, EmploymentType } from "@/lib/types";
 
-const STEP_LABELS = [
-  "Work Type",
-  "Location",
-  "Skills",
-  "Experience",
-  "Salary",
-  "The Basics",
-  "Your Matches",
-];
-
-const TOTAL_STEPS = 7;
+const TOTAL_STEPS = 4;
 
 interface OnboardingWizardProps {
   initialProfile: Partial<Profile>;
@@ -33,138 +21,89 @@ interface OnboardingWizardProps {
 
 export function OnboardingWizard({ initialProfile }: OnboardingWizardProps) {
   const router = useRouter();
-  const [step, setStep] = useState(initialProfile.onboarding_step || 0);
-  const [data, setData] = useState<Partial<Profile>>({
-    ...initialProfile,
-    user_role: "job_seeker",
-  });
+
+  // Clamp initial step to 0-3
+  const initialStep = Math.min(initialProfile.onboarding_step || 0, TOTAL_STEPS - 1);
+  const [step, setStep] = useState(initialStep);
+
+  // Step 0: Welcome
+  const [firstName, setFirstName] = useState(
+    initialProfile.full_name?.split(" ")[0] || ""
+  );
+  const [employmentType, setEmploymentType] = useState(
+    initialProfile.employment_type || ""
+  );
+
+  // Step 1: Skills
+  const [skills, setSkills] = useState<string[]>(initialProfile.skills || []);
+
+  // Step 2: Preferences
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  const [workSetup, setWorkSetup] = useState(
+    initialProfile.work_preference || ""
+  );
+  const [salaryMin, setSalaryMin] = useState(
+    initialProfile.desired_salary_min
+      ? Math.round(initialProfile.desired_salary_min / 1000)
+      : 30
+  );
+  const [salaryMax, setSalaryMax] = useState(
+    initialProfile.desired_salary_max
+      ? Math.round(initialProfile.desired_salary_max / 1000)
+      : 80
+  );
+  const [salarySkipped, setSalarySkipped] = useState(false);
+
+  // UI state
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [topMatches, setTopMatches] = useState<
-    { role: string; company: string; match: number; salary: string }[]
-  >([]);
-  const [matchesLoading, setMatchesLoading] = useState(false);
 
-  // Auto-fill salary when experience level changes
-  function updateData(updates: Partial<Profile>) {
-    const newData = { ...data, ...updates };
+  // Build profile data for API calls
+  const profileData = useMemo(
+    () => ({
+      ...initialProfile,
+      full_name: firstName.trim(),
+      employment_type: (employmentType || "full_time") as EmploymentType,
+      skills,
+      preferred_industries: rolesToIndustries(selectedRoles),
+      work_preference: (workSetup || "any") as WorkPreference,
+      desired_salary_min: salarySkipped ? null : salaryMin * 1000,
+      desired_salary_max: salarySkipped ? null : salaryMax * 1000,
+      user_role: "job_seeker" as const,
+    }),
+    [initialProfile, firstName, employmentType, skills, selectedRoles, workSetup, salaryMin, salaryMax, salarySkipped]
+  );
 
-    if (updates.experience_level && updates.experience_level !== data.experience_level) {
-      const preset = SALARY_PRESETS[updates.experience_level];
-      if (preset && !data.desired_salary_min && !data.desired_salary_max) {
-        newData.desired_salary_min = preset.min;
-        newData.desired_salary_max = preset.max;
-      }
+  // ─── Validation ───
+
+  function validate(): string | null {
+    if (step === 0) {
+      if (!firstName.trim()) return "Enter your first name to continue.";
+      if (!employmentType) return "Pick what you're looking for.";
     }
-
-    setData(newData);
+    if (step === 1) {
+      if (skills.length < 3) return "Select at least 3 skills.";
+    }
+    if (step === 2) {
+      if (selectedRoles.length === 0) return "Select at least one role.";
+      if (!workSetup) return "Pick a work setup.";
+    }
+    return null;
   }
 
-  // Fetch top matches when reaching the final step
-  useEffect(() => {
-    if (step === 6) {
-      setMatchesLoading(true);
-      // Use the API route to get matches based on current profile data
-      fetch("/api/onboarding-matches", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      })
-        .then((res) => res.json())
-        .then((result) => {
-          setTopMatches(result.matches || []);
-        })
-        .catch(() => {
-          setTopMatches([]);
-        })
-        .finally(() => {
-          setMatchesLoading(false);
-        });
-    }
-  }, [step]); // eslint-disable-line react-hooks/exhaustive-deps
+  // ─── Navigation ───
 
   async function handleNext() {
-    // Step 0 (Work Type): at least 1 category
-    if (step === 0) {
-      if (!data.preferred_industries || data.preferred_industries.length === 0) {
-        setError("Please select at least one work category.");
-        return;
-      }
+    const err = validate();
+    if (err) {
+      setError(err);
+      return;
     }
-
-    // Step 1 (Location): city required unless remote
-    if (step === 1) {
-      if (data.work_preference !== "remote" && !data.preferred_city) {
-        setError("Please select your preferred city.");
-        return;
-      }
-    }
-
-    // Step 2 (Skills): min 5 skills with proficiency
-    if (step === 2) {
-      if (!data.skills || data.skills.length < 5) {
-        setError("Please select at least 5 skills.");
-        return;
-      }
-    }
-
-    // Step 3 (Experience): level required
-    if (step === 3) {
-      if (!data.experience_level) {
-        setError("Please select your experience level.");
-        return;
-      }
-    }
-
-    // Step 4 (Salary): skippable — no validation
-
-    // Step 5 (Identity): education + name required
-    if (step === 5) {
-      if (!data.full_name?.trim()) {
-        setError("Full name is required.");
-        return;
-      }
-      if (!data.education) {
-        setError("Please select your education level.");
-        return;
-      }
-    }
-
     setError("");
     setSaving(true);
 
     try {
-      if (step < TOTAL_STEPS - 1) {
-        const result = await saveOnboardingStep(step, data);
-        if (result?.error) {
-          setError(result.error);
-          setSaving(false);
-          return;
-        }
-        setStep(step + 1);
-      } else {
-        // Step 6 (final): complete onboarding
-        const result = await completeOnboarding(data);
-        if (result?.error) {
-          setError(result.error);
-          setSaving(false);
-          return;
-        }
-        router.push("/?welcome=1");
-      }
-    } catch {
-      setError("Something went wrong. Please try again.");
-    }
-
-    setSaving(false);
-  }
-
-  async function handleSkip() {
-    setSaving(true);
-    setError("");
-
-    try {
-      const result = await saveOnboardingStep(step, data);
+      const result = await saveOnboardingStep(step, profileData);
       if (result?.error) {
         setError(result.error);
         setSaving(false);
@@ -174,7 +113,24 @@ export function OnboardingWizard({ initialProfile }: OnboardingWizardProps) {
     } catch {
       setError("Something went wrong. Please try again.");
     }
+    setSaving(false);
+  }
 
+  async function handleComplete() {
+    setSaving(true);
+    setError("");
+
+    try {
+      const result = await completeOnboarding(profileData);
+      if (result?.error) {
+        setError(result.error);
+        setSaving(false);
+        return;
+      }
+      router.push("/?welcome=1");
+    } catch {
+      setError("Something went wrong. Please try again.");
+    }
     setSaving(false);
   }
 
@@ -185,138 +141,123 @@ export function OnboardingWizard({ initialProfile }: OnboardingWizardProps) {
     }
   }
 
-  function renderStep() {
-    if (step === 0) return <StepWorkType data={data} onChange={updateData} />;
-    if (step === 1) return <StepLocation data={data} onChange={updateData} />;
-    if (step === 2) return <StepSkills data={data} onChange={updateData} />;
-    if (step === 3) return <StepExperience data={data} onChange={updateData} />;
-    if (step === 4) return <StepSalary data={data} onChange={updateData} />;
-    if (step === 5) return <StepIdentity data={data} onChange={updateData} />;
-    if (step === 6) return <StepTopMatches matches={topMatches} loading={matchesLoading} />;
-    return null;
+  // ─── Bottom bar config per step ───
+
+  function getBottomBarProps() {
+    if (step === 0) {
+      const hasName = !!firstName.trim();
+      const hasType = !!employmentType;
+      const ready = hasName && hasType;
+      let hint = "Fill in both to continue";
+      if (hasName && !hasType) hint = "Pick one below";
+      else if (!hasName && hasType) hint = "Enter your name";
+      else if (ready) hint = "Ready!";
+
+      return {
+        variant: "dots" as const,
+        dots: [hasName, hasType],
+        hint,
+        hintReady: ready,
+        nextDisabled: !ready,
+        nextLabel: "Continue \u2192",
+      };
+    }
+
+    if (step === 1) {
+      return {
+        variant: "dots" as const,
+        onBack: handleBack,
+        dots: [skills.length >= 1, skills.length >= 2, skills.length >= 3],
+        count: skills.length,
+        nextDisabled: skills.length < 3,
+        nextLabel: "Continue",
+      };
+    }
+
+    if (step === 2) {
+      return {
+        variant: "checks" as const,
+        onBack: handleBack,
+        checks: [selectedRoles.length > 0, !!workSetup],
+        nextDisabled: selectedRoles.length === 0 || !workSetup,
+        nextLabel: "See My Matches \u2192",
+      };
+    }
+
+    return null; // Step 3 has its own bar
   }
 
-  // Skip button only on step 4 (salary)
-  const showSkip = step === 4;
-  const showBack = step > 0;
+  // ─── Progress label ───
 
-  // Button labels
-  let nextLabel = "Continue";
-  if (saving) nextLabel = "Saving...";
-  else if (step === 5) nextLabel = "See Your Matches";
-  else if (step === 6) nextLabel = "Start Job Hunting";
+  function getProgressLabel() {
+    if (step === 3) {
+      return "Finding your matches\u2026";
+    }
+    return undefined;
+  }
+
+  // ─── Show skip on steps 1 & 2 ───
+
+  const showSkip = step === 1 || step === 2;
+
+  // ─── Render ───
 
   return (
-    <div
-      className="onboarding-outer"
-      style={{
-        minHeight: "100vh",
-        background: colors.bg,
-        display: "flex",
-        alignItems: "flex-start",
-        justifyContent: "center",
-      }}
-    >
-      <div
-        className="onboarding-inner"
-        style={{
-          width: "100%",
-          maxWidth: 560,
-          background: colors.surface,
-          borderRadius: 12,
-          border: `1px solid ${colors.border}`,
-        }}
-      >
-        <ProgressBar currentStep={step} totalSteps={TOTAL_STEPS} labels={STEP_LABELS} />
+    <div className="ob-page">
+      <TopBar onSkip={showSkip ? handleNext : undefined} />
+      <ProgressBarNew currentStep={step} label={getProgressLabel()} />
 
-        {error && (
-          <div
-            style={{
-              padding: "10px 14px",
-              borderRadius: 8,
-              background: "var(--hb-warning-bg)",
-              border: "1px solid var(--hb-warning-border)",
-              color: colors.live,
-              fontSize: 13,
-              marginBottom: 16,
-            }}
-          >
-            {error}
-          </div>
-        )}
+      {error && <div className="ob-error" style={{ maxWidth: 520, margin: "16px auto 0", padding: "10px 24px" }}>{error}</div>}
 
-        {renderStep()}
+      {step === 0 && (
+        <StepWelcome
+          firstName={firstName}
+          employmentType={employmentType}
+          onFirstNameChange={setFirstName}
+          onEmploymentTypeChange={setEmploymentType}
+        />
+      )}
+      {step === 1 && (
+        <StepSkillsNew
+          skills={skills}
+          onSkillsChange={setSkills}
+        />
+      )}
+      {step === 2 && (
+        <StepPreferences
+          selectedRoles={selectedRoles}
+          onRolesChange={setSelectedRoles}
+          workSetup={workSetup}
+          onWorkSetupChange={setWorkSetup}
+          salaryMin={salaryMin}
+          salaryMax={salaryMax}
+          onSalaryMinChange={setSalaryMin}
+          onSalaryMaxChange={setSalaryMax}
+          salarySkipped={salarySkipped}
+          onSalarySkipToggle={() => setSalarySkipped(!salarySkipped)}
+        />
+      )}
+      {step === 3 && (
+        <StepMatches
+          firstName={firstName}
+          profileData={profileData}
+          onComplete={handleComplete}
+          saving={saving}
+        />
+      )}
 
-        <div
-          className="responsive-row-reverse onboarding-footer-gap"
-          style={{
-            justifyContent: "space-between",
-            marginTop: 28,
-            paddingTop: 20,
-            borderTop: `1px solid ${colors.border}`,
-          }}
-        >
-          <div style={{ display: "flex", gap: 12 }}>
-            {showBack && (
-              <button
-                type="button"
-                onClick={handleBack}
-                disabled={saving}
-                className="onboarding-back-btn"
-                style={{
-                  padding: "10px 20px",
-                  borderRadius: 8,
-                  border: `1px solid ${colors.border}`,
-                  background: colors.surface,
-                  color: colors.textSec,
-                  fontSize: 14,
-                  fontWeight: 500,
-                  cursor: "pointer",
-                }}
-              >
-                Back
-              </button>
-            )}
-          </div>
-
-          <div className="responsive-row" style={{ gap: 12 }}>
-            <button
-              type="button"
-              onClick={handleNext}
-              disabled={saving}
-              style={{
-                padding: "10px 24px",
-                borderRadius: 8,
-                border: "none",
-                background: saving ? colors.textMuted : colors.primary,
-                color: colors.inv,
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: saving ? "not-allowed" : "pointer",
-              }}
-            >
-              {nextLabel}
-            </button>
-            {showSkip && (
-              <button
-                type="button"
-                onClick={handleSkip}
-                disabled={saving}
-                style={{
-                  padding: "10px 16px",
-                  border: "none",
-                  background: "transparent",
-                  color: colors.textMuted,
-                  fontSize: 13,
-                  cursor: "pointer",
-                }}
-              >
-                Skip for now
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
+      {/* Bottom bar for steps 0-2 */}
+      {step < 3 && (() => {
+        const props = getBottomBarProps();
+        if (!props) return null;
+        return (
+          <BottomBar
+            {...props}
+            onNext={handleNext}
+            saving={saving}
+          />
+        );
+      })()}
     </div>
   );
 }

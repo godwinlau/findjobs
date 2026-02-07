@@ -1,5 +1,78 @@
 import { industrySkillDemand } from "@/lib/constants/industrySkillDemand";
+import { createServiceClient } from "@/lib/supabase-server";
+import { SCORING_COLUMNS } from "@/lib/jobs";
+import {
+  computeMatchScore,
+  MATCH_SCORE_THRESHOLD,
+  isProfileSufficient,
+} from "@/lib/matching";
+import type { Profile } from "@/lib/types";
 import type { SkillsSnapshot, SkillROI, ScoredCourse } from "@/lib/types/learn";
+
+// ─── Match Potential (Real Job Scoring) ───
+
+export interface MatchPotentialData {
+  currentMatches: number;
+  totalJobsAnalyzed: number;
+  progression: {
+    skill: string;
+    matchesBefore: number;
+    matchesAfter: number;
+  }[];
+  fullPotentialMatches: number;
+}
+
+export async function computeMatchPotential(
+  profile: Profile,
+  skillROIs: SkillROI[]
+): Promise<MatchPotentialData | null> {
+  if (!isProfileSufficient(profile)) return null;
+
+  const supabase = createServiceClient();
+
+  const { data: scoringData } = await supabase
+    .from("jobs")
+    .select(SCORING_COLUMNS)
+    .eq("is_active", true);
+
+  if (!scoringData || scoringData.length === 0) return null;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rows = scoringData as any[];
+  const totalJobsAnalyzed = rows.length;
+
+  // Score all jobs with current profile
+  const currentMatches = rows.filter(
+    (row) => computeMatchScore(row, profile).score >= MATCH_SCORE_THRESHOLD
+  ).length;
+
+  // Simulate adding each top-3 skill
+  const top3 = skillROIs.slice(0, 3);
+  const progression: MatchPotentialData["progression"] = [];
+  let cumulativeSkills = [...profile.skills];
+  let prevMatches = currentMatches;
+
+  for (const roi of top3) {
+    cumulativeSkills = [...cumulativeSkills, roi.skill];
+    const augmented: Profile = { ...profile, skills: cumulativeSkills };
+    const newMatches = rows.filter(
+      (row) => computeMatchScore(row, augmented).score >= MATCH_SCORE_THRESHOLD
+    ).length;
+    progression.push({
+      skill: roi.skill,
+      matchesBefore: prevMatches,
+      matchesAfter: newMatches,
+    });
+    prevMatches = newMatches;
+  }
+
+  return {
+    currentMatches,
+    totalJobsAnalyzed,
+    progression,
+    fullPotentialMatches: prevMatches,
+  };
+}
 
 // ─── Insight Hero Data ───
 
@@ -9,16 +82,39 @@ export interface InsightHeroData {
   jobsUnlocked: number;
   potentialMatchPct: number;
   skillsCount: number;
+  currentMatches: number | null;
+  totalJobsAnalyzed: number | null;
 }
 
 export function buildInsightHeroData(
   snapshot: SkillsSnapshot,
   skillROIs: SkillROI[],
-  userSkills: string[]
+  userSkills: string[],
+  matchPotential?: MatchPotentialData | null
 ): InsightHeroData {
   const top = skillROIs.slice(0, 3);
+
+  // Use real match counts if available
+  if (matchPotential) {
+    const jobsUnlocked =
+      matchPotential.fullPotentialMatches - matchPotential.currentMatches;
+    return {
+      overallPercentage: snapshot.overallPercentage,
+      skillsAwayCount: Math.min(skillROIs.length, 5),
+      jobsUnlocked,
+      potentialMatchPct: Math.min(
+        snapshot.overallPercentage +
+          Math.min(top.length * Math.round(30 / Math.max(top.length, 1)), 30),
+        99
+      ),
+      skillsCount: userSkills.length,
+      currentMatches: matchPotential.currentMatches,
+      totalJobsAnalyzed: matchPotential.totalJobsAnalyzed,
+    };
+  }
+
+  // Fallback heuristic
   const jobsUnlocked = top.reduce((sum, r) => sum + r.estimatedNewMatches, 0);
-  // Estimate boost: each top skill adds ~3-5% match improvement
   const boostPerSkill = top.length > 0 ? Math.round(30 / top.length) : 0;
   const totalBoost = Math.min(top.length * boostPerSkill, 30);
   const potentialMatchPct = Math.min(
@@ -32,6 +128,8 @@ export function buildInsightHeroData(
     jobsUnlocked,
     potentialMatchPct,
     skillsCount: userSkills.length,
+    currentMatches: null,
+    totalJobsAnalyzed: null,
   };
 }
 

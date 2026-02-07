@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onboarding — Skills</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#F5F5F0;font-family:'Sora',sans-serif;color:#0A0A0A;min-height:100vh;display:flex;flex-direction:column}
+  ::selection{background:#0A0A0A;color:#F5F5F0}
+
+  /* ============ TOP BAR ============ */
+  .topbar{background:#0A0A0A;color:#F5F5F0;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between}
+  .topbar-left{display:flex;align-items:center;gap:10px}
+  .topbar-logo{width:30px;height:30px;background:#FBBF24;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:#0A0A0A}
+  .topbar-wordmark{font-size:15px;font-weight:800;letter-spacing:-.03em}
+  .topbar-skip{font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.25);cursor:pointer;border:0;background:0;transition:color .15s;padding:8px 0}
+  .topbar-skip:hover{color:rgba(255,255,255,.5)}
+
+  /* ============ PROGRESS BAR (minimal) ============ */
+  .progress-wrap{padding:0 24px;background:#F5F5F0}
+  .progress-inner{max-width:520px;margin:0 auto;padding:24px 0 0}
+  .progress-steps{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+  .prog-seg{flex:1;height:4px;background:#E0DDD8}
+  .prog-seg.done{background:#0A0A0A}
+  .prog-seg.active{background:#FBBF24}
+  .prog-label{font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#bbb}
+
+  /* ============ MAIN ============ */
+  .main{flex:1;display:flex;justify-content:center;padding:32px 24px 120px}
+  .content{width:100%;max-width:520px}
+
+  /* Header */
+  .ob-title{font-size:32px;font-weight:800;letter-spacing:-.04em;line-height:1.05;margin-bottom:8px}
+  .ob-title span{color:#FBBF24}
+  .ob-desc{font-size:14px;line-height:1.6;color:#888;margin-bottom:32px}
+  @media(max-width:500px){.ob-title{font-size:26px}}
+
+  /* ============ SKILL PILLS ============ */
+  .pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+
+  .pill{
+    font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+    padding:10px 18px;
+    border:2px solid #0A0A0A;background:#F5F5F0;color:#0A0A0A;
+    cursor:pointer;transition:all .1s;user-select:none;
+    display:flex;align-items:center;gap:0;
+    position:relative;overflow:hidden;
+  }
+  .pill:hover{background:#EEEEE8}
+  .pill:active{transform:scale(.97)}
+  .pill.selected{background:#0A0A0A;color:#FBBF24}
+  .pill.selected .pill-check{width:18px;margin-right:6px;opacity:1}
+  .pill-check{width:0;margin-right:0;opacity:0;transition:all .15s;font-size:11px;flex-shrink:0;overflow:hidden}
+
+  @media(max-width:500px){.pill{font-size:11px;padding:8px 14px}}
+
+  /* ============ ADD CUSTOM ============ */
+  .custom-row{display:flex;gap:6px;margin-bottom:32px}
+  .custom-input{flex:1;padding:10px 14px;border:2px dashed rgba(0,0,0,.12);background:transparent;font-family:'Space Mono',monospace;font-size:12px;outline:none;transition:border-color .15s;color:#0A0A0A}
+  .custom-input:focus{border-color:#FBBF24;border-style:solid}
+  .custom-input::placeholder{color:#ccc}
+  .custom-add{padding:10px 18px;background:0;border:2px solid rgba(0,0,0,.12);font-family:'Space Mono',monospace;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#888;cursor:pointer;transition:all .15s}
+  .custom-add:hover{border-color:#0A0A0A;color:#0A0A0A}
+
+  /* ============ POPULAR HINT ============ */
+  .hint{font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#bbb;margin-bottom:10px}
+
+  /* ============ BOTTOM BAR ============ */
+  .bottom-bar{position:fixed;bottom:0;left:0;right:0;background:#F5F5F0;border-top:3px solid #0A0A0A;z-index:50}
+  .bottom-inner{max-width:520px;margin:0 auto;padding:16px 24px;display:flex;justify-content:space-between;align-items:center}
+  .bb-back{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#888;cursor:pointer;border:0;background:0;padding:10px 0;transition:color .15s}
+  .bb-back:hover{color:#0A0A0A}
+  .bb-right{display:flex;align-items:center;gap:14px}
+  .bb-dots{display:flex;gap:4px;align-items:center}
+  .bb-dot{width:8px;height:8px;background:#E0DDD8;transition:all .2s}
+  .bb-dot.filled{background:#FBBF24}
+  .bb-next{padding:12px 28px;background:#0A0A0A;color:#F5F5F0;border:none;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px}
+  .bb-next:hover:not(:disabled){background:#FBBF24;color:#0A0A0A;box-shadow:4px 4px 0 #0A0A0A;transform:translate(-2px,-2px)}
+  .bb-next:disabled{opacity:.25;cursor:not-allowed}
+  .bb-count{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;background:#FBBF24;color:#0A0A0A;width:24px;height:24px;display:flex;align-items:center;justify-content:center;transition:all .15s;opacity:0;transform:scale(.8)}
+  .bb-count.visible{opacity:1;transform:scale(1)}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">JB</div>
+    <span class="topbar-wordmark">Jobboard</span>
+  </div>
+  <button class="topbar-skip">Skip</button>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap"><div class="progress-inner">
+  <div class="progress-steps">
+    <div class="prog-seg done"></div>
+    <div class="prog-seg active"></div>
+    <div class="prog-seg"></div>
+    <div class="prog-seg"></div>
+  </div>
+  <div class="prog-label">Step 2 of 4</div>
+</div></div>
+
+<!-- MAIN -->
+<div class="main"><div class="content">
+
+  <div class="ob-title">Pick your <span>skills</span></div>
+  <p class="ob-desc">Tap everything you know. We'll match you with jobs that fit.</p>
+
+  <div class="hint">Popular in the Philippines ↓</div>
+
+  <div class="pills" id="pillGrid">
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>React</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>JavaScript</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>Figma</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>Python</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>Node.js</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>TypeScript</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>PHP / Laravel</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>Java</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>UI Design</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>UX Design</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>Product Design</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>HTML / CSS</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>Next.js</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>React Native</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>Vue.js</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>Flutter</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>Shopify</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>WordPress</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>AWS</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>SQL</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>Git</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>Tailwind CSS</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>Agile / Scrum</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>Customer Service</div>
+    <div class="pill" onclick="toggle(this)"><span class="pill-check">✓</span>Data Analysis</div>
+  </div>
+
+  <div class="custom-row">
+    <input class="custom-input" type="text" id="customInput" placeholder="Don't see yours? Type a skill…" onkeydown="if(event.key==='Enter')addCustom()">
+    <button class="custom-add" onclick="addCustom()">+ Add</button>
+  </div>
+
+</div></div>
+
+<!-- BOTTOM BAR -->
+<div class="bottom-bar"><div class="bottom-inner">
+  <button class="bb-back">← Back</button>
+  <div class="bb-right">
+    <div class="bb-dots" id="bbDots">
+      <div class="bb-dot"></div>
+      <div class="bb-dot"></div>
+      <div class="bb-dot"></div>
+    </div>
+    <button class="bb-next" id="bbNext" disabled>
+      Continue
+      <div class="bb-count" id="bbCount">0</div>
+    </button>
+  </div>
+</div></div>
+
+<script>
+  const dots = document.querySelectorAll('.bb-dot');
+  const countEl = document.getElementById('bbCount');
+  const nextBtn = document.getElementById('bbNext');
+
+  function toggle(el) {
+    el.classList.toggle('selected');
+    update();
+  }
+
+  function update() {
+    const n = document.querySelectorAll('.pill.selected').length;
+    countEl.textContent = n;
+
+    // Dots fill up to 3
+    dots.forEach((d, i) => {
+      d.classList.toggle('filled', i < Math.min(n, 3));
+    });
+
+    // Show count badge after 1+
+    countEl.classList.toggle('visible', n > 0);
+
+    // Enable after 3
+    nextBtn.disabled = n < 3;
+  }
+
+  function addCustom() {
+    const input = document.getElementById('customInput');
+    const val = input.value.trim();
+    if (!val) return;
+
+    const grid = document.getElementById('pillGrid');
+    const pill = document.createElement('div');
+    pill.className = 'pill selected';
+    pill.onclick = function() { toggle(this); };
+    pill.innerHTML = `<span class="pill-check" style="width:18px;margin-right:6px;opacity:1">✓</span>${val}`;
+    grid.appendChild(pill);
+
+    input.value = '';
+    update();
+
+    // Scroll pill into view
+    pill.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  update();
+</script>
+</body>
+</html>

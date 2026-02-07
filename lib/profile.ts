@@ -5,15 +5,15 @@ export function calculateCompletion(data: Partial<Profile>): number {
   let total = 0;
 
   const checks: [unknown, number][] = [
-    [data.full_name, 10],
+    [data.full_name, 15],
     [data.headline, 5],
-    [data.preferred_city, 10],
-    [data.work_preference && data.work_preference !== "any", 5],
-    [(data.skills || []).length >= 5, 20],
-    [(data.skills || []).length > 0 && (data.skills || []).length < 5, 10],
-    [data.skill_proficiencies && Object.keys(data.skill_proficiencies).length > 0, 10],
-    [data.experience_level, 10],
-    [data.education, 10],
+    [data.preferred_city, 5],
+    [data.work_preference && data.work_preference !== "any", 10],
+    [(data.skills || []).length >= 3, 20],
+    [(data.skills || []).length > 0 && (data.skills || []).length < 3, 10],
+    [data.skill_proficiencies && Object.keys(data.skill_proficiencies).length > 0, 5],
+    [data.experience_level, 5],
+    [data.education, 5],
     [data.field_of_study, 5],
     [data.desired_salary_min || data.desired_salary_max, 5],
     [data.employment_type && data.employment_type !== "full_time", 5],

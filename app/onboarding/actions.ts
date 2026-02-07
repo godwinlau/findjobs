@@ -24,8 +24,8 @@ export async function saveOnboardingStep(step: number, data: Partial<Profile>) {
     return { error: "Not authenticated." };
   }
 
-  // Validate step number
-  if (typeof step !== "number" || step < 0 || step > 6) {
+  // Validate step number (0-2 for the 4-step flow; step 3 uses completeOnboarding)
+  if (typeof step !== "number" || step < 0 || step > 2) {
     return { error: "Invalid step." };
   }
 
@@ -34,42 +34,23 @@ export async function saveOnboardingStep(step: number, data: Partial<Profile>) {
     user_role: "job_seeker",
   };
 
-  // Step 0: Work Type (preferred_industries, employment_type)
+  // Step 0: Welcome (full_name, employment_type)
   if (step === 0) {
-    if (data.preferred_industries) updateData.preferred_industries = data.preferred_industries;
+    if (data.full_name) updateData.full_name = data.full_name.trim();
     if (data.employment_type) updateData.employment_type = data.employment_type;
   }
 
-  // Step 1: Location (preferred_city, work_preference, willing_to_relocate)
+  // Step 1: Skills (skills)
   if (step === 1) {
-    if (data.preferred_city !== undefined) updateData.preferred_city = data.preferred_city || null;
-    if (data.work_preference) updateData.work_preference = data.work_preference;
-    if (data.willing_to_relocate !== undefined) updateData.willing_to_relocate = data.willing_to_relocate;
-  }
-
-  // Step 2: Skills (skills, skill_proficiencies)
-  if (step === 2) {
     if (data.skills) updateData.skills = data.skills;
-    if (data.skill_proficiencies) updateData.skill_proficiencies = data.skill_proficiencies;
   }
 
-  // Step 3: Experience (experience_level, field_of_study)
-  if (step === 3) {
-    if (data.experience_level) updateData.experience_level = data.experience_level;
-    if (data.field_of_study !== undefined) updateData.field_of_study = data.field_of_study || null;
-  }
-
-  // Step 4: Salary (desired_salary_min, desired_salary_max)
-  if (step === 4) {
+  // Step 2: Preferences (preferred_industries, work_preference, desired_salary_min/max)
+  if (step === 2) {
+    if (data.preferred_industries) updateData.preferred_industries = data.preferred_industries;
+    if (data.work_preference) updateData.work_preference = data.work_preference;
     if (data.desired_salary_min !== undefined) updateData.desired_salary_min = data.desired_salary_min;
     if (data.desired_salary_max !== undefined) updateData.desired_salary_max = data.desired_salary_max;
-  }
-
-  // Step 5: Identity (full_name, education, school)
-  if (step === 5) {
-    if (data.full_name) updateData.full_name = data.full_name.trim();
-    if (data.education !== undefined) updateData.education = data.education || null;
-    if (data.school !== undefined) updateData.school = data.school || null;
   }
 
   const { error } = await supabase
@@ -106,26 +87,19 @@ export async function completeOnboarding(data: Partial<Profile>) {
 
   const updateData: Record<string, unknown> = {
     onboarding_completed: true,
-    onboarding_step: 7,
+    onboarding_step: 4,
     user_role: "job_seeker",
     profile_completion: completion,
   };
 
-  // Save all fields from all steps
-  if (data.preferred_industries) updateData.preferred_industries = data.preferred_industries;
+  // Save fields from the 4-step flow
+  if (data.full_name) updateData.full_name = data.full_name.trim();
   if (data.employment_type) updateData.employment_type = data.employment_type;
-  if (data.preferred_city !== undefined) updateData.preferred_city = data.preferred_city || null;
-  if (data.work_preference) updateData.work_preference = data.work_preference;
-  if (data.willing_to_relocate !== undefined) updateData.willing_to_relocate = data.willing_to_relocate;
   if (data.skills) updateData.skills = data.skills;
-  if (data.skill_proficiencies) updateData.skill_proficiencies = data.skill_proficiencies;
-  if (data.experience_level) updateData.experience_level = data.experience_level;
-  if (data.field_of_study !== undefined) updateData.field_of_study = data.field_of_study || null;
+  if (data.preferred_industries) updateData.preferred_industries = data.preferred_industries;
+  if (data.work_preference) updateData.work_preference = data.work_preference;
   if (data.desired_salary_min !== undefined) updateData.desired_salary_min = data.desired_salary_min;
   if (data.desired_salary_max !== undefined) updateData.desired_salary_max = data.desired_salary_max;
-  if (data.full_name) updateData.full_name = data.full_name.trim();
-  if (data.education !== undefined) updateData.education = data.education || null;
-  if (data.school !== undefined) updateData.school = data.school || null;
 
   const { error } = await supabase
     .from("profiles")

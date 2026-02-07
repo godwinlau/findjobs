@@ -9,7 +9,7 @@ import { MatchPotentialBlock } from "./MatchPotentialBlock";
 import { YourSkillsBlock } from "./YourSkillsBlock";
 import { QuickActionsBlock } from "./QuickActionsBlock";
 import { AssessmentQuizModal } from "./AssessmentQuizModal";
-import type { InsightHeroData, MatchProgression, DemandTrend, UserSkillBar, GapResourceLink } from "@/lib/learn-page-helpers";
+import type { InsightHeroData, MatchProgression, MatchPotentialData, DemandTrend, UserSkillBar, GapResourceLink } from "@/lib/learn-page-helpers";
 import type { SkillROI, SkillAssessment, QuizResult } from "@/lib/types/learn";
 
 interface LearnPageClientProps {
@@ -21,6 +21,7 @@ interface LearnPageClientProps {
     currentPct: number;
     fullPotentialPct: number;
   };
+  matchPotential: MatchPotentialData | null;
   demandTrends: DemandTrend[];
   userSkillBars: UserSkillBar[];
   assessments: SkillAssessment[];
@@ -32,6 +33,7 @@ export function LearnPageClient({
   skillROIs,
   resourceLinksMap,
   matchProgression,
+  matchPotential,
   demandTrends,
   userSkillBars,
   assessments,
@@ -63,7 +65,7 @@ export function LearnPageClient({
 
   return (
     <>
-      <InsightHero data={heroData} />
+      <InsightHero data={heroData} matchPotential={matchPotential} />
 
       <div className="learn-two-col">
         {/* Main column */}
@@ -81,6 +83,7 @@ export function LearnPageClient({
             items={matchProgression.items}
             currentPct={matchProgression.currentPct}
             fullPotentialPct={matchProgression.fullPotentialPct}
+            matchPotential={matchPotential}
           />
           <YourSkillsBlock skills={userSkillBars} />
           <QuickActionsBlock onTakeAssessment={handleTakeAssessment} />

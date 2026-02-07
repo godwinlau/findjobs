@@ -1,6 +1,6 @@
 "use client";
 
-import type { MatchProgression } from "@/lib/learn-page-helpers";
+import type { MatchProgression, MatchPotentialData } from "@/lib/learn-page-helpers";
 
 const MONO = "'Space Mono', monospace";
 
@@ -8,13 +8,18 @@ interface MatchPotentialBlockProps {
   items: MatchProgression[];
   currentPct: number;
   fullPotentialPct: number;
+  matchPotential: MatchPotentialData | null;
 }
 
 export function MatchPotentialBlock({
   items,
   currentPct,
   fullPotentialPct,
+  matchPotential,
 }: MatchPotentialBlockProps) {
+  // Use real match counts when available, fall back to percentage heuristic
+  const useRealCounts = matchPotential !== null;
+
   return (
     <div
       style={{
@@ -42,7 +47,7 @@ export function MatchPotentialBlock({
         Match Potential
       </div>
 
-      {/* Current avg */}
+      {/* Current */}
       <div
         style={{
           display: "flex",
@@ -53,54 +58,97 @@ export function MatchPotentialBlock({
         }}
       >
         <span style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>
-          Current avg.
+          Current
         </span>
         <span style={{ fontFamily: MONO, fontSize: 13, fontWeight: 700 }}>
-          {currentPct}%
+          {useRealCounts
+            ? `${matchPotential.currentMatches} matches`
+            : `${currentPct}%`}
         </span>
       </div>
 
       {/* Progression rows */}
-      {items.map((item, i) => (
-        <div
-          key={i}
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "8px 0",
-            borderBottom:
-              i < items.length - 1
-                ? "1px solid rgba(255,255,255,.06)"
-                : "none",
-          }}
-        >
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>
-            + {item.skill.charAt(0).toUpperCase() + item.skill.slice(1)}
-          </span>
-          <span
-            style={{
-              fontFamily: MONO,
-              fontSize: 13,
-              fontWeight: 700,
-              color: "#FBBF24",
-            }}
-          >
-            {item.fromPct}%
-            <span
+      {useRealCounts
+        ? matchPotential.progression.map((item, i) => (
+            <div
+              key={i}
               style={{
-                fontFamily: MONO,
-                fontSize: 10,
-                color: "rgba(255,255,255,.2)",
-                margin: "0 6px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "8px 0",
+                borderBottom:
+                  i < matchPotential.progression.length - 1
+                    ? "1px solid rgba(255,255,255,.06)"
+                    : "none",
               }}
             >
-              →
-            </span>
-            {item.toPct}%
-          </span>
-        </div>
-      ))}
+              <span style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>
+                + {item.skill.charAt(0).toUpperCase() + item.skill.slice(1)}
+              </span>
+              <span
+                style={{
+                  fontFamily: MONO,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: "#FBBF24",
+                }}
+              >
+                {item.matchesBefore}
+                <span
+                  style={{
+                    fontFamily: MONO,
+                    fontSize: 10,
+                    color: "rgba(255,255,255,.2)",
+                    margin: "0 6px",
+                  }}
+                >
+                  →
+                </span>
+                {item.matchesAfter}
+              </span>
+            </div>
+          ))
+        : items.map((item, i) => (
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "8px 0",
+                borderBottom:
+                  i < items.length - 1
+                    ? "1px solid rgba(255,255,255,.06)"
+                    : "none",
+              }}
+            >
+              <span style={{ fontSize: 12, color: "rgba(255,255,255,.5)" }}>
+                + {item.skill.charAt(0).toUpperCase() + item.skill.slice(1)}
+              </span>
+              <span
+                style={{
+                  fontFamily: MONO,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: "#FBBF24",
+                }}
+              >
+                {item.fromPct}%
+                <span
+                  style={{
+                    fontFamily: MONO,
+                    fontSize: 10,
+                    color: "rgba(255,255,255,.2)",
+                    margin: "0 6px",
+                  }}
+                >
+                  →
+                </span>
+                {item.toPct}%
+              </span>
+            </div>
+          ))}
 
       {/* Full potential */}
       <div
@@ -122,7 +170,9 @@ export function MatchPotentialBlock({
             color: "#FBBF24",
           }}
         >
-          {fullPotentialPct}%
+          {useRealCounts
+            ? `${matchPotential.fullPotentialMatches} matches`
+            : `${fullPotentialPct}%`}
         </span>
       </div>
     </div>

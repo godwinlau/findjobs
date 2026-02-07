@@ -1,10 +1,18 @@
 "use client";
 
-import type { InsightHeroData } from "@/lib/learn-page-helpers";
+import type { InsightHeroData, MatchPotentialData } from "@/lib/learn-page-helpers";
 
 const MONO = "'Space Mono', monospace";
 
-export function InsightHero({ data }: { data: InsightHeroData }) {
+interface InsightHeroProps {
+  data: InsightHeroData;
+  matchPotential: MatchPotentialData | null;
+}
+
+export function InsightHero({ data, matchPotential }: InsightHeroProps) {
+  const useRealCounts = matchPotential !== null && data.currentMatches !== null;
+  const jobsUnlocked = data.jobsUnlocked;
+
   return (
     <div className="learn-insight-hero">
       {/* Left panel - dark with grid texture */}
@@ -36,7 +44,7 @@ export function InsightHero({ data }: { data: InsightHeroData }) {
           <span style={{ color: "#FBBF24" }}>
             {data.skillsAwayCount} skill{data.skillsAwayCount !== 1 ? "s" : ""}
           </span>{" "}
-          away from {data.jobsUnlocked}+ more matches
+          away from {jobsUnlocked}+ more matches
         </div>
         <p
           style={{
@@ -48,8 +56,9 @@ export function InsightHero({ data }: { data: InsightHeroData }) {
             maxWidth: 380,
           }}
         >
-          We analyzed jobs matching your profile. Here&apos;s what the market
-          wants — and where you can level up.
+          {useRealCounts
+            ? `We scored ${data.totalJobsAnalyzed} active jobs against your profile. Here's what the market wants — and where you can level up.`
+            : "We analyzed jobs matching your profile. Here's what the market wants — and where you can level up."}
         </p>
         <div style={{ marginTop: "auto", position: "relative", zIndex: 1 }}>
           <div
@@ -61,7 +70,7 @@ export function InsightHero({ data }: { data: InsightHeroData }) {
               color: "#FBBF24",
             }}
           >
-            {data.overallPercentage}%
+            {useRealCounts ? data.currentMatches : `${data.overallPercentage}%`}
           </div>
           <div
             style={{
@@ -73,7 +82,7 @@ export function InsightHero({ data }: { data: InsightHeroData }) {
               marginTop: 4,
             }}
           >
-            Current Avg. Match Score
+            {useRealCounts ? "Current Job Matches" : "Current Avg. Match Score"}
           </div>
         </div>
       </div>
@@ -101,7 +110,7 @@ export function InsightHero({ data }: { data: InsightHeroData }) {
           }}
         >
           <div style={{ fontSize: 28, fontWeight: 800, letterSpacing: "-.03em" }}>
-            +{data.jobsUnlocked}
+            +{jobsUnlocked}
           </div>
           <div
             style={{
@@ -113,7 +122,9 @@ export function InsightHero({ data }: { data: InsightHeroData }) {
               lineHeight: 1.4,
             }}
           >
-            Jobs unlocked if you add top 3 skills
+            {useRealCounts
+              ? "Jobs unlocked with top 3 skills"
+              : "Jobs unlocked if you add top 3 skills"}
           </div>
         </div>
 
@@ -147,7 +158,7 @@ export function InsightHero({ data }: { data: InsightHeroData }) {
           </div>
         </div>
 
-        {/* Potential match */}
+        {/* Potential match / skill coverage */}
         <div
           style={{
             border: "2px solid #0A0A0A",
@@ -168,7 +179,9 @@ export function InsightHero({ data }: { data: InsightHeroData }) {
               color: "#FBBF24",
             }}
           >
-            {data.potentialMatchPct}%
+            {useRealCounts
+              ? matchPotential!.fullPotentialMatches
+              : `${data.potentialMatchPct}%`}
           </div>
           <div
             style={{
@@ -180,7 +193,9 @@ export function InsightHero({ data }: { data: InsightHeroData }) {
               lineHeight: 1.4,
             }}
           >
-            Potential match score with top skills
+            {useRealCounts
+              ? "Full potential matches"
+              : "Potential match score with top skills"}
           </div>
         </div>
 

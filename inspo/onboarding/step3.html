@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onboarding — Preferences</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#F5F5F0;font-family:'Sora',sans-serif;color:#0A0A0A;min-height:100vh;display:flex;flex-direction:column}
+  ::selection{background:#0A0A0A;color:#F5F5F0}
+
+  /* ============ TOP BAR ============ */
+  .topbar{background:#0A0A0A;color:#F5F5F0;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between}
+  .topbar-left{display:flex;align-items:center;gap:10px}
+  .topbar-logo{width:30px;height:30px;background:#FBBF24;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:#0A0A0A}
+  .topbar-wordmark{font-size:15px;font-weight:800;letter-spacing:-.03em}
+  .topbar-skip{font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.25);cursor:pointer;border:0;background:0;transition:color .15s;padding:8px 0}
+  .topbar-skip:hover{color:rgba(255,255,255,.5)}
+
+  /* ============ PROGRESS ============ */
+  .progress-wrap{padding:0 24px;background:#F5F5F0}
+  .progress-inner{max-width:520px;margin:0 auto;padding:24px 0 0}
+  .progress-steps{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+  .prog-seg{flex:1;height:4px;background:#E0DDD8}
+  .prog-seg.done{background:#0A0A0A}
+  .prog-seg.active{background:#FBBF24}
+  .prog-label{font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#bbb}
+
+  /* ============ MAIN ============ */
+  .main{flex:1;display:flex;justify-content:center;padding:32px 24px 120px}
+  .content{width:100%;max-width:520px}
+  .ob-title{font-size:32px;font-weight:800;letter-spacing:-.04em;line-height:1.05;margin-bottom:8px}
+  .ob-title span{color:#FBBF24}
+  .ob-desc{font-size:14px;line-height:1.6;color:#888;margin-bottom:36px}
+  @media(max-width:500px){.ob-title{font-size:26px}}
+
+  /* ============ FIELD SECTIONS ============ */
+  .field{margin-bottom:32px}
+  .field-label{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#0A0A0A;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .field-label-num{width:22px;height:22px;background:#0A0A0A;color:#F5F5F0;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+  .field-hint{font-family:'Space Mono',monospace;font-size:9px;color:#bbb;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px}
+  .field-opt{font-family:'Space Mono',monospace;font-size:9px;color:#FBBF24;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-left:auto}
+
+  /* ============ ROLE PILLS (multi-select) ============ */
+  .pills{display:flex;flex-wrap:wrap;gap:7px}
+  .pill{
+    font-family:'Space Mono',monospace;font-size:11px;font-weight:700;
+    padding:9px 16px;border:2px solid #0A0A0A;background:#F5F5F0;color:#0A0A0A;
+    cursor:pointer;transition:all .1s;user-select:none;display:flex;align-items:center;gap:0;
+  }
+  .pill:hover{background:#EEEEE8}
+  .pill:active{transform:scale(.97)}
+  .pill.selected{background:#0A0A0A;color:#FBBF24}
+  .pill.selected .pill-check{width:16px;margin-right:5px;opacity:1}
+  .pill-check{width:0;margin-right:0;opacity:0;transition:all .15s;font-size:10px;flex-shrink:0;overflow:hidden}
+  @media(max-width:500px){.pill{font-size:10px;padding:8px 12px}}
+
+  /* ============ LOCATION (single-select cards) ============ */
+  .loc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0}
+  @media(max-width:400px){.loc-grid{grid-template-columns:1fr}}
+  .loc-card{
+    border:2px solid #0A0A0A;margin-top:-2px;margin-left:-2px;
+    padding:18px 20px;cursor:pointer;transition:all .1s;
+    display:flex;align-items:center;gap:12px;user-select:none;
+  }
+  .loc-card:hover{background:#EEEEE8}
+  .loc-card:active{transform:scale(.99)}
+  .loc-card.selected{background:#0A0A0A;color:#F5F5F0}
+  .loc-card.selected .loc-radio{background:#FBBF24;border-color:#FBBF24}
+  .loc-card.selected .loc-radio::after{opacity:1}
+  .loc-card.selected .loc-emoji{filter:none}
+  .loc-radio{width:18px;height:18px;border:2px solid rgba(0,0,0,.2);flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;transition:all .15s}
+  .loc-radio::after{content:'';width:8px;height:8px;background:#0A0A0A;opacity:0;transition:opacity .15s}
+  .loc-emoji{font-size:18px;flex-shrink:0}
+  .loc-text{display:flex;flex-direction:column;gap:1px}
+  .loc-name{font-size:14px;font-weight:700;letter-spacing:-.01em}
+  .loc-sub{font-family:'Space Mono',monospace;font-size:9px;color:#888;text-transform:uppercase;letter-spacing:.03em}
+  .loc-card.selected .loc-sub{color:rgba(255,255,255,.35)}
+
+  /* ============ SALARY (range slider) ============ */
+  .salary-section{display:flex;flex-direction:column;gap:14px}
+  .salary-display{display:flex;justify-content:space-between;align-items:flex-end}
+  .salary-val{font-size:28px;font-weight:800;letter-spacing:-.04em;line-height:1}
+  .salary-val span{color:#FBBF24}
+  .salary-period{font-family:'Space Mono',monospace;font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.04em}
+  .salary-skip{font-family:'Space Mono',monospace;font-size:10px;color:#bbb;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;border:0;background:0;transition:color .15s;padding:0}
+  .salary-skip:hover{color:#0A0A0A}
+  .salary-skip.active{color:#FBBF24;font-weight:700}
+
+  /* Slider track */
+  .slider-wrap{position:relative;height:40px;display:flex;align-items:center}
+  .slider-track{width:100%;height:6px;background:#E0DDD8;position:relative}
+  .slider-fill{position:absolute;height:100%;background:#0A0A0A;top:0;transition:left .05s,width .05s}
+  .slider-fill.disabled{background:#E0DDD8}
+
+  /* Dual thumb via two range inputs stacked */
+  .slider-wrap input[type=range]{
+    position:absolute;width:100%;top:50%;transform:translateY(-50%);
+    -webkit-appearance:none;appearance:none;
+    background:transparent;pointer-events:none;margin:0;height:40px;
+  }
+  .slider-wrap input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;
+    width:24px;height:24px;background:#0A0A0A;border:3px solid #F5F5F0;
+    cursor:pointer;pointer-events:all;position:relative;z-index:2;
+    box-shadow:0 0 0 2px #0A0A0A;transition:background .15s;
+  }
+  .slider-wrap input[type=range]::-webkit-slider-thumb:hover{background:#FBBF24;box-shadow:0 0 0 2px #FBBF24}
+  .slider-wrap input[type=range]::-moz-range-thumb{
+    width:24px;height:24px;background:#0A0A0A;border:3px solid #F5F5F0;
+    cursor:pointer;pointer-events:all;border-radius:0;
+    box-shadow:0 0 0 2px #0A0A0A;
+  }
+  .slider-wrap input[type=range].disabled{pointer-events:none;opacity:.2}
+
+  .salary-ticks{display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:8px;color:#ccc;text-transform:uppercase;letter-spacing:.03em;margin-top:2px}
+
+  /* ============ BOTTOM BAR ============ */
+  .bottom-bar{position:fixed;bottom:0;left:0;right:0;background:#F5F5F0;border-top:3px solid #0A0A0A;z-index:50}
+  .bottom-inner{max-width:520px;margin:0 auto;padding:16px 24px;display:flex;justify-content:space-between;align-items:center}
+  .bb-back{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#888;cursor:pointer;border:0;background:0;padding:10px 0;transition:color .15s}
+  .bb-back:hover{color:#0A0A0A}
+  .bb-right{display:flex;align-items:center;gap:14px}
+  .bb-progress{display:flex;align-items:center;gap:6px}
+  .bb-check{width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;transition:all .2s}
+  .bb-check.done{background:#FBBF24;color:#0A0A0A}
+  .bb-check.empty{border:1.5px solid #E0DDD8}
+  .bb-next{padding:12px 28px;background:#0A0A0A;color:#F5F5F0;border:none;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;transition:all .15s}
+  .bb-next:hover:not(:disabled){background:#FBBF24;color:#0A0A0A;box-shadow:4px 4px 0 #0A0A0A;transform:translate(-2px,-2px)}
+  .bb-next:disabled{opacity:.25;cursor:not-allowed}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">JB</div>
+    <span class="topbar-wordmark">Jobboard</span>
+  </div>
+  <button class="topbar-skip">Skip</button>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap"><div class="progress-inner">
+  <div class="progress-steps">
+    <div class="prog-seg done"></div>
+    <div class="prog-seg done"></div>
+    <div class="prog-seg active"></div>
+    <div class="prog-seg"></div>
+  </div>
+  <div class="prog-label">Step 3 of 4</div>
+</div></div>
+
+<!-- MAIN -->
+<div class="main"><div class="content">
+
+  <div class="ob-title">What are you <span>looking for</span>?</div>
+  <p class="ob-desc">Quick preferences so we show you the right jobs. You can always change these later.</p>
+
+  <!-- ===== 1. ROLES ===== -->
+  <div class="field">
+    <div class="field-label"><span class="field-label-num">1</span> Roles you want</div>
+    <div class="field-hint">Select all that apply</div>
+    <div class="pills" id="rolePills">
+      <div class="pill" onclick="togglePill(this)"><span class="pill-check">✓</span>Product Designer</div>
+      <div class="pill" onclick="togglePill(this)"><span class="pill-check">✓</span>UI Designer</div>
+      <div class="pill" onclick="togglePill(this)"><span class="pill-check">✓</span>UX Designer</div>
+      <div class="pill" onclick="togglePill(this)"><span class="pill-check">✓</span>UX Engineer</div>
+      <div class="pill" onclick="togglePill(this)"><span class="pill-check">✓</span>Frontend Developer</div>
+      <div class="pill" onclick="togglePill(this)"><span class="pill-check">✓</span>Full-Stack Developer</div>
+      <div class="pill" onclick="togglePill(this)"><span class="pill-check">✓</span>Design Engineer</div>
+      <div class="pill" onclick="togglePill(this)"><span class="pill-check">✓</span>Mobile Developer</div>
+      <div class="pill" onclick="togglePill(this)"><span class="pill-check">✓</span>Shopify Developer</div>
+      <div class="pill" onclick="togglePill(this)"><span class="pill-check">✓</span>Product Manager</div>
+      <div class="pill" onclick="togglePill(this)"><span class="pill-check">✓</span>Data Analyst</div>
+      <div class="pill" onclick="togglePill(this)"><span class="pill-check">✓</span>QA Engineer</div>
+      <div class="pill" onclick="togglePill(this)"><span class="pill-check">✓</span>DevOps</div>
+      <div class="pill" onclick="togglePill(this)"><span class="pill-check">✓</span>Customer Support</div>
+      <div class="pill" onclick="togglePill(this)"><span class="pill-check">✓</span>Virtual Assistant</div>
+    </div>
+  </div>
+
+  <!-- ===== 2. LOCATION ===== -->
+  <div class="field">
+    <div class="field-label"><span class="field-label-num">2</span> Work setup</div>
+    <div class="loc-grid" id="locGrid">
+      <div class="loc-card" onclick="selectLoc(this)">
+        <div class="loc-radio"></div>
+        <div class="loc-emoji">🌍</div>
+        <div class="loc-text"><div class="loc-name">Remote</div><div class="loc-sub">Work from anywhere</div></div>
+      </div>
+      <div class="loc-card" onclick="selectLoc(this)">
+        <div class="loc-radio"></div>
+        <div class="loc-emoji">🏢</div>
+        <div class="loc-text"><div class="loc-name">On-site</div><div class="loc-sub">Office-based</div></div>
+      </div>
+      <div class="loc-card" onclick="selectLoc(this)">
+        <div class="loc-radio"></div>
+        <div class="loc-emoji">🔀</div>
+        <div class="loc-text"><div class="loc-name">Hybrid</div><div class="loc-sub">Mix of both</div></div>
+      </div>
+      <div class="loc-card" onclick="selectLoc(this)">
+        <div class="loc-radio"></div>
+        <div class="loc-emoji">✌️</div>
+        <div class="loc-text"><div class="loc-name">No preference</div><div class="loc-sub">Show me everything</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 3. SALARY ===== -->
+  <div class="field">
+    <div class="field-label">
+      <span class="field-label-num">3</span> Salary range
+      <span class="field-opt">Optional</span>
+    </div>
+    <div class="salary-section">
+      <div class="salary-display">
+        <div>
+          <div class="salary-val" id="salaryVal">₱30K <span>–</span> ₱80K</div>
+          <div class="salary-period">Monthly · before tax</div>
+        </div>
+        <button class="salary-skip" id="salarySkip" onclick="toggleSalarySkip()">Skip this</button>
+      </div>
+      <div class="slider-wrap">
+        <div class="slider-track">
+          <div class="slider-fill" id="sliderFill" style="left:15%;width:40%"></div>
+        </div>
+        <input type="range" min="0" max="200" value="30" id="rangeMin" oninput="updateSalary()">
+        <input type="range" min="0" max="200" value="80" id="rangeMax" oninput="updateSalary()">
+      </div>
+      <div class="salary-ticks">
+        <span>₱0</span>
+        <span>₱50K</span>
+        <span>₱100K</span>
+        <span>₱150K</span>
+        <span>₱200K+</span>
+      </div>
+    </div>
+  </div>
+
+</div></div>
+
+<!-- BOTTOM BAR -->
+<div class="bottom-bar"><div class="bottom-inner">
+  <button class="bb-back">← Back</button>
+  <div class="bb-right">
+    <div class="bb-progress">
+      <div class="bb-check empty" id="chk1"></div>
+      <div class="bb-check empty" id="chk2"></div>
+    </div>
+    <button class="bb-next" id="bbNext" disabled onclick="handleNext()">See My Matches →</button>
+  </div>
+</div></div>
+
+<script>
+  let rolesSelected = 0;
+  let locSelected = false;
+  let salarySkipped = false;
+
+  function togglePill(el) {
+    el.classList.toggle('selected');
+    rolesSelected = document.querySelectorAll('#rolePills .pill.selected').length;
+    validate();
+  }
+
+  function selectLoc(el) {
+    document.querySelectorAll('.loc-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    locSelected = true;
+    validate();
+  }
+
+  function validate() {
+    const chk1 = document.getElementById('chk1');
+    const chk2 = document.getElementById('chk2');
+    const btn = document.getElementById('bbNext');
+
+    // Check 1: at least 1 role
+    if (rolesSelected > 0) {
+      chk1.className = 'bb-check done';
+      chk1.textContent = '✓';
+    } else {
+      chk1.className = 'bb-check empty';
+      chk1.textContent = '';
+    }
+
+    // Check 2: location selected
+    if (locSelected) {
+      chk2.className = 'bb-check done';
+      chk2.textContent = '✓';
+    } else {
+      chk2.className = 'bb-check empty';
+      chk2.textContent = '';
+    }
+
+    // Enable continue if both required fields done
+    btn.disabled = !(rolesSelected > 0 && locSelected);
+  }
+
+  // Salary slider
+  function updateSalary() {
+    const min = parseInt(document.getElementById('rangeMin').value);
+    const max = parseInt(document.getElementById('rangeMax').value);
+
+    // Prevent crossover
+    if (min > max - 10) {
+      document.getElementById('rangeMin').value = max - 10;
+      return;
+    }
+
+    const lo = Math.max(0, min);
+    const hi = Math.min(200, max);
+
+    const display = document.getElementById('salaryVal');
+    const fill = document.getElementById('sliderFill');
+
+    if (hi >= 200) {
+      display.innerHTML = `₱${lo}K <span>–</span> ₱200K+`;
+    } else {
+      display.innerHTML = `₱${lo}K <span>–</span> ₱${hi}K`;
+    }
+
+    fill.style.left = (lo / 200 * 100) + '%';
+    fill.style.width = ((hi - lo) / 200 * 100) + '%';
+
+    // If user interacts with salary, un-skip
+    if (salarySkipped) {
+      salarySkipped = false;
+      document.getElementById('salarySkip').classList.remove('active');
+      fill.classList.remove('disabled');
+      document.getElementById('rangeMin').classList.remove('disabled');
+      document.getElementById('rangeMax').classList.remove('disabled');
+    }
+  }
+
+  function toggleSalarySkip() {
+    salarySkipped = !salarySkipped;
+    const btn = document.getElementById('salarySkip');
+    const fill = document.getElementById('sliderFill');
+    const r1 = document.getElementById('rangeMin');
+    const r2 = document.getElementById('rangeMax');
+
+    if (salarySkipped) {
+      btn.classList.add('active');
+      btn.textContent = 'Skipped ✓';
+      fill.classList.add('disabled');
+      r1.classList.add('disabled');
+      r2.classList.add('disabled');
+      document.getElementById('salaryVal').innerHTML = `<span style="color:#bbb">No preference</span>`;
+    } else {
+      btn.classList.remove('active');
+      btn.textContent = 'Skip this';
+      fill.classList.remove('disabled');
+      r1.classList.remove('disabled');
+      r2.classList.remove('disabled');
+      updateSalary();
+    }
+  }
+
+  function handleNext() {
+    alert('→ Loading your matches…');
+  }
+
+  validate();
+</script>
+</body>
+</html>
