@@ -793,68 +793,63 @@
 .map-body {
   background: var(--hb-border);
   position: relative;
-  height: 240px;
+  height: 280px;
   overflow: hidden;
 }
 
-.map-body::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-  background-size: 28px 28px;
+.map-country {
+  fill: #1a1a1a;
+  stroke: #2a2a2a;
+  stroke-width: 0.5px;
 }
 
-.map-dot {
-  position: absolute;
-  border-radius: 50%;
-  animation: dotPulse 2.5s ease-in-out infinite;
+.map-marker-dot {
+  fill: var(--hb-accent);
 }
 
-@keyframes dotPulse {
-  0%, 100% {
-    opacity: 0.5;
-    transform: scale(1);
+.map-marker-dot.dot-lg {
+  opacity: 1;
+}
+
+.map-marker-dot.dot-md {
+  opacity: 0.6;
+}
+
+.map-marker-dot.dot-sm {
+  fill: rgba(255, 255, 255, 0.15);
+}
+
+.map-marker-pulse {
+  fill: none;
+  stroke: var(--hb-accent);
+  stroke-width: 1px;
+  opacity: 0;
+  animation: markerPulse 2.5s ease-out infinite;
+}
+
+@keyframes markerPulse {
+  0% {
+    r: 5;
+    opacity: 0.6;
   }
-  50% {
-    opacity: 1;
-    transform: scale(1.4);
+  100% {
+    r: 18;
+    opacity: 0;
   }
 }
 
-.map-dot::after {
-  content: attr(data-label);
-  position: absolute;
-  bottom: -16px;
-  left: 50%;
-  transform: translateX(-50%);
+.map-marker-label {
   font-family: 'Space Mono', monospace;
   font-size: 7px;
-  color: rgba(255, 255, 255, 0.25);
+  fill: rgba(255, 255, 255, 0.25);
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  white-space: nowrap;
 }
 
-.dot-lg {
-  width: 10px;
-  height: 10px;
-  background: var(--hb-accent);
-}
-
-.dot-md {
-  width: 7px;
-  height: 7px;
-  background: var(--hb-accent);
-  opacity: 0.5;
-}
-
-.dot-sm {
-  width: 4px;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.12);
+@media (max-width: 500px) {
+  .map-body {
+    height: 200px;
+  }
 }
 
 .map-stats {

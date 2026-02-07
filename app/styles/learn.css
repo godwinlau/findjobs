@@ -1,9 +1,94 @@
 /* ═══════════════════════════════════════════════════════
-   LEARN PAGE STYLES
-   Horizontal scroll container for skill assessment cards
-   on the Learn page.
+   LEARN PAGE — Brutalist Redesign
    ═══════════════════════════════════════════════════════ */
 
+/* ── Insight Hero ── */
+.learn-insight-hero {
+  border: 3px solid #0A0A0A;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 32px;
+}
+@media (max-width: 700px) {
+  .learn-insight-hero { grid-template-columns: 1fr; }
+}
+
+.ih-left-panel {
+  background: #0A0A0A;
+  color: #F5F5F0;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.ih-left-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
+
+/* ── Two-Column Layout ── */
+.learn-two-col {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 28px;
+}
+@media (max-width: 800px) {
+  .learn-two-col { grid-template-columns: 1fr; }
+}
+
+/* ── Demand Grid ── */
+.learn-demand-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0;
+}
+@media (max-width: 600px) {
+  .learn-demand-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Gap Card Hover ── */
+.gap-card:hover {
+  background: #EEEEE8;
+  z-index: 2;
+}
+
+/* ── Demand Card Hover ── */
+.demand-card:hover {
+  background: #EEEEE8;
+}
+
+/* ── Resource Link Hover Variants ── */
+.res-link:hover {
+  border-color: #0A0A0A;
+  color: #0A0A0A;
+}
+.res-link-yt:hover {
+  border-color: #cc0000;
+}
+.res-link-fcc:hover {
+  border-color: #0A0A0A;
+}
+.res-link-docs:hover {
+  border-color: #3B82F6;
+}
+.res-link-course:hover {
+  border-color: #A45CFF;
+}
+
+/* ── Quick Action Hover ── */
+.qa-btn:hover {
+  border-color: #0A0A0A;
+}
+
+/* ── Assessment scroll (preserved) ── */
 .learn-assessments-scroll {
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;

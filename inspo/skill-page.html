@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skills</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#F5F5F0;font-family:'Sora',sans-serif;color:#0A0A0A;min-height:100vh}
+  ::selection{background:#0A0A0A;color:#F5F5F0}
+
+  /* ============ NAV ============ */
+  .nav{position:sticky;top:0;z-index:100;background:#0A0A0A;color:#F5F5F0;border-bottom:3px solid #0A0A0A}
+  .nav-inner{max-width:1060px;margin:0 auto;padding:0 20px;display:flex;align-items:stretch;height:60px}
+  .nav-brand{display:flex;align-items:center;gap:10px;padding-right:24px;border-right:2px solid rgba(255,255,255,.1);flex-shrink:0;cursor:pointer;transition:opacity .15s;text-decoration:none;color:#F5F5F0}
+  .nav-brand:hover{opacity:.8}
+  .nav-logo{width:32px;height:32px;background:#FBBF24;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:#0A0A0A}
+  .nav-wordmark{font-size:16px;font-weight:800;letter-spacing:-.03em}
+  .nav-links{display:flex;align-items:stretch;list-style:none;flex:1}
+  .nav-links li{display:flex;align-items:stretch;border-right:1px solid rgba(255,255,255,.06)}
+  .nav-links a{display:flex;align-items:center;padding:0 20px;font-family:'Space Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.4);text-decoration:none;transition:all .15s;position:relative}
+  .nav-links a:hover{color:#F5F5F0;background:rgba(255,255,255,.04)}
+  .nav-links a.active{color:#FBBF24;background:rgba(251,191,36,.05)}
+  .nav-links a.active::after{content:'';position:absolute;bottom:-3px;left:0;width:100%;height:3px;background:#FBBF24}
+  .nav-links .badge{font-size:9px;font-weight:700;background:#FBBF24;color:#0A0A0A;padding:2px 6px;margin-left:8px}
+  .nav-right{display:flex;align-items:stretch;margin-left:auto;border-left:2px solid rgba(255,255,255,.1)}
+  .nav-btn{display:flex;align-items:center;padding:0 16px;background:0;border:0;color:rgba(255,255,255,.4);cursor:pointer;transition:all .15s;border-left:1px solid rgba(255,255,255,.06);position:relative}
+  .nav-btn:hover{color:#F5F5F0;background:rgba(255,255,255,.04)}
+  .nav-btn svg{width:18px;height:18px}
+  .nav-btn .notif-dot{width:6px;height:6px;background:#FBBF24;position:absolute;top:16px;right:14px}
+  .nav-avatar{width:28px;height:28px;background:#FBBF24;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#0A0A0A}
+  @media(max-width:700px){.nav-links a span.full{display:none}.nav-links a span.short{display:inline}.nav-links a{padding:0 12px;font-size:10px}.nav-wordmark{display:none}}
+  @media(min-width:701px){.nav-links a span.short{display:none}}
+
+  /* ============ PAGE ============ */
+  .page{max-width:1060px;margin:0 auto;padding:28px 20px 60px}
+  .sec{margin-bottom:32px}
+  .sec-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:14px}
+  .sec-left{display:flex;flex-direction:column;gap:3px}
+  .sec-label{font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#888}
+  .sec-title{font-size:24px;font-weight:800;letter-spacing:-.04em;line-height:1}
+  .sec-link{font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:#888;cursor:pointer;background:0;border:0;padding:0;transition:color .15s}
+  .sec-link:hover{color:#0A0A0A}
+
+  /* ============ INSIGHT HERO ============ */
+  .insight-hero{border:3px solid #0A0A0A;display:grid;grid-template-columns:1fr 1fr;margin-bottom:32px}
+  @media(max-width:700px){.insight-hero{grid-template-columns:1fr}}
+
+  .ih-left{background:#0A0A0A;color:#F5F5F0;padding:40px;display:flex;flex-direction:column;gap:16px;position:relative;overflow:hidden}
+  .ih-left::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
+  .ih-label{font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.3);position:relative;z-index:1}
+  .ih-title{font-size:36px;font-weight:800;letter-spacing:-.04em;line-height:1.05;position:relative;z-index:1}
+  .ih-title span{color:#FBBF24}
+  .ih-sub{font-size:14px;line-height:1.6;color:rgba(255,255,255,.4);position:relative;z-index:1;max-width:380px}
+  .ih-big-stat{margin-top:auto;position:relative;z-index:1}
+  .ih-big-val{font-size:72px;font-weight:800;letter-spacing:-.06em;line-height:.85;color:#FBBF24}
+  .ih-big-label{font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,255,255,.25);margin-top:4px}
+
+  .ih-right{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  .ih-stat{border:2px solid #0A0A0A;margin-top:-2px;margin-left:-2px;padding:28px;display:flex;flex-direction:column;justify-content:space-between;gap:8px}
+  .ih-stat-val{font-size:28px;font-weight:800;letter-spacing:-.03em}
+  .ih-stat-val.yellow{color:#FBBF24}
+  .ih-stat-label{font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:#888;line-height:1.4}
+  .ih-stat-yellow{background:#FBBF24}
+  .ih-stat-yellow .ih-stat-label{color:rgba(10,10,10,.5)}
+
+  /* ============ TWO-COL ============ */
+  .two-col{display:grid;grid-template-columns:1fr 320px;gap:28px}
+  @media(max-width:800px){.two-col{grid-template-columns:1fr}}
+
+  /* ============ SKILL GAPS ============ */
+  .gap-list{display:flex;flex-direction:column;gap:0}
+  .gap-card{border:2px solid #0A0A0A;margin-top:-2px;padding:24px;display:flex;flex-direction:column;gap:14px;transition:all .15s;position:relative}
+  .gap-card:hover{background:#EEEEE8;z-index:2}
+
+  .gap-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+  .gap-left{display:flex;gap:14px;align-items:flex-start;flex:1}
+  .gap-badge{width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;flex-shrink:0}
+  .gap-badge-yellow{background:#FBBF24;color:#0A0A0A}
+  .gap-badge-dark{background:#0A0A0A;color:#F5F5F0}
+  .gap-info{display:flex;flex-direction:column;gap:4px}
+  .gap-name{font-size:18px;font-weight:800;letter-spacing:-.03em;line-height:1.15}
+  .gap-reason{font-family:'Space Mono',monospace;font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.04em}
+
+  .gap-boost{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+  .gap-boost-val{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;padding:5px 12px;background:#FBBF24;color:#0A0A0A}
+  .gap-boost-label{font-family:'Space Mono',monospace;font-size:9px;color:#888;text-transform:uppercase;letter-spacing:.03em}
+
+  .gap-impact{display:flex;gap:12px;flex-wrap:wrap}
+  .gap-impact-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#555}
+  .gap-impact-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:12px;background:rgba(0,0,0,.04)}
+
+  /* Resources row */
+  .gap-resources{display:flex;gap:6px;flex-wrap:wrap;padding-top:12px;border-top:1px solid rgba(0,0,0,.06)}
+  .res-link{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;padding:5px 12px;border:1.5px solid rgba(0,0,0,.1);text-transform:uppercase;letter-spacing:.04em;color:#555;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+  .res-link:hover{border-color:#0A0A0A;color:#0A0A0A}
+  .res-link svg{width:10px;height:10px}
+  .res-link-yt{border-color:rgba(255,0,0,.15);color:#cc0000}
+  .res-link-yt:hover{border-color:#cc0000}
+  .res-link-fcc{border-color:rgba(10,10,10,.15);color:#0A0A0A}
+  .res-link-docs{border-color:rgba(59,130,246,.15);color:#3B82F6}
+  .res-link-docs:hover{border-color:#3B82F6}
+  .res-link-udemy{border-color:rgba(164,92,255,.15);color:#A45CFF}
+  .res-link-udemy:hover{border-color:#A45CFF}
+
+  /* ============ MARKET DEMAND ============ */
+  .demand-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0}
+  @media(max-width:600px){.demand-grid{grid-template-columns:1fr}}
+  .demand-card{border:2px solid #0A0A0A;margin-top:-2px;margin-left:-2px;padding:20px;display:flex;flex-direction:column;gap:8px;cursor:default;transition:background .15s}
+  .demand-card:hover{background:#EEEEE8}
+  .demand-top{display:flex;justify-content:space-between;align-items:center}
+  .demand-name{font-size:14px;font-weight:700;letter-spacing:-.01em}
+  .demand-trend{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:3px 8px}
+  .demand-trend.up{background:#FBBF24;color:#0A0A0A}
+  .demand-trend.stable{background:#E0DDD8;color:#555}
+  .demand-trend.down{background:#0A0A0A;color:#F5F5F0}
+  .demand-bar{height:10px;background:#E0DDD8}
+  .demand-fill{height:100%;background:#0A0A0A}
+  .demand-fill.hot{background:#FBBF24}
+  .demand-meta{display:flex;justify-content:space-between}
+  .demand-meta span{font-family:'Space Mono',monospace;font-size:9px;color:#888;text-transform:uppercase;letter-spacing:.03em}
+  .demand-meta strong{color:#0A0A0A}
+  .demand-yours{font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.03em;padding:3px 8px;display:inline-block;margin-top:2px}
+  .demand-yours.have{border:1px solid rgba(0,0,0,.1);color:#0A0A0A}
+  .demand-yours.missing{border:1px dashed rgba(251,191,36,.4);color:#B45309;background:rgba(251,191,36,.05)}
+
+  /* ============ SIDEBAR ============ */
+  .sb-card{border:2px solid #0A0A0A;margin-bottom:-2px;padding:24px}
+  .sb-title{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:14px}
+
+  /* Your skills */
+  .my-skills{display:flex;flex-direction:column;gap:10px}
+  .my-skill{display:flex;align-items:center;gap:10px}
+  .my-skill-name{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;width:90px;flex-shrink:0;color:#555}
+  .my-skill-track{flex:1;height:8px;background:#E0DDD8}
+  .my-skill-fill{height:100%;background:#0A0A0A}
+  .my-skill-fill.accent{background:#FBBF24}
+  .my-skill-tag{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;width:28px;text-align:right;flex-shrink:0}
+
+  /* Match potential */
+  .potential-block{background:#0A0A0A;color:#F5F5F0;border:2px solid #0A0A0A;padding:24px;margin-bottom:-2px;display:flex;flex-direction:column;gap:14px}
+  .pot-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+  .pot-row:last-child{border-bottom:0}
+  .pot-label{font-size:12px;color:rgba(255,255,255,.5)}
+  .pot-val{font-family:'Space Mono',monospace;font-size:13px;font-weight:700}
+  .pot-val.yellow{color:#FBBF24}
+  .pot-arrow{font-family:'Space Mono',monospace;font-size:10px;color:rgba(255,255,255,.2);margin:0 6px}
+
+  /* Top missing -->
+  .missing-list{display:flex;flex-direction:column;gap:0}
+  .missing-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(0,0,0,.05)}
+  .missing-item:last-child{border-bottom:0}
+  .missing-name{font-size:12px;font-weight:600}
+  .missing-jobs{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;padding:3px 8px;background:#FBBF24;color:#0A0A0A}
+
+  /* Quick actions */
+  .quick-actions{display:flex;flex-direction:column;gap:6px}
+  .qa-btn{display:flex;align-items:center;gap:10px;padding:12px;border:1.5px solid rgba(0,0,0,.08);cursor:pointer;transition:all .15s;background:0}
+  .qa-btn:hover{border-color:#0A0A0A}
+  .qa-icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:16px;background:rgba(0,0,0,.03);flex-shrink:0}
+  .qa-text{display:flex;flex-direction:column;gap:1px}
+  .qa-title{font-size:12px;font-weight:700}
+  .qa-desc{font-size:10px;color:#888}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav"><div class="nav-inner">
+  <a class="nav-brand" href="#"><div class="nav-logo">JB</div><span class="nav-wordmark">Jobboard</span></a>
+  <ul class="nav-links">
+    <li><a href="#"><span class="full">Home</span><span class="short">Home</span></a></li>
+    <li><a href="#"><span class="full">Explore</span><span class="short">🔍</span></a></li>
+    <li><a href="#" class="active"><span class="full">Skills</span><span class="short">Skills</span></a></li>
+    <li><a href="#"><span class="full">Applications</span><span class="short">Apps</span></a></li>
+    <li><a href="#"><span class="full">Profile</span><span class="short">Me</span></a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></button>
+    <button class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span class="notif-dot"></span></button>
+    <button class="nav-btn"><div class="nav-avatar">GR</div></button>
+  </div>
+</div></nav>
+
+<div class="page">
+
+  <!-- ===== INSIGHT HERO ===== -->
+  <div class="insight-hero">
+    <div class="ih-left">
+      <div class="ih-label">// your skill analysis</div>
+      <div class="ih-title">You're <span>3 skills</span> away from 40+ more matches</div>
+      <p class="ih-sub">We analyzed 2,400 jobs matching your profile. Here's what the market wants — and where you can level up.</p>
+      <div class="ih-big-stat">
+        <div class="ih-big-val">89%</div>
+        <div class="ih-big-label">Current Avg. Match Score</div>
+      </div>
+    </div>
+    <div class="ih-right">
+      <div class="ih-stat ih-stat-yellow"><div class="ih-stat-val">+40</div><div class="ih-stat-label">Jobs unlocked if you add top 3 skills</div></div>
+      <div class="ih-stat"><div class="ih-stat-val">8</div><div class="ih-stat-label">Skills on your profile</div></div>
+      <div class="ih-stat"><div class="ih-stat-val yellow">96%</div><div class="ih-stat-label">Potential match score with top skills</div></div>
+      <div class="ih-stat"><div class="ih-stat-val">2,400</div><div class="ih-stat-label">Jobs analyzed for your profile</div></div>
+    </div>
+  </div>
+
+  <!-- ===== TWO-COL ===== -->
+  <div class="two-col">
+    <div>
+
+      <!-- Skill gaps with resources -->
+      <div class="sec">
+        <div class="sec-header">
+          <div class="sec-left"><span class="sec-label">// biggest opportunities</span><div class="sec-title">Skill Gaps to Close</div></div>
+        </div>
+        <div class="gap-list">
+
+          <div class="gap-card">
+            <div class="gap-top">
+              <div class="gap-left">
+                <div class="gap-badge gap-badge-dark">TS</div>
+                <div class="gap-info">
+                  <div class="gap-name">TypeScript</div>
+                  <div class="gap-reason">Required in 8 of your top 10 matches</div>
+                </div>
+              </div>
+              <div class="gap-boost">
+                <div class="gap-boost-val">+12% match</div>
+                <div class="gap-boost-label">Est. boost</div>
+              </div>
+            </div>
+            <div class="gap-impact">
+              <div class="gap-impact-item"><div class="gap-impact-icon">💼</div>Unlocks 28 new jobs</div>
+              <div class="gap-impact-item"><div class="gap-impact-icon">💰</div>Avg. salary $165K</div>
+              <div class="gap-impact-item"><div class="gap-impact-icon">📈</div>+34% demand YoY</div>
+            </div>
+            <div class="gap-resources">
+              <a class="res-link res-link-yt" href="#">▶ YouTube: TS in 1 Hour</a>
+              <a class="res-link res-link-fcc" href="#">freeCodeCamp</a>
+              <a class="res-link res-link-docs" href="#">Official Docs</a>
+              <a class="res-link res-link-udemy" href="#">Udemy Course</a>
+            </div>
+          </div>
+
+          <div class="gap-card">
+            <div class="gap-top">
+              <div class="gap-left">
+                <div class="gap-badge gap-badge-yellow">DS</div>
+                <div class="gap-info">
+                  <div class="gap-name">Design Systems</div>
+                  <div class="gap-reason">Listed in 5 senior roles you match</div>
+                </div>
+              </div>
+              <div class="gap-boost">
+                <div class="gap-boost-val">+8% match</div>
+                <div class="gap-boost-label">Est. boost</div>
+              </div>
+            </div>
+            <div class="gap-impact">
+              <div class="gap-impact-item"><div class="gap-impact-icon">💼</div>Unlocks 16 new jobs</div>
+              <div class="gap-impact-item"><div class="gap-impact-icon">💰</div>Avg. salary $185K</div>
+              <div class="gap-impact-item"><div class="gap-impact-icon">📈</div>+18% demand YoY</div>
+            </div>
+            <div class="gap-resources">
+              <a class="res-link res-link-yt" href="#">▶ Build a Design System</a>
+              <a class="res-link res-link-docs" href="#">Figma Docs</a>
+              <a class="res-link res-link-fcc" href="#">Storybook Guide</a>
+            </div>
+          </div>
+
+          <div class="gap-card">
+            <div class="gap-top">
+              <div class="gap-left">
+                <div class="gap-badge gap-badge-dark">A11Y</div>
+                <div class="gap-info">
+                  <div class="gap-name">Accessibility (WCAG)</div>
+                  <div class="gap-reason">Mentioned in 40% of design roles</div>
+                </div>
+              </div>
+              <div class="gap-boost">
+                <div class="gap-boost-val">+6% match</div>
+                <div class="gap-boost-label">Est. boost</div>
+              </div>
+            </div>
+            <div class="gap-impact">
+              <div class="gap-impact-item"><div class="gap-impact-icon">💼</div>Unlocks 12 new jobs</div>
+              <div class="gap-impact-item"><div class="gap-impact-icon">💰</div>Avg. salary $155K</div>
+              <div class="gap-impact-item"><div class="gap-impact-icon">📈</div>+22% demand YoY</div>
+            </div>
+            <div class="gap-resources">
+              <a class="res-link res-link-yt" href="#">▶ A11Y Crash Course</a>
+              <a class="res-link res-link-docs" href="#">WCAG Guidelines</a>
+              <a class="res-link res-link-fcc" href="#">MDN Accessibility</a>
+            </div>
+          </div>
+
+          <div class="gap-card">
+            <div class="gap-top">
+              <div class="gap-left">
+                <div class="gap-badge gap-badge-yellow">🎬</div>
+                <div class="gap-info">
+                  <div class="gap-name">Motion Design</div>
+                  <div class="gap-reason">Bonus skill in 12 of your matches</div>
+                </div>
+              </div>
+              <div class="gap-boost">
+                <div class="gap-boost-val">+5% match</div>
+                <div class="gap-boost-label">Est. boost</div>
+              </div>
+            </div>
+            <div class="gap-impact">
+              <div class="gap-impact-item"><div class="gap-impact-icon">💼</div>Unlocks 8 new jobs</div>
+              <div class="gap-impact-item"><div class="gap-impact-icon">💰</div>Avg. salary $148K</div>
+              <div class="gap-impact-item"><div class="gap-impact-icon">📈</div>+28% demand YoY</div>
+            </div>
+            <div class="gap-resources">
+              <a class="res-link res-link-yt" href="#">▶ Framer Motion</a>
+              <a class="res-link res-link-udemy" href="#">Lottie Course</a>
+              <a class="res-link res-link-docs" href="#">Framer Docs</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Market demand -->
+      <div class="sec">
+        <div class="sec-header">
+          <div class="sec-left"><span class="sec-label">// ph market · design & engineering</span><div class="sec-title">Skill Demand Trends</div></div>
+          <button class="sec-link">View all →</button>
+        </div>
+        <div class="demand-grid">
+          <div class="demand-card">
+            <div class="demand-top"><div class="demand-name">React</div><span class="demand-trend up">+34%</span></div>
+            <div class="demand-bar"><div class="demand-fill hot" style="width:88%"></div></div>
+            <div class="demand-meta"><span><strong>512</strong> jobs</span><span>Avg. $140K</span></div>
+            <span class="demand-yours have">✓ On your profile</span>
+          </div>
+          <div class="demand-card">
+            <div class="demand-top"><div class="demand-name">TypeScript</div><span class="demand-trend up">+42%</span></div>
+            <div class="demand-bar"><div class="demand-fill hot" style="width:82%"></div></div>
+            <div class="demand-meta"><span><strong>468</strong> jobs</span><span>Avg. $155K</span></div>
+            <span class="demand-yours missing">⚡ Missing — high impact</span>
+          </div>
+          <div class="demand-card">
+            <div class="demand-top"><div class="demand-name">Figma</div><span class="demand-trend up">+18%</span></div>
+            <div class="demand-bar"><div class="demand-fill" style="width:76%"></div></div>
+            <div class="demand-meta"><span><strong>386</strong> jobs</span><span>Avg. $130K</span></div>
+            <span class="demand-yours have">✓ On your profile</span>
+          </div>
+          <div class="demand-card">
+            <div class="demand-top"><div class="demand-name">Next.js</div><span class="demand-trend up">+52%</span></div>
+            <div class="demand-bar"><div class="demand-fill hot" style="width:70%"></div></div>
+            <div class="demand-meta"><span><strong>324</strong> jobs</span><span>Avg. $148K</span></div>
+            <span class="demand-yours have">✓ On your profile</span>
+          </div>
+          <div class="demand-card">
+            <div class="demand-top"><div class="demand-name">Node.js</div><span class="demand-trend stable">+8%</span></div>
+            <div class="demand-bar"><div class="demand-fill" style="width:65%"></div></div>
+            <div class="demand-meta"><span><strong>290</strong> jobs</span><span>Avg. $135K</span></div>
+            <span class="demand-yours missing">⚡ Not on profile</span>
+          </div>
+          <div class="demand-card">
+            <div class="demand-top"><div class="demand-name">Python</div><span class="demand-trend up">+28%</span></div>
+            <div class="demand-bar"><div class="demand-fill" style="width:62%"></div></div>
+            <div class="demand-meta"><span><strong>268</strong> jobs</span><span>Avg. $142K</span></div>
+            <span class="demand-yours missing">⚡ Not on profile</span>
+          </div>
+          <div class="demand-card">
+            <div class="demand-top"><div class="demand-name">Shopify / Liquid</div><span class="demand-trend stable">+5%</span></div>
+            <div class="demand-bar"><div class="demand-fill" style="width:35%"></div></div>
+            <div class="demand-meta"><span><strong>86</strong> jobs</span><span>Avg. $95K</span></div>
+            <span class="demand-yours have">✓ On your profile</span>
+          </div>
+          <div class="demand-card">
+            <div class="demand-top"><div class="demand-name">AWS / Cloud</div><span class="demand-trend up">+38%</span></div>
+            <div class="demand-bar"><div class="demand-fill hot" style="width:72%"></div></div>
+            <div class="demand-meta"><span><strong>340</strong> jobs</span><span>Avg. $158K</span></div>
+            <span class="demand-yours missing">⚡ Not on profile</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== SIDEBAR ===== -->
+    <div>
+
+      <!-- Match potential -->
+      <div class="potential-block">
+        <div class="sb-title" style="color:rgba(255,255,255,.3)">Match Potential</div>
+        <div class="pot-row">
+          <span class="pot-label">Current avg.</span>
+          <span class="pot-val">89%</span>
+        </div>
+        <div class="pot-row">
+          <span class="pot-label">+ TypeScript</span>
+          <span class="pot-val yellow">89%<span class="pot-arrow">→</span>94%</span>
+        </div>
+        <div class="pot-row">
+          <span class="pot-label">+ Design Systems</span>
+          <span class="pot-val yellow">94%<span class="pot-arrow">→</span>96%</span>
+        </div>
+        <div class="pot-row">
+          <span class="pot-label">+ Accessibility</span>
+          <span class="pot-val yellow">96%<span class="pot-arrow">→</span>97%</span>
+        </div>
+        <div class="pot-row">
+          <span class="pot-label" style="color:#F5F5F0;font-weight:600">Full potential</span>
+          <span class="pot-val yellow" style="font-size:16px">97%</span>
+        </div>
+      </div>
+
+      <!-- Your current skills -->
+      <div class="sb-card">
+        <div class="sb-title">Your Skills</div>
+        <div class="my-skills">
+          <div class="my-skill"><span class="my-skill-name">Figma</span><div class="my-skill-track"><div class="my-skill-fill accent" style="width:95%"></div></div><span class="my-skill-tag">95</span></div>
+          <div class="my-skill"><span class="my-skill-name">HTML/CSS</span><div class="my-skill-track"><div class="my-skill-fill accent" style="width:96%"></div></div><span class="my-skill-tag">96</span></div>
+          <div class="my-skill"><span class="my-skill-name">Product</span><div class="my-skill-track"><div class="my-skill-fill accent" style="width:92%"></div></div><span class="my-skill-tag">92</span></div>
+          <div class="my-skill"><span class="my-skill-name">Shopify</span><div class="my-skill-track"><div class="my-skill-fill" style="width:88%"></div></div><span class="my-skill-tag">88</span></div>
+          <div class="my-skill"><span class="my-skill-name">Design Sys</span><div class="my-skill-track"><div class="my-skill-fill" style="width:85%"></div></div><span class="my-skill-tag">85</span></div>
+          <div class="my-skill"><span class="my-skill-name">React</span><div class="my-skill-track"><div class="my-skill-fill" style="width:78%"></div></div><span class="my-skill-tag">78</span></div>
+          <div class="my-skill"><span class="my-skill-name">Next.js</span><div class="my-skill-track"><div class="my-skill-fill" style="width:74%"></div></div><span class="my-skill-tag">74</span></div>
+          <div class="my-skill"><span class="my-skill-name">UX Research</span><div class="my-skill-track"><div class="my-skill-fill" style="width:70%"></div></div><span class="my-skill-tag">70</span></div>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="sb-card">
+        <div class="sb-title">Quick Actions</div>
+        <div class="quick-actions">
+          <button class="qa-btn">
+            <div class="qa-icon">➕</div>
+            <div class="qa-text"><div class="qa-title">Add a skill to profile</div><div class="qa-desc">Learned something new? Update your profile</div></div>
+          </button>
+          <button class="qa-btn">
+            <div class="qa-icon">📄</div>
+            <div class="qa-text"><div class="qa-title">Upload a certificate</div><div class="qa-desc">Verify skills with credentials</div></div>
+          </button>
+          <button class="qa-btn">
+            <div class="qa-icon">🎯</div>
+            <div class="qa-text"><div class="qa-title">Take a skill assessment</div><div class="qa-desc">Quick quiz to validate your level</div></div>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

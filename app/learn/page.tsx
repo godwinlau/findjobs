@@ -1,38 +1,22 @@
 import { redirect } from "next/navigation";
-import { colors } from "@/lib/constants/colors";
 import { SKILL_CATEGORIES } from "@/lib/constants/onboarding";
 import { Navbar } from "@/components/layout";
-import { ResponsiveContainer } from "@/components/layout/ResponsiveContainer";
 import { buildSkillsSnapshot, selectQuestions } from "@/lib/learn";
 import {
   buildRecommendationContext,
   scoreAndRankCourses,
   computeSkillROI,
-  rankLearningPaths,
-  rankQuickWins,
-  rankFreeResources,
 } from "@/lib/recommendations";
 import {
-  SkillsSnapshotHero,
-  LearningPathsSection,
-  AssessmentsSection,
-  QuickWinsSection,
-  FreeResourcesSection,
-  LearningActivityFeed,
-  SkillROISection,
-  RecommendedCoursesSection,
-} from "@/components/learn";
-import {
-  skillAssessments,
-  learningActivities,
-  quickWins as hardcodedWins,
-  freeResources as hardcodedResources,
-  learningPaths as hardcodedPaths,
-} from "@/lib/data/learnMockData";
-import {
-  getCourseCatalog,
-  getQuestionBank,
-} from "@/lib/data/learn-data";
+  buildInsightHeroData,
+  buildMatchProgression,
+  buildDemandTrends,
+  buildGapResourceLinks,
+  buildUserSkillBars,
+} from "@/lib/learn-page-helpers";
+import { LearnPageClient } from "@/components/learn";
+import { skillAssessments } from "@/lib/data/learnMockData";
+import { getCourseCatalog, getQuestionBank } from "@/lib/data/learn-data";
 import { getAssessmentResults } from "@/lib/actions/assessments";
 import { createClient } from "@/lib/supabase/server";
 import type { SkillAssessment } from "@/lib/types/learn";
@@ -57,12 +41,7 @@ export default async function LearnPage() {
     .eq("id", user.id)
     .single();
 
-  // Fetch all content in parallel (Notion → fallback to hardcoded)
-  const [
-    courseCatalog,
-    questionBank,
-    assessmentResults,
-  ] = await Promise.all([
+  const [courseCatalog, questionBank, assessmentResults] = await Promise.all([
     getCourseCatalog(),
     getQuestionBank(),
     getAssessmentResults(),
@@ -85,11 +64,16 @@ export default async function LearnPage() {
     return { ...a, questions };
   });
 
-  // Build recommendation context from profile + snapshot + assessment results
+  // Build recommendation context
   const assessmentScores: Record<string, { score: number; total: number }> = {};
   if (assessmentResults) {
     for (const [categoryId, result] of Object.entries(assessmentResults)) {
-      if (result && typeof result === "object" && "score" in result && "total" in result) {
+      if (
+        result &&
+        typeof result === "object" &&
+        "score" in result &&
+        "total" in result
+      ) {
         assessmentScores[categoryId] = {
           score: result.score as number,
           total: result.total as number,
@@ -108,36 +92,41 @@ export default async function LearnPage() {
   // Compute personalized data
   const scoredCourses = scoreAndRankCourses(courseCatalog, recContext);
   const skillROIs = computeSkillROI(recContext, courseCatalog);
-  const rankedPaths = rankLearningPaths(hardcodedPaths, recContext);
-  const rankedWins = rankQuickWins(hardcodedWins, recContext);
-  const rankedResources = rankFreeResources(hardcodedResources, recContext);
+
+  // Build new page data
+  const heroData = buildInsightHeroData(snapshot, skillROIs, userSkills);
+  const matchProgression = buildMatchProgression(snapshot, skillROIs);
+  const demandTrends = buildDemandTrends(
+    profile?.preferred_industries ?? [],
+    userSkills
+  );
+  const userSkillBars = buildUserSkillBars(userSkills, snapshot);
+
+  // Build resource links for each skill gap
+  const resourceLinksMap: Record<string, ReturnType<typeof buildGapResourceLinks>> = {};
+  for (const roi of skillROIs.slice(0, 5)) {
+    resourceLinksMap[roi.skill] = buildGapResourceLinks(roi, scoredCourses);
+  }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: colors.bg,
-        color: colors.text,
-      }}
-    >
+    <div style={{ minHeight: "100vh", background: "#F5F5F0", color: "#0A0A0A" }}>
       <Navbar
         fullName={profile?.full_name || user.user_metadata?.full_name || ""}
         email={user.email || ""}
       />
 
-      <ResponsiveContainer>
-        <SkillsSnapshotHero snapshot={snapshot} />
-        <SkillROISection skills={skillROIs} />
-        <RecommendedCoursesSection courses={scoredCourses} />
-        <LearningPathsSection paths={rankedPaths} />
-        <AssessmentsSection
+      <div style={{ maxWidth: 1060, margin: "0 auto", padding: "28px 20px 60px" }}>
+        <LearnPageClient
+          heroData={heroData}
+          skillROIs={skillROIs}
+          resourceLinksMap={resourceLinksMap}
+          matchProgression={matchProgression}
+          demandTrends={demandTrends}
+          userSkillBars={userSkillBars}
           assessments={tailoredAssessments}
           initialResults={assessmentResults ?? {}}
         />
-        <QuickWinsSection wins={rankedWins} />
-        <FreeResourcesSection resources={rankedResources} />
-        <LearningActivityFeed activities={learningActivities} />
-      </ResponsiveContainer>
+      </div>
     </div>
   );
 }

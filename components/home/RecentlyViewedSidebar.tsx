@@ -12,9 +12,9 @@ export function RecentlyViewedSidebar({ jobs }: RecentlyViewedSidebarProps) {
     <div className="sidebar-card">
       <div className="sb-title">Recently Viewed</div>
       <div className="rv-list">
-        {jobs.map((job) => (
+        {jobs.map((job, i) => (
           <Link
-            key={job.jobId}
+            key={`${job.jobId}-${i}`}
             href={`/jobs/${job.jobId}`}
             className="rv-item"
             style={{ textDecoration: "none", color: "inherit", display: "block" }}
