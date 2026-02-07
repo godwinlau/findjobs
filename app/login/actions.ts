@@ -13,8 +13,9 @@ export async function sendMagicLink(formData: FormData) {
   const headerList = await headers();
   const forwardedHost = headerList.get("x-forwarded-host");
   const host = headerList.get("host");
-  const protocol = headerList.get("x-forwarded-proto") ?? "http";
-  const origin = `${protocol}://${forwardedHost ?? host}`;
+  const protocol = headerList.get("x-forwarded-proto") ?? "https";
+  const origin = process.env.NEXT_PUBLIC_SITE_URL
+    ?? `${protocol}://${forwardedHost ?? host}`;
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithOtp({
