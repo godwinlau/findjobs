@@ -49,9 +49,12 @@ const ZapIcon = forwardRef<ZapHandle, ZapProps>(
     useEffect(() => {
       let active = true;
       const loop = async () => {
+        // Wait a tick so the motion component is mounted before calling controls.start()
+        await new Promise((r) => setTimeout(r, 0));
         while (active) {
           await controls.start("animate");
           await new Promise((r) => setTimeout(r, 2000));
+          if (!active) break;
           await controls.start("normal");
           await new Promise((r) => setTimeout(r, 500));
         }

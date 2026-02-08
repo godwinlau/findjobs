@@ -1,564 +1,625 @@
 /* ═══════════════════════════════════════════════════════
-   BRUTALIST JOB CARD DESIGN SYSTEM
-   Hard borders, no radius, offset shadows,
-   monospace labels, uppercase everything.
-   Includes base card, hero card, header, source badges,
-   match display, save button, tags, bottom section,
-   and responsive overrides.
+   JOB CARD DESIGN SYSTEM — REVAMPED
+   Brutalist layout with score badge, salary banner,
+   skill bars, and 2-column hero banner.
    ═══════════════════════════════════════════════════════ */
 
-/* ─── Base card ─── */
-.job-card {
-  background: var(--jc-bg);
-  border: 2px solid #0A0A0A;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  cursor: pointer;
-  position: relative;
-  transition: all 0.2s ease;
-  margin-top: -2px;
-}
-
-.job-card:hover {
-  background: #EEEEE8;
-  box-shadow: 6px 6px 0 #0A0A0A;
-  transform: translate(-3px, -3px);
-  z-index: 10;
-}
-
-/* Remove the gradient accent bar — brutalist uses borders */
-.job-card::before {
-  display: none;
-}
-
-/* ─── Hero (featured) card ─── */
-.hero-job-card {
-  background: #0A0A0A;
-  color: #F5F5F0;
-  border: 2px solid #0A0A0A;
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  cursor: pointer;
-  position: relative;
-  transition: all 0.2s ease;
-}
-
-.hero-job-card:hover {
-  background: #1A1A1A;
-  box-shadow: 8px 8px 0 #0A0A0A;
-  transform: translate(-4px, -4px);
-}
-
-.hero-job-card::before {
-  display: none;
-}
-
-.hero-job-card .jc-title {
-  font-size: 32px;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  color: #F5F5F0;
-}
-
-.hero-job-card .jc-salary {
-  font-size: 28px;
-  color: #F5F5F0;
-}
-
-.hero-job-card .jc-company {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: rgba(245,245,240,0.4);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.hero-job-card .jc-desc {
-  font-size: 14px;
-  line-height: 1.65;
-  color: rgba(245,245,240,0.5);
-  max-width: 520px;
-}
-
-.hero-job-card .jc-tag {
-  border: 1px solid rgba(255,255,255,0.15);
-  color: rgba(255,255,255,0.5);
-  background: transparent;
-}
-
-.hero-job-card .jc-bottom {
-  border-top: 2px solid rgba(255,255,255,0.1);
-}
-
-.hero-job-card .jc-time {
-  color: rgba(245,245,240,0.25);
-}
-
-.hero-job-card .jc-save {
-  border: 1.5px solid rgba(255,255,255,0.15);
-  background: transparent;
-}
-
-.hero-job-card .jc-save svg {
-  color: rgba(255,255,255,0.3);
-}
-
-.hero-job-card .jc-save.saved svg {
-  color: #FBBF24;
-  fill: #FBBF24;
-}
-
-.hero-job-card .jc-apply {
-  padding: 14px 32px;
-  background: #F5F5F0;
-  color: #0A0A0A;
-  border: none;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.hero-job-card .jc-apply:hover {
-  background: #FBBF24;
-  box-shadow: 4px 4px 0 rgba(255,255,255,0.2);
-  transform: translate(-2px, -2px);
-}
-
-.hero-job-card .jc-source {
-  border: 1.5px solid;
-  background: transparent !important;
-}
-
-.hero-job-card .jc-match-brutal {
-  background: #F5F5F0;
-  color: #0A0A0A;
-}
-
-/* ─── Card header row ─── */
-.jc-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.jc-header-right {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* ─── Source badges (brutalist bordered) ─── */
-.jc-source {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
+/* ============ SECTION HEADER ============ */
+.matches-header { margin-bottom: 20px }
+.matches-label {
   font-family: var(--font-mono);
   font-size: 10px;
-  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  border: 1.5px solid;
-  flex-shrink: 0;
+  letter-spacing: .08em;
+  color: #888;
+  margin-bottom: 6px;
+}
+.matches-title {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -.04em;
   line-height: 1;
-  transition: filter 0.15s;
-  background: transparent;
+  margin-bottom: 8px;
+}
+.matches-subtitle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #555;
+  letter-spacing: .02em;
 }
 
-.jc-source:hover {
-  filter: brightness(0.9);
-}
-
-.jc-source-icon {
-  width: 16px;
-  height: 16px;
+/* Info banner */
+.matches-info {
+  border: 2px solid #0A0A0A;
+  padding: 14px 24px;
+  margin-bottom: -2px;
+  background: #0A0A0A;
+  color: #F5F5F0;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  gap: 20px;
+  flex-wrap: wrap;
 }
-
-.jc-source-icon svg {
-  width: 10px;
-  height: 10px;
+.matches-info-text {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .02em;
 }
-
-/* ─── Match display (brutalist, no ring) ─── */
-.jc-match {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-  position: relative;
+.matches-info-text span {
+  color: #FBBF24;
+  font-weight: 700;
 }
-
-.jc-match-ring {
-  display: none;
-}
-
-.jc-match-pct {
+.matches-info-link {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
-  padding: 4px 10px;
-  background: #0A0A0A;
-  color: #F5F5F0;
-}
-
-.hero-job-card .jc-match-pct {
-  background: #F5F5F0;
-  color: #0A0A0A;
-}
-
-.jc-match-label {
-  display: none;
-}
-
-/* ─── Match hover popover ─── */
-.jc-match-popover {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  width: 240px;
-  padding: 14px;
-  background: #0A0A0A;
-  color: #F5F5F0;
-  border: 2px solid #0A0A0A;
-  box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-4px);
-  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
-  z-index: 20;
-  pointer-events: none;
-}
-
-.jc-match-popover::before {
-  display: none;
-}
-
-.jc-match:hover .jc-match-popover {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-.jc-match-popover-header {
-  display: flex;
-  align-items: baseline;
-  gap: 5px;
-  margin-bottom: 8px;
-}
-
-.jc-match-popover-pct {
-  font-family: var(--font-mono);
-  font-size: 14px;
-  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
   color: #FBBF24;
+  text-decoration: none;
+  transition: color .15s;
 }
+.matches-info-link:hover { color: #F5F5F0 }
 
-.jc-match--high .jc-match-popover-pct { color: #FBBF24; }
-.jc-match--mid .jc-match-popover-pct { color: #F5F5F0; }
-.jc-match--low .jc-match-popover-pct { color: #888; }
-
-.jc-match-popover-tier {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 400;
-  color: rgba(245,245,240,0.5);
-  text-transform: uppercase;
-}
-
-.jc-match-popover-reason {
-  font-size: 12px;
-  line-height: 1.5;
-  color: rgba(245,245,240,0.6);
-  margin: 0;
-}
-
-.jc-match-popover-label {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: rgba(245,245,240,0.4);
-  margin: 0 0 6px;
-}
-
-.jc-match-popover-skills {
+.matches-wrapper {
   display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 24px;
 }
 
-.jc-match-popover-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 10px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
-  background: rgba(255,255,255,0.08);
-  color: rgba(245,245,240,0.7);
-  text-transform: uppercase;
-  border: 1px solid rgba(255,255,255,0.12);
-  white-space: nowrap;
-  line-height: 1.2;
-}
-
-/* ─── Save button (bookmark) ─── */
-.jc-save {
-  width: 36px;
-  height: 36px;
-  border: 1.5px solid rgba(0,0,0,0.12);
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* ============ HERO BANNER — BEST MATCH ============ */
+.hero-banner {
+  margin-bottom: 12px;
+  border: 2px solid #0A0A0A;
+  background: #0A0A0A;
+  color: #F5F5F0;
+  display: grid;
+  grid-template-columns: 1fr 240px;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
   cursor: pointer;
   transition: all 0.15s;
-  flex-shrink: 0;
+}
+.hero-banner:hover {
+  box-shadow: 8px 8px 0 #0A0A0A;
+  transform: translate(-3px, -3px);
+  z-index: 10;
+  position: relative;
 }
 
-.jc-save:hover {
-  border-color: rgba(0,0,0,0.4);
-}
-
-.jc-save svg {
-  width: 15px;
-  height: 15px;
-  color: #ccc;
-}
-
-.jc-save.saved svg {
-  color: #0A0A0A;
-  fill: #0A0A0A;
-}
-
-/* ─── Top row: logo + company + title ─── */
-.jc-top {
+.hero-left {
+  padding: 28px;
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.jc-logo {
-  width: 48px;
-  height: 48px;
-  border: 2px solid currentColor;
+.hero-header {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.hero-logo {
+  width: 56px;
+  height: 56px;
+  border: 2px solid #FBBF24;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #FFF;
+  overflow: hidden;
+  font-size: 22px;
+  font-weight: 800;
+}
+.hero-logo img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.hero-header-info { flex: 1; min-width: 0 }
+.hero-tag-best {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  padding: 4px 10px;
+  background: #FBBF24;
+  color: #0A0A0A;
+  display: inline-block;
+  margin-bottom: 8px;
+}
+.hero-role {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -.03em;
+  line-height: 1.15;
+  margin-bottom: 6px;
+  color: #F5F5F0;
+}
+.hero-company {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255,255,255,.7);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.hero-verified {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  background: #FBBF24;
+  color: #0A0A0A;
+  font-size: 10px;
+  font-weight: 700;
+}
+.hero-source {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: rgba(255,255,255,.4);
+}
+
+.hero-salary-big {
+  padding: 16px 20px;
+  background: rgba(251,191,36,.15);
+  border: 2px solid #FBBF24;
+  margin: 0 -28px;
+}
+.hero-salary-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: rgba(255,255,255,.4);
+  margin-bottom: 6px;
+}
+.hero-salary-amount {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 700;
+  color: #FBBF24;
+  letter-spacing: -.02em;
+}
+
+.hero-description {
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(255,255,255,.7);
+}
+
+.hero-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+.hero-meta-item { display: flex; flex-direction: column; gap: 3px }
+.hero-meta-label {
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: rgba(255,255,255,.35);
+}
+.hero-meta-value {
+  font-weight: 700;
+  color: rgba(255,255,255,.85);
+}
+
+.hero-right {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: rgba(0,0,0,.3);
+  border-left: 4px solid rgba(255,255,255,.1);
+}
+.hero-score-area { text-align: center }
+.hero-score {
+  font-family: var(--font-mono);
+  font-size: 64px;
+  font-weight: 700;
+  letter-spacing: -.05em;
+  line-height: .8;
+  color: #FBBF24;
+}
+.hero-score-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: rgba(255,255,255,.35);
+  margin-top: 10px;
+}
+
+.hero-skills { flex: 1 }
+.hero-skills-header {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: rgba(255,255,255,.35);
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+.hero-skill {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.hero-skill:last-child { margin-bottom: 0 }
+.hero-skill-name {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.7);
+}
+.hero-skill-percent {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,.35);
+}
+.hero-skill-percent.matched { color: #FBBF24 }
+
+.hero-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-top: 3px solid rgba(255,255,255,.1);
+  margin: 0 -24px -24px -24px;
+}
+.hero-btn {
+  padding: 16px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  border: 0;
+  background: rgba(0,0,0,.3);
+  color: rgba(255,255,255,.6);
+  cursor: pointer;
+  transition: all .15s;
+  text-align: center;
+  border-right: 2px solid rgba(255,255,255,.1);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.hero-btn:last-child { border-right: 0 }
+.hero-btn:hover {
+  color: #F5F5F0;
+  background: rgba(255,255,255,.1);
+}
+.hero-btn.primary {
+  background: #FBBF24;
+  color: #0A0A0A;
+}
+.hero-btn.primary:hover { background: #F5F5F0 }
+
+/* ============ REGULAR JOB CARDS ============ */
+.jobs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.job-card {
+  border: 2px solid #0A0A0A;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+  background: #F5F5F0;
+  min-height: 320px;
+}
+
+.job-card:hover {
+  background: var(--hb-surface-alt);
+  box-shadow: 5px 5px 0 var(--hb-border);
+  transform: translate(-2px, -2px);
+  z-index: 10;
+  position: relative;
+}
+
+/* Score badge */
+.score-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 10px 14px;
+  background: #0A0A0A;
+  z-index: 2;
+}
+.score-num {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -.03em;
+  line-height: .85;
+  color: #FBBF24;
+}
+.score-label {
+  font-family: var(--font-mono);
+  font-size: 7px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: rgba(255,255,255,.3);
+  margin-top: 3px;
+  text-align: center;
+}
+
+/* Header */
+.job-header {
+  padding: 20px;
+  padding-right: 90px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  border-bottom: 2px solid #0A0A0A;
+}
+
+.job-logo {
+  width: 48px;
+  height: 48px;
+  border: 2px solid #0A0A0A;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FFF;
+  box-shadow: 2px 2px 0 rgba(0,0,0,.06);
+  overflow: hidden;
   font-size: 20px;
   font-weight: 800;
-  overflow: hidden;
 }
-
-.hero-job-card .jc-logo {
-  border-color: rgba(255,255,255,0.2);
-}
-
-.jc-logo img {
+.job-logo img {
   width: 28px;
   height: 28px;
   object-fit: contain;
 }
 
-.jc-meta {
-  flex: 1;
-  min-width: 0;
+.job-header-info { flex: 1; min-width: 0 }
+.job-role {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+.job-company {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0A0A0A;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.job-verified {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  background: #0A0A0A;
+  color: #FBBF24;
+  font-size: 9px;
+  font-weight: 700;
+}
+.job-source {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #888;
+  padding: 3px 7px;
+  border: 1.5px solid rgba(0,0,0,.12);
+  display: inline-block;
 }
 
-.jc-company {
+/* Body */
+.job-body {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+}
+
+/* Salary banner */
+.job-salary-top {
+  padding: 12px 16px;
+  background: #0A0A0A;
+  margin: 0 -18px;
+  border-top: 2px solid #0A0A0A;
+  border-bottom: 2px solid #0A0A0A;
+}
+.job-salary-label {
   font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 400;
-  color: #888;
+  font-size: 7px;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: .04em;
+  color: rgba(255,255,255,.4);
   margin-bottom: 4px;
 }
-
-.jc-title {
-  font-size: 20px;
-  font-weight: 800;
-  line-height: 1.15;
-  letter-spacing: -0.03em;
-  color: var(--jc-text);
+.job-salary-amount {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: #FBBF24;
+  letter-spacing: -.02em;
 }
 
-/* ─── Description ─── */
-.jc-desc {
-  font-size: 12.5px;
+/* Description */
+.job-description {
+  font-size: 12px;
   line-height: 1.6;
-  color: #666;
+  color: #333;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-/* ─── Tags ─── */
-.jc-tags {
+/* Info compact */
+.job-info-compact {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
-}
-
-.jc-tag {
-  display: inline-flex;
-  align-items: center;
+  gap: 10px;
   font-family: var(--font-mono);
   font-size: 10px;
-  font-weight: 400;
-  padding: 4px 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  border: 1px solid rgba(0,0,0,0.12);
-  color: #888;
-  background: transparent;
+  color: #555;
+  padding-bottom: 12px;
+  border-bottom: 2px solid rgba(0,0,0,.05);
 }
+.job-info-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.job-info-icon { font-size: 11px }
+.job-info-value { font-weight: 700; color: #0A0A0A }
 
-/* ─── Bottom section (salary + time + CTA) ─── */
-.jc-bottom {
+/* Skills breakdown */
+.job-skills { margin-top: auto }
+.job-skills-header {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #888;
+  margin-bottom: 10px;
+  font-weight: 700;
   display: flex;
   justify-content: space-between;
+}
+.job-skills-count { color: #FBBF24 }
+.job-skills-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.job-skill {
+  display: flex;
   align-items: center;
-  padding-top: 14px;
-  border-top: 2px solid #0A0A0A;
-  margin-top: auto;
+  gap: 8px;
 }
-
-.jc-salary {
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: var(--jc-brand);
-}
-
-.jc-salary span {
+.job-skill-name {
   font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 400;
-  color: #888;
-  display: block;
-  margin-top: 2px;
-}
-
-.jc-salary--undisclosed {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 400;
-  color: #888;
-  text-transform: uppercase;
-}
-
-.jc-time {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: #888;
-  text-transform: uppercase;
-}
-
-.jc-apply {
-  padding: 10px 20px;
-  border: 2px solid #0A0A0A;
-  background: transparent;
-  color: #0A0A0A;
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  transition: all 0.15s;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  letter-spacing: .02em;
+  width: 65px;
+  flex-shrink: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-
-.jc-apply:hover {
+.job-skill-bar {
+  flex: 1;
+  height: 6px;
+  background: #E0DDD8;
+  position: relative;
+  border: 1px solid rgba(0,0,0,.08);
+}
+.job-skill-fill {
+  height: 100%;
   background: #0A0A0A;
-  color: #F5F5F0;
-  box-shadow: 3px 3px 0 #888;
-  transform: translate(-2px, -2px);
+  position: absolute;
+  top: 0;
+  left: 0;
 }
+.job-skill-fill.matched { background: #FBBF24 }
+.job-skill-percent {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: #555;
+  width: 42px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.job-skill-percent.matched { color: #FBBF24 }
 
-/* ─── Hero card grid layout ─── */
-.hero-card-grid {
+/* Footer */
+.job-footer {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 32px;
-  align-items: end;
+  grid-template-columns: 1fr 90px;
+  gap: 0;
+  border-top: 2px solid #0A0A0A;
+}
+.job-btn {
+  padding: 14px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  border: 0;
+  background: #F5F5F0;
+  color: #0A0A0A;
+  cursor: pointer;
+  transition: all .15s;
+  text-align: center;
+  border-right: 2px solid #0A0A0A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: none;
+}
+.job-btn:last-child { border-right: 0 }
+.job-btn:hover { background: #E0DDD8 }
+.job-btn.primary {
+  background: #0A0A0A;
+  color: #FBBF24;
+}
+.job-btn.primary:hover {
+  background: #FBBF24;
+  color: #0A0A0A;
 }
 
-/* ─── Responsive ─── */
-@media (max-width: 700px) {
-  .hero-card-grid {
-    grid-template-columns: 1fr !important;
-    padding: 28px !important;
-    min-height: auto !important;
-    gap: 20px !important;
+/* ============ RESPONSIVE ============ */
+@media (max-width: 900px) {
+  .jobs-grid { grid-template-columns: 1fr }
+  .hero-banner { grid-template-columns: 1fr }
+  .hero-right {
+    border-left: 0;
+    border-top: 2px solid rgba(255,255,255,.1);
   }
-
-  .hero-card-grid .hero-title {
-    font-size: 28px !important;
-  }
-
-  .hero-card-grid .hero-salary {
-    font-size: 24px !important;
-  }
-
-  .hero-card-grid .hero-right {
-    align-items: flex-start !important;
-    flex-direction: row !important;
-    flex-wrap: wrap !important;
-    gap: 12px !important;
-  }
+  .hero-meta-grid { grid-template-columns: repeat(2, 1fr) }
 }
 
 @media (max-width: 639px) {
-  .job-card {
-    padding: 18px;
-  }
-
-  .hero-job-card {
-    padding: 28px;
-  }
-
-  .jc-title {
-    font-size: 16px;
-  }
-
-  .hero-job-card .jc-title {
-    font-size: 24px;
-  }
-
-  .jc-salary {
-    font-size: 14px;
-  }
-
-  .hero-job-card .jc-salary {
-    font-size: 20px;
-  }
-
-  .jc-apply {
-    padding: 7px 16px;
-    font-size: 10px;
-  }
-
-  .jc-logo {
-    width: 40px;
-    height: 40px;
-  }
+  .hero-left { padding: 20px }
+  .hero-right { padding: 20px }
+  .hero-role { font-size: 18px }
+  .hero-salary-amount { font-size: 20px }
+  .hero-salary-big { margin: 0 -20px }
+  .hero-score { font-size: 48px }
+  .hero-actions { margin: 0 -20px -20px -20px }
+  .job-header { padding: 16px; padding-right: 80px }
+  .job-body { padding: 14px }
+  .job-salary-top { margin: 0 -14px }
+  .job-role { font-size: 15px }
+  .matches-title { font-size: 24px }
 }

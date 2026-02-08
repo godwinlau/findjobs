@@ -65,6 +65,7 @@ export interface Job {
   responseTime: string | null;
   highlight: string | null;
   matchedSkills?: string[];
+  skillsRequired?: string[];
   isTop: boolean;
   desc: string;
   applyUrl: string;

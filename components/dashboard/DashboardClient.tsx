@@ -54,7 +54,7 @@ export function DashboardClient({
       )}
 
       {/* Top Matches */}
-      <div data-tour="top-matches">
+      <div>
         <TopMatchesPreview
           topJob={topJob}
           otherJobs={otherJobs}
@@ -75,7 +75,7 @@ export function DashboardClient({
 
       {/* Profile Completion (only if < 100%) */}
       {!profileComplete && (
-        <div data-tour="profile-completion" style={{ marginTop: 20 }}>
+        <div style={{ marginTop: 20 }}>
           <ProfileCompletion
             percentage={profileCompletion}
             matchesUnlocked={highMatchJobCount}

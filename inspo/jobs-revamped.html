@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Top Matches - Final</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#F5F5F0;font-family:'Sora',sans-serif;color:#0A0A0A;min-height:100vh;padding:40px 20px}
+  ::selection{background:#0A0A0A;color:#F5F5F0}
+
+  .container{max-width:1060px;margin:0 auto}
+
+  /* ============ SECTION ============ */
+  .matches-section{margin-bottom:40px}
+  
+  .matches-header{margin-bottom:20px}
+  .matches-label{font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#888;margin-bottom:6px}
+  .matches-title{font-size:32px;font-weight:800;letter-spacing:-.04em;line-height:1;margin-bottom:8px}
+  .matches-subtitle{font-family:'Space Mono',monospace;font-size:11px;color:#555;letter-spacing:.02em}
+
+  /* Info banner */
+  .matches-info{border:3px solid #0A0A0A;padding:14px 24px;margin-bottom:-3px;background:#0A0A0A;color:#F5F5F0;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+  .matches-info-text{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.02em}
+  .matches-info-text span{color:#FBBF24;font-weight:700}
+
+  .matches-wrapper{display:flex;flex-direction:column;gap:0;margin-top:24px}
+
+  /* ============ HERO BANNER - BEST MATCH ============ */
+  .hero-banner{border:4px solid #0A0A0A;background:#0A0A0A;color:#F5F5F0;display:grid;grid-template-columns:1fr 240px;position:relative;overflow:hidden;cursor:pointer;transition:all .2s;margin-bottom:-4px}
+  .hero-banner:hover{transform:translate(-4px,-4px);box-shadow:8px 8px 0 #0A0A0A;z-index:10}
+
+  .hero-left{padding:28px;display:flex;flex-direction:column;gap:16px}
+  
+  .hero-header{display:flex;gap:16px;align-items:flex-start}
+  .hero-logo{width:56px;height:56px;border:2px solid #FBBF24;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#FFF}
+  .hero-logo svg{width:28px;height:28px}
+  
+  .hero-header-info{flex:1;min-width:0}
+  .hero-tag-best{font-family:'Space Mono',monospace;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:4px 10px;background:#FBBF24;color:#0A0A0A;display:inline-block;margin-bottom:8px}
+  .hero-role{font-size:22px;font-weight:800;letter-spacing:-.03em;line-height:1.15;margin-bottom:6px;color:#F5F5F0}
+  .hero-company{font-size:14px;font-weight:700;color:rgba(255,255,255,.7);display:flex;align-items:center;gap:6px;margin-bottom:6px}
+  .hero-verified{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;background:#FBBF24;color:#0A0A0A;font-size:10px;font-weight:700}
+  .hero-source{font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.04em;color:rgba(255,255,255,.4)}
+  
+  .hero-salary-big{padding:16px 20px;background:rgba(251,191,36,.15);border:2px solid #FBBF24;margin:0 -28px}
+  .hero-salary-label{font-family:'Space Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.04em;color:rgba(255,255,255,.4);margin-bottom:6px}
+  .hero-salary-amount{font-family:'Space Mono',monospace;font-size:24px;font-weight:700;color:#FBBF24;letter-spacing:-.02em}
+  
+  .hero-description{font-size:13px;line-height:1.6;color:rgba(255,255,255,.7)}
+  
+  .hero-meta-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;font-family:'Space Mono',monospace;font-size:10px}
+  .hero-meta-item{display:flex;flex-direction:column;gap:3px}
+  .hero-meta-label{font-size:8px;text-transform:uppercase;letter-spacing:.04em;color:rgba(255,255,255,.35)}
+  .hero-meta-value{font-weight:700;color:rgba(255,255,255,.85)}
+  
+  .hero-right{padding:24px;display:flex;flex-direction:column;gap:16px;background:rgba(0,0,0,.3);border-left:4px solid rgba(255,255,255,.1)}
+  .hero-score-area{text-align:center}
+  .hero-score{font-family:'Space Mono',monospace;font-size:64px;font-weight:700;letter-spacing:-.05em;line-height:.8;color:#FBBF24}
+  .hero-score-label{font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.04em;color:rgba(255,255,255,.35);margin-top:10px}
+  
+  .hero-skills{flex:1}
+  .hero-skills-header{font-family:'Space Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.04em;color:rgba(255,255,255,.35);margin-bottom:12px;font-weight:700}
+  .hero-skill{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .hero-skill:last-child{margin-bottom:0}
+  .hero-skill-name{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;text-transform:uppercase;color:rgba(255,255,255,.7)}
+  .hero-skill-percent{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#FBBF24}
+  
+  .hero-actions{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:3px solid rgba(255,255,255,.1);margin:0 -24px -24px -24px}
+  .hero-btn{padding:16px;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;border:0;background:rgba(0,0,0,.3);color:rgba(255,255,255,.6);cursor:pointer;transition:all .15s;text-align:center;border-right:2px solid rgba(255,255,255,.1)}
+  .hero-btn:last-child{border-right:0}
+  .hero-btn:hover{color:#F5F5F0;background:rgba(255,255,255,.1)}
+  .hero-btn.primary{background:#FBBF24;color:#0A0A0A}
+  .hero-btn.primary:hover{background:#F5F5F0}
+
+  /* ============ REGULAR JOB CARDS - COMPRESSED ============ */
+  .jobs-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0}
+  @media(max-width:900px){.jobs-grid{grid-template-columns:1fr}}
+
+  .job-card{border:3px solid #0A0A0A;margin-top:-3px;margin-left:-3px;display:flex;flex-direction:column;cursor:pointer;transition:all .2s;position:relative;background:#F5F5F0;min-height:320px}
+  .job-card:hover{transform:translate(-3px,-3px);box-shadow:6px 6px 0 #0A0A0A;z-index:10}
+
+  /* Score badge */
+  .score-badge{position:absolute;top:16px;right:16px;padding:10px 14px;background:#0A0A0A;z-index:2}
+  .score-num{font-family:'Space Mono',monospace;font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:.85;color:#FBBF24}
+  .score-label{font-family:'Space Mono',monospace;font-size:7px;text-transform:uppercase;letter-spacing:.04em;color:rgba(255,255,255,.3);margin-top:3px;text-align:center}
+
+  /* Header */
+  .job-header{padding:20px;padding-right:90px;display:flex;gap:14px;align-items:flex-start;border-bottom:3px solid #0A0A0A}
+  
+  .job-logo{width:48px;height:48px;border:2px solid #0A0A0A;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#FFF;box-shadow:2px 2px 0 rgba(0,0,0,.06)}
+  .job-logo svg{width:24px;height:24px}
+  
+  .job-header-info{flex:1;min-width:0}
+  .job-role{font-size:17px;font-weight:800;letter-spacing:-.02em;line-height:1.2;margin-bottom:6px}
+  .job-company{font-size:13px;font-weight:700;color:#0A0A0A;margin-bottom:5px;display:flex;align-items:center;gap:5px}
+  .job-verified{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;background:#0A0A0A;color:#FBBF24;font-size:9px;font-weight:700}
+  .job-source{font-family:'Space Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.04em;color:#888;padding:3px 7px;border:1.5px solid rgba(0,0,0,.12);display:inline-block}
+
+  /* Body - SALARY FIRST */
+  .job-body{padding:18px;display:flex;flex-direction:column;gap:14px;flex:1}
+  
+  /* SALARY AT TOP - PROMINENT */
+  .job-salary-top{padding:12px 16px;background:#0A0A0A;margin:0 -18px;border-top:2px solid #0A0A0A;border-bottom:2px solid #0A0A0A}
+  .job-salary-label{font-family:'Space Mono',monospace;font-size:7px;text-transform:uppercase;letter-spacing:.04em;color:rgba(255,255,255,.4);margin-bottom:4px}
+  .job-salary-amount{font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:#FBBF24;letter-spacing:-.02em}
+
+  /* Description - shorter */
+  .job-description{font-size:12px;line-height:1.6;color:#333;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  
+  /* Info compact */
+  .job-info-compact{display:flex;flex-wrap:wrap;gap:10px;font-family:'Space Mono',monospace;font-size:10px;color:#555;padding-bottom:12px;border-bottom:2px solid rgba(0,0,0,.05)}
+  .job-info-item{display:flex;align-items:center;gap:4px;white-space:nowrap}
+  .job-info-icon{font-size:11px}
+  .job-info-value{font-weight:700;color:#0A0A0A}
+  
+  /* Skills breakdown */
+  .job-skills{margin-top:auto}
+  .job-skills-header{font-family:'Space Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.04em;color:#888;margin-bottom:10px;font-weight:700;display:flex;justify-content:space-between}
+  .job-skills-count{color:#FBBF24}
+  .job-skills-list{display:flex;flex-direction:column;gap:8px}
+  .job-skill{display:flex;align-items:center;gap:8px}
+  .job-skill-name{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;width:65px;flex-shrink:0}
+  .job-skill-bar{flex:1;height:6px;background:#E0DDD8;position:relative;border:1px solid rgba(0,0,0,.08)}
+  .job-skill-fill{height:100%;background:#0A0A0A;position:absolute;top:0;left:0}
+  .job-skill-fill.perfect{background:#FBBF24}
+  .job-skill-percent{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:#555;width:28px;text-align:right;flex-shrink:0}
+  .job-skill-percent.perfect{color:#FBBF24}
+  
+  /* Footer */
+  .job-footer{display:grid;grid-template-columns:1fr 90px;gap:0;border-top:3px solid #0A0A0A}
+  .job-btn{padding:14px;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;border:0;background:#F5F5F0;color:#0A0A0A;cursor:pointer;transition:all .15s;text-align:center;border-right:3px solid #0A0A0A;display:flex;align-items:center;justify-content:center;gap:6px}
+  .job-btn:last-child{border-right:0}
+  .job-btn:hover{background:#E0DDD8}
+  .job-btn.primary{background:#0A0A0A;color:#FBBF24}
+  .job-btn.primary:hover{background:#FBBF24;color:#0A0A0A}
+  .job-btn .icon{font-size:11px}
+
+  @media(max-width:900px){
+    .hero-banner{grid-template-columns:1fr}
+    .hero-right{border-left:0;border-top:4px solid rgba(255,255,255,.1)}
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  
+  <div class="matches-section">
+    
+    <!-- Header -->
+    <div class="matches-header">
+      <div class="matches-label">// personalized for you</div>
+      <div class="matches-title">Top Matches</div>
+      <div class="matches-subtitle">6 highly compatible roles · Updated 12 min ago</div>
+    </div>
+
+    <!-- Info banner -->
+    <div class="matches-info">
+      <div class="matches-info-text">Showing <span>6 highly compatible</span> roles from 2,840 active listings</div>
+    </div>
+
+    <div class="matches-wrapper">
+
+      <!-- ============ HERO BANNER - BEST MATCH ============ -->
+      <div class="hero-banner">
+        <div class="hero-left">
+          <div class="hero-header">
+            <div class="hero-logo">
+              <svg viewBox="0 0 24 24" fill="#0A0A0A"><path d="M24 12l-5.657 5.657-1.414-1.414L21.172 12l-4.243-4.243 1.414-1.414L24 12zM2.828 12l4.243 4.243-1.414 1.414L0 12l5.657-5.657L7.07 7.757 2.828 12zm6.96 9H7.66l6.552-18h2.128L9.788 21z"/></svg>
+            </div>
+            <div class="hero-header-info">
+              <div class="hero-tag-best">★ Best Match</div>
+              <div class="hero-role">Design Engineer</div>
+              <div class="hero-company">
+                <span>Vercel</span>
+                <span class="hero-verified">✓</span>
+              </div>
+              <div class="hero-source">via LinkedIn</div>
+            </div>
+          </div>
+          
+          <div class="hero-salary-big">
+            <div class="hero-salary-label">Salary</div>
+            <div class="hero-salary-amount">$140K – $220K</div>
+          </div>
+          
+          <div class="hero-description">Design and build production-ready components for Next.js and Vercel's dashboard. Work directly with the design systems team to create accessible, performant interfaces used by millions of developers.</div>
+          
+          <div class="hero-meta-grid">
+            <div class="hero-meta-item">
+              <div class="hero-meta-label">Location</div>
+              <div class="hero-meta-value">Remote (Worldwide)</div>
+            </div>
+            <div class="hero-meta-item">
+              <div class="hero-meta-label">Type</div>
+              <div class="hero-meta-value">Full-time</div>
+            </div>
+            <div class="hero-meta-item">
+              <div class="hero-meta-label">Degree</div>
+              <div class="hero-meta-value">Not Required</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="hero-right">
+          <div class="hero-score-area">
+            <div class="hero-score">94</div>
+            <div class="hero-score-label">Match Score</div>
+          </div>
+          
+          <div class="hero-skills">
+            <div class="hero-skills-header">Skills Match (4/4)</div>
+            <div class="hero-skill">
+              <span class="hero-skill-name">React</span>
+              <span class="hero-skill-percent">100%</span>
+            </div>
+            <div class="hero-skill">
+              <span class="hero-skill-name">Next.js</span>
+              <span class="hero-skill-percent">95%</span>
+            </div>
+            <div class="hero-skill">
+              <span class="hero-skill-name">Figma</span>
+              <span class="hero-skill-percent">88%</span>
+            </div>
+            <div class="hero-skill">
+              <span class="hero-skill-name">TypeScript</span>
+              <span class="hero-skill-percent">92%</span>
+            </div>
+          </div>
+          
+          <div class="hero-actions">
+            <button class="hero-btn primary">Apply →</button>
+            <button class="hero-btn">Save ★</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ REGULAR JOB CARDS ============ -->
+      <div class="jobs-grid">
+        
+        <!-- Job Card 1 -->
+        <div class="job-card">
+          <div class="score-badge">
+            <div class="score-num">91</div>
+            <div class="score-label">Match</div>
+          </div>
+          
+          <div class="job-header">
+            <div class="job-logo">
+              <svg viewBox="0 0 24 24" fill="#635BFF"><path d="M13.98 7.87c-1.18 0-1.95.52-2.4 1.05l-.32-1.05H9.1v12.04l2.63-.56.01-2.92c.46.33 1.13.8 2.24.8 2.26 0 4.32-1.82 4.32-5.82-.01-3.66-2.1-5.54-4.32-5.54z"/></svg>
+            </div>
+            <div class="job-header-info">
+              <div class="job-role">Senior Product Designer</div>
+              <div class="job-company">
+                <span>Stripe</span>
+                <span class="job-verified">✓</span>
+              </div>
+              <div class="job-source">via Google Jobs</div>
+            </div>
+          </div>
+          
+          <div class="job-body">
+            <div class="job-salary-top">
+              <div class="job-salary-label">Salary</div>
+              <div class="job-salary-amount">$160K – $240K</div>
+            </div>
+            
+            <div class="job-description">Lead design for core payments flows. Own end-to-end product design for merchant dashboard, working with PMs and engineers on checkout optimization.</div>
+            
+            <div class="job-info-compact">
+              <div class="job-info-item">
+                <span class="job-info-icon">📍</span>
+                <span class="job-info-value">San Francisco</span>
+              </div>
+              <div class="job-info-item">
+                <span class="job-info-icon">💼</span>
+                <span class="job-info-value">Full-time</span>
+              </div>
+              <div class="job-info-item">
+                <span class="job-info-icon">🎓</span>
+                <span class="job-info-value">Bachelor's Preferred</span>
+              </div>
+              <div class="job-info-item">
+                <span class="job-info-icon">📅</span>
+                <span class="job-info-value">5h ago</span>
+              </div>
+            </div>
+            
+            <div class="job-skills">
+              <div class="job-skills-header">
+                <span>Skills Match</span>
+                <span class="job-skills-count">3/3</span>
+              </div>
+              <div class="job-skills-list">
+                <div class="job-skill">
+                  <span class="job-skill-name">Figma</span>
+                  <div class="job-skill-bar"><div class="job-skill-fill perfect" style="width:100%"></div></div>
+                  <span class="job-skill-percent perfect">100%</span>
+                </div>
+                <div class="job-skill">
+                  <span class="job-skill-name">Research</span>
+                  <div class="job-skill-bar"><div class="job-skill-fill" style="width:72%"></div></div>
+                  <span class="job-skill-percent">72%</span>
+                </div>
+                <div class="job-skill">
+                  <span class="job-skill-name">Systems</span>
+                  <div class="job-skill-bar"><div class="job-skill-fill" style="width:85%"></div></div>
+                  <span class="job-skill-percent">85%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="job-footer">
+            <button class="job-btn primary"><span class="icon">→</span> Apply</button>
+            <button class="job-btn"><span class="icon">★</span> Save</button>
+          </div>
+        </div>
+
+        <!-- Job Card 2 -->
+        <div class="job-card">
+          <div class="score-badge">
+            <div class="score-num">89</div>
+            <div class="score-label">Match</div>
+          </div>
+          
+          <div class="job-header">
+            <div class="job-logo" style="background:#E6ECFB">
+              <svg viewBox="0 0 24 24" fill="#5E6AD2"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>
+            </div>
+            <div class="job-header-info">
+              <div class="job-role">AI Product Designer</div>
+              <div class="job-company">
+                <span>Linear</span>
+                <span class="job-verified">✓</span>
+              </div>
+              <div class="job-source">via Company Site</div>
+            </div>
+          </div>
+          
+          <div class="job-body">
+            <div class="job-salary-top">
+              <div class="job-salary-label">Salary</div>
+              <div class="job-salary-amount">$170K – $280K</div>
+            </div>
+            
+            <div class="job-description">Shape AI-powered workflows in Linear. Design intelligent features like smart suggestions, automated triage, and natural language issue creation.</div>
+            
+            <div class="job-info-compact">
+              <div class="job-info-item">
+                <span class="job-info-icon">📍</span>
+                <span class="job-info-value">Remote (US)</span>
+              </div>
+              <div class="job-info-item">
+                <span class="job-info-icon">💼</span>
+                <span class="job-info-value">Full-time</span>
+              </div>
+              <div class="job-info-item">
+                <span class="job-info-icon">🎓</span>
+                <span class="job-info-value">Not Required</span>
+              </div>
+              <div class="job-info-item">
+                <span class="job-info-icon">📅</span>
+                <span class="job-info-value">1d ago</span>
+              </div>
+            </div>
+            
+            <div class="job-skills">
+              <div class="job-skills-header">
+                <span>Skills Match</span>
+                <span class="job-skills-count">3/4</span>
+              </div>
+              <div class="job-skills-list">
+                <div class="job-skill">
+                  <span class="job-skill-name">Figma</span>
+                  <div class="job-skill-bar"><div class="job-skill-fill perfect" style="width:100%"></div></div>
+                  <span class="job-skill-percent perfect">100%</span>
+                </div>
+                <div class="job-skill">
+                  <span class="job-skill-name">Prototype</span>
+                  <div class="job-skill-bar"><div class="job-skill-fill" style="width:82%"></div></div>
+                  <span class="job-skill-percent">82%</span>
+                </div>
+                <div class="job-skill">
+                  <span class="job-skill-name">AI/ML UX</span>
+                  <div class="job-skill-bar"><div class="job-skill-fill" style="width:68%"></div></div>
+                  <span class="job-skill-percent">68%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="job-footer">
+            <button class="job-btn primary"><span class="icon">→</span> Apply</button>
+            <button class="job-btn"><span class="icon">★</span> Save</button>
+          </div>
+        </div>
+
+        <!-- Job Card 3 -->
+        <div class="job-card">
+          <div class="score-badge">
+            <div class="score-num">88</div>
+            <div class="score-label">Match</div>
+          </div>
+          
+          <div class="job-header">
+            <div class="job-logo" style="background:#E8F7EF">
+              <svg viewBox="0 0 24 24" fill="#3ECF8E"><path d="M21.362 9.354H12V.396a12.104 12.104 0 0 1 9.362 8.958zM11.638 11.5l-.026 12.501c-6.617-.008-11.974-5.373-11.974-11.99 0-4.667 2.667-8.716 6.548-10.702L11.638 11.5z"/></svg>
+            </div>
+            <div class="job-header-info">
+              <div class="job-role">Founding Designer</div>
+              <div class="job-company">
+                <span>Supabase</span>
+                <span class="job-verified">✓</span>
+              </div>
+              <div class="job-source">via LinkedIn</div>
+            </div>
+          </div>
+          
+          <div class="job-body">
+            <div class="job-salary-top">
+              <div class="job-salary-label">Salary + Equity</div>
+              <div class="job-salary-amount">$130K – $180K + 0.5%</div>
+            </div>
+            
+            <div class="job-description">First design hire. Build the design org from scratch. Own product design, brand, marketing site, and design system with massive impact.</div>
+            
+            <div class="job-info-compact">
+              <div class="job-info-item">
+                <span class="job-info-icon">📍</span>
+                <span class="job-info-value">Remote (Worldwide)</span>
+              </div>
+              <div class="job-info-item">
+                <span class="job-info-icon">💼</span>
+                <span class="job-info-value">Full-time</span>
+              </div>
+              <div class="job-info-item">
+                <span class="job-info-icon">🎓</span>
+                <span class="job-info-value">Not Required</span>
+              </div>
+              <div class="job-info-item">
+                <span class="job-info-icon">📅</span>
+                <span class="job-info-value">2d ago</span>
+              </div>
+            </div>
+            
+            <div class="job-skills">
+              <div class="job-skills-header">
+                <span>Skills Match</span>
+                <span class="job-skills-count">3/5</span>
+              </div>
+              <div class="job-skills-list">
+                <div class="job-skill">
+                  <span class="job-skill-name">Figma</span>
+                  <div class="job-skill-bar"><div class="job-skill-fill perfect" style="width:100%"></div></div>
+                  <span class="job-skill-percent perfect">100%</span>
+                </div>
+                <div class="job-skill">
+                  <span class="job-skill-name">Branding</span>
+                  <div class="job-skill-bar"><div class="job-skill-fill" style="width:65%"></div></div>
+                  <span class="job-skill-percent">65%</span>
+                </div>
+                <div class="job-skill">
+                  <span class="job-skill-name">Systems</span>
+                  <div class="job-skill-bar"><div class="job-skill-fill" style="width:80%"></div></div>
+                  <span class="job-skill-percent">80%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="job-footer">
+            <button class="job-btn primary"><span class="icon">→</span> Apply</button>
+            <button class="job-btn"><span class="icon">★</span> Save</button>
+          </div>
+        </div>
+
+        <!-- Job Card 4 -->
+        <div class="job-card">
+          <div class="score-badge">
+            <div class="score-num">86</div>
+            <div class="score-label">Match</div>
+          </div>
+          
+          <div class="job-header">
+            <div class="job-logo" style="background:#E8F7EF">
+              <svg viewBox="0 0 24 24" fill="#95BF47"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm-.84 4.67h1.679v8.39H11.16V4.67zm.84 10.66c-.532 0-.963-.432-.963-.964 0-.533.431-.964.963-.964.533 0 .964.431.964.964 0 .532-.431.964-.964.964z"/></svg>
+            </div>
+            <div class="job-header-info">
+              <div class="job-role">UX Engineer</div>
+              <div class="job-company">
+                <span>Shopify</span>
+                <span class="job-verified">✓</span>
+              </div>
+              <div class="job-source">via Indeed</div>
+            </div>
+          </div>
+          
+          <div class="job-body">
+            <div class="job-salary-top">
+              <div class="job-salary-label">Salary</div>
+              <div class="job-salary-amount">$120K – $190K</div>
+            </div>
+            
+            <div class="job-description">Bridge design and engineering for Polaris design system. Build React components, prototype interactions, and collaborate with designers.</div>
+            
+            <div class="job-info-compact">
+              <div class="job-info-item">
+                <span class="job-info-icon">📍</span>
+                <span class="job-info-value">Toronto, ON</span>
+              </div>
+              <div class="job-info-item">
+                <span class="job-info-icon">💼</span>
+                <span class="job-info-value">Full-time (Hybrid)</span>
+              </div>
+              <div class="job-info-item">
+                <span class="job-info-icon">🎓</span>
+                <span class="job-info-value">Bachelor's Required</span>
+              </div>
+              <div class="job-info-item">
+                <span class="job-info-icon">📅</span>
+                <span class="job-info-value">3d ago</span>
+              </div>
+            </div>
+            
+            <div class="job-skills">
+              <div class="job-skills-header">
+                <span>Skills Match</span>
+                <span class="job-skills-count">3/3</span>
+              </div>
+              <div class="job-skills-list">
+                <div class="job-skill">
+                  <span class="job-skill-name">React</span>
+                  <div class="job-skill-bar"><div class="job-skill-fill perfect" style="width:100%"></div></div>
+                  <span class="job-skill-percent perfect">100%</span>
+                </div>
+                <div class="job-skill">
+                  <span class="job-skill-name">CSS/HTML</span>
+                  <div class="job-skill-bar"><div class="job-skill-fill" style="width:78%"></div></div>
+                  <span class="job-skill-percent">78%</span>
+                </div>
+                <div class="job-skill">
+                  <span class="job-skill-name">Figma</span>
+                  <div class="job-skill-bar"><div class="job-skill-fill" style="width:92%"></div></div>
+                  <span class="job-skill-percent">92%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="job-footer">
+            <button class="job-btn primary"><span class="icon">→</span> Apply</button>
+            <button class="job-btn"><span class="icon">★</span> Save</button>
+          </div>
+        </div>
+
+        <!-- Job Card 5 -->
+        <div class="job-card">
+          <div class="score-badge">
+            <div class="score-num">84</div>
+            <div class="score-label">Match</div>
+          </div>
+          
+          <div class="job-header">
+            <div class="job-logo" style="background:#FDEAE6">
+              <svg viewBox="0 0 24 24" fill="#F24E1E"><path d="M8 24c2.2 0 4-1.8 4-4v-4H8c-2.2 0-4 1.8-4 4s1.8 4 4 4zm0-20C5.8 4 4 5.8 4 8s1.8 4 4 4h4V4H8z"/></svg>
+            </div>
+            <div class="job-header-info">
+              <div class="job-role">Staff Product Designer</div>
+              <div class="job-company">
+                <span>Figma</span>
+                <span class="job-verified">✓</span>
+              </div>
+              <div class="job-source">via Google Jobs</div>
+            </div>
+          </div>
+          
+          <div class="job-body">
+            <div class="job-salary-top">
+              <div class="job-salary-label">Salary</div>
+              <div class="job-salary-amount">$180K – $280K</div>
+            </div>
+            
+            <div class="job-description">Lead strategic design initiatives for Figma's core editor. Mentor designers, drive product vision, and partner with leadership on 0→1 features.</div>
+            
+            <div class="job-info-compact">
+              <div class="job-info-item">
+                <span class="job-info-icon">📍</span>
+                <span class="job-info-value">San Francisco</span>
+              </div>
+              <div class="job-info-item">
+                <span class="job-info-icon">💼</span>
+                <span class="job-info-value">Full-time (Hybrid)</span>
+              </div>
+              <div class="job-info-item">
+                <span class="job-info-icon">🎓</span>
+                <span class="job-info-value">Bachelor's Preferred</span>
+              </div>
+              <div class="job-info-item">
+                <span class="job-info-icon">📅</span>
+                <span class="job-info-value">4d ago</span>
+              </div>
+            </div>
+            
+            <div class="job-skills">
+              <div class="job-skills-header">
+                <span>Skills Match</span>
+                <span class="job-skills-count">3/4</span>
+              </div>
+              <div class="job-skills-list">
+                <div class="job-skill">
+                  <span class="job-skill-name">Figma</span>
+                  <div class="job-skill-bar"><div class="job-skill-fill perfect" style="width:100%"></div></div>
+                  <span class="job-skill-percent perfect">100%</span>
+                </div>
+                <div class="job-skill">
+                  <span class="job-skill-name">Systems</span>
+                  <div class="job-skill-bar"><div class="job-skill-fill" style="width:88%"></div></div>
+                  <span class="job-skill-percent">88%</span>
+                </div>
+                <div class="job-skill">
+                  <span class="job-skill-name">Leadership</span>
+                  <div class="job-skill-bar"><div class="job-skill-fill" style="width:70%"></div></div>
+                  <span class="job-skill-percent">70%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="job-footer">
+            <button class="job-btn primary"><span class="icon">→</span> Apply</button>
+            <button class="job-btn"><span class="icon">★</span> Save</button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>

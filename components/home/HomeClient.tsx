@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import type {
   TrendingRole,
   CompanyInfo,
@@ -8,6 +9,8 @@ import type {
   SkillDemandItem,
   CategoryCount,
 } from "@/lib/types/home";
+import type { Job } from "@/lib/types";
+import { TopMatchesPreview } from "@/components/dashboard";
 import { CategoryBrowse } from "./CategoryBrowse";
 import { TrendingRoles } from "./TrendingRoles";
 import { CompaniesList } from "./CompaniesList";
@@ -23,6 +26,9 @@ interface HomeClientProps {
   initialCompanies: CompanyInfo[];
   recentlyViewed: RecentlyViewedJob[];
   skillDemand: SkillDemandItem[];
+  topJob: Job | null;
+  otherJobs: Job[];
+  totalMatches: number;
   /** Server action to fetch filtered roles/companies */
   fetchCategoryData: (category: string) => Promise<{
     roles: TrendingRole[];
@@ -36,13 +42,22 @@ export function HomeClient({
   initialCompanies,
   recentlyViewed,
   skillDemand,
+  topJob,
+  otherJobs,
+  totalMatches,
   fetchCategoryData,
 }: HomeClientProps) {
+  const router = useRouter();
   const firstWithJobs = categories.find((c) => c.count > 0);
   const [activeCategory, setActiveCategory] = useState(firstWithJobs?.id ?? categories[0]?.id ?? "tech_it");
   const [roles, setRoles] = useState<TrendingRole[]>(initialRoles);
   const [companies, setCompanies] = useState<CompanyInfo[]>(initialCompanies);
   const [isPending, startTransition] = useTransition();
+
+  const handleJobSelect = useCallback(
+    (job: Job) => router.push(`/jobs/${job.id}`),
+    [router]
+  );
 
   const activeCategoryName = categories.find((c) => c.id === activeCategory)?.name ?? "All";
 
@@ -57,6 +72,13 @@ export function HomeClient({
 
   return (
     <div className="home-page">
+      <TopMatchesPreview
+        topJob={topJob}
+        otherJobs={otherJobs}
+        totalMatches={totalMatches}
+        onJobSelect={handleJobSelect}
+      />
+
       <CategoryBrowse
         categories={categories}
         activeCategory={activeCategory}

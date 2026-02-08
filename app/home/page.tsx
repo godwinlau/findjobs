@@ -1,14 +1,14 @@
-import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { colors } from "@/lib/constants/colors";
 import { Navbar } from "@/components/layout";
 import { SearchStrip, HomeClient } from "@/components/home";
-import { WelcomeWalkthrough } from "@/components/walkthrough/WelcomeWalkthrough";
+
 import {
   getCategoryJobCounts,
   getTrendingRoles,
   getTopHiringCompanies,
   getRecentlyViewed,
+  getTopMatchedJobs,
 } from "@/lib/jobs";
 import { createClient } from "@/lib/supabase/server";
 import { industrySkillDemand } from "@/lib/constants/industrySkillDemand";
@@ -69,11 +69,16 @@ export default async function Dashboard() {
   const firstWithJobs = categories.find((c) => c.count > 0);
   const defaultCategory = firstWithJobs?.id ?? categories[0]?.id ?? "tech_it";
 
-  const [initialRoles, initialCompanies, recentlyViewed] = await Promise.all([
+  const [initialRoles, initialCompanies, recentlyViewed, matchedResult] = await Promise.all([
     getTrendingRoles(defaultCategory),
     getTopHiringCompanies(defaultCategory),
     getRecentlyViewed(user.id),
+    getTopMatchedJobs({ profile, limit: 5 }),
   ]);
+
+  const topJob = matchedResult.jobs[0] ?? null;
+  const otherJobs = matchedResult.jobs.slice(1);
+  const totalMatches = matchedResult.totalMatches;
 
   const userSkills = profile?.skills ?? [];
   const skillDemand = computeSkillDemand(userSkills);
@@ -100,13 +105,10 @@ export default async function Dashboard() {
         recentlyViewed={recentlyViewed}
         skillDemand={skillDemand}
         fetchCategoryData={fetchCategoryData}
+        topJob={topJob}
+        otherJobs={otherJobs}
+        totalMatches={totalMatches}
       />
-
-      <Suspense fallback={null}>
-        <WelcomeWalkthrough
-          firstName={profile?.full_name?.split(" ")[0] || ""}
-        />
-      </Suspense>
     </div>
   );
 }
