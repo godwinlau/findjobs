@@ -8,7 +8,10 @@ import {
   computeQualityScore,
   formatHighlight,
   MATCH_SCORE_THRESHOLD,
+  ScoringOptions,
 } from "@/lib/matching";
+import { buildProfileEmbeddingText, generateEmbeddingSafe } from "@/lib/embeddings";
+import { filterByRoleCategory } from "@/lib/role-gates";
 
 // ─── Search helpers ───
 
@@ -107,6 +110,45 @@ export const SCORING_COLUMNS = [
   "posted_at",
 ].join(",");
 
+// ─── Semantic score helpers ───
+
+async function buildSemanticScoreMap(
+  supabase: ReturnType<typeof createServiceClient>,
+  profile: Profile,
+): Promise<Map<string, number>> {
+  const map = new Map<string, number>();
+
+  try {
+    const profileText = buildProfileEmbeddingText(profile);
+    const embedding = await generateEmbeddingSafe(profileText);
+    if (!embedding) return map;
+
+    // Format as pgvector string for the RPC
+    const vectorStr = `[${embedding.join(",")}]`;
+
+    const { data, error } = await supabase.rpc("match_jobs_by_embedding", {
+      query_embedding: vectorStr,
+      similarity_threshold: 0.3,
+      match_count: 500,
+    });
+
+    if (error) {
+      console.error("Semantic matching RPC error:", error.message);
+      return map;
+    }
+
+    if (data) {
+      for (const row of data as { job_id: string; similarity: number }[]) {
+        map.set(row.job_id, row.similarity);
+      }
+    }
+  } catch (err) {
+    console.error("Semantic matching error:", err);
+  }
+
+  return map;
+}
+
 export async function getActiveJobs({
   query,
   page = 1,
@@ -172,7 +214,7 @@ async function getActiveJobsMatchScored(
 ): Promise<PaginatedJobs> {
   const { query, page, pageSize, from, to, profile } = opts;
 
-  // Phase 1 — lightweight scoring query
+  // Fetch scoring rows and semantic scores in parallel
   let scoringBuilder = supabase
     .from("jobs")
     .select(SCORING_COLUMNS, { count: "exact" })
@@ -184,7 +226,12 @@ async function getActiveJobsMatchScored(
     if (filter) scoringBuilder = scoringBuilder.or(filter);
   }
 
-  const { data: scoringData, error, count } = await scoringBuilder;
+  const [scoringResult, semanticMap] = await Promise.all([
+    scoringBuilder,
+    buildSemanticScoreMap(supabase, profile),
+  ]);
+
+  const { data: scoringData, error, count } = scoringResult;
 
   if (error) {
     console.error("Failed to fetch jobs for scoring:", error.message);
@@ -196,13 +243,22 @@ async function getActiveJobsMatchScored(
     return { jobs: [], total, page, pageSize, totalPages: Math.ceil(total / pageSize), isMatchFiltered: !query };
   }
 
-  const scoringRows = scoringData as unknown as ScoringRow[];
+  // Apply role category gate
+  const scoringRows = filterByRoleCategory(
+    scoringData as unknown as ScoringRow[],
+    profile.headline
+  );
+
+  const scoringOpts: ScoringOptions = { profileHeadline: profile.headline };
 
   // Score and sort
   const scored = scoringRows.map((row) => ({
     id: row.id,
     postedAt: row.posted_at,
-    result: computeMatchScore(row, profile),
+    result: computeMatchScore(row, profile, {
+      ...scoringOpts,
+      semanticScore: semanticMap.get(row.id) ?? null,
+    }),
   }));
 
   scored.sort((a, b) => {
@@ -332,23 +388,37 @@ export async function getTopMatchedJobs({
     return { jobs, totalMatches: 0 };
   }
 
-  // Phase 1 — lightweight scoring of all active jobs
-  const { data: scoringData } = await supabase
-    .from("jobs")
-    .select(SCORING_COLUMNS)
-    .eq("is_active", true)
-    .order("posted_at", { ascending: false });
+  // Phase 1 — lightweight scoring + semantic in parallel
+  const [scoringResult, semanticMap] = await Promise.all([
+    supabase
+      .from("jobs")
+      .select(SCORING_COLUMNS)
+      .eq("is_active", true)
+      .order("posted_at", { ascending: false }),
+    buildSemanticScoreMap(supabase, profile!),
+  ]);
+
+  const { data: scoringData } = scoringResult;
 
   if (!scoringData || scoringData.length === 0) {
     return { jobs: [], totalMatches: 0 };
   }
 
-  const scoringRows = scoringData as unknown as ScoringRow[];
+  // Apply role category gate
+  const scoringRows = filterByRoleCategory(
+    scoringData as unknown as ScoringRow[],
+    profile!.headline
+  );
+
+  const scoringOpts: ScoringOptions = { profileHeadline: profile!.headline };
 
   const scored = scoringRows.map((row) => ({
     id: row.id,
     postedAt: row.posted_at,
-    result: computeMatchScore(row, profile!),
+    result: computeMatchScore(row, profile!, {
+      ...scoringOpts,
+      semanticScore: semanticMap.get(row.id) ?? null,
+    }),
   }));
 
   scored.sort((a, b) => {
@@ -980,7 +1050,7 @@ async function getExploreJobsMatchSorted(
     return getExploreJobs({ ...opts, sort: "recency", profile });
   }
 
-  // Phase 1 — lightweight scoring query
+  // Phase 1 — lightweight scoring + semantic in parallel
   let scoringBuilder = supabase
     .from("jobs")
     .select(SCORING_COLUMNS, { count: "exact" })
@@ -989,7 +1059,12 @@ async function getExploreJobsMatchSorted(
 
   scoringBuilder = applyExploreFilters(scoringBuilder, opts);
 
-  const { data: scoringData, error, count } = await scoringBuilder;
+  const [scoringResult, semanticMap] = await Promise.all([
+    scoringBuilder,
+    profile ? buildSemanticScoreMap(supabase, profile) : Promise.resolve(new Map<string, number>()),
+  ]);
+
+  const { data: scoringData, error, count } = scoringResult;
 
   if (error) {
     console.error("Failed to fetch explore jobs for scoring:", error.message);
@@ -1001,13 +1076,22 @@ async function getExploreJobsMatchSorted(
     return { jobs: [], total, page, pageSize, totalPages: Math.ceil(total / pageSize), isMatchFiltered: false };
   }
 
-  const scoringRows = scoringData as unknown as ScoringRow[];
+  // Apply role category gate
+  const scoringRows = filterByRoleCategory(
+    scoringData as unknown as ScoringRow[],
+    profile?.headline ?? null
+  );
+
+  const scoringOpts: ScoringOptions = { profileHeadline: profile?.headline ?? null };
 
   // Score and sort — NO threshold filtering
   const scored = scoringRows.map((row) => ({
     id: row.id,
     postedAt: row.posted_at,
-    result: computeMatchScore(row, profile),
+    result: computeMatchScore(row, profile, {
+      ...scoringOpts,
+      semanticScore: semanticMap.get(row.id) ?? null,
+    }),
   }));
 
   scored.sort((a, b) => {

@@ -2,14 +2,22 @@ import { Profile, ProfileEducationLevel, SkillProficiency } from "@/lib/types";
 import { extractEducation, EducationLevel } from "@/lib/queries";
 import { TITLE_SKILL_PATTERNS, SKILL_ALIASES } from "@/lib/constants/skill-mappings";
 import { resolveSkillCluster } from "@/lib/constants/skillTaxonomy";
+import { computeSkillMismatchPenalty } from "@/lib/role-gates";
 
 // ─── Types ───
+
+export interface ScoringOptions {
+  semanticScore?: number | null;
+  profileHeadline?: string | null;
+}
 
 export interface MatchResult {
   score: number;           // 0-98
   scoreRange?: [number, number]; // uncertainty range when profile has missing dimensions
   highlight: string | null;
   matchedSkills?: string[];
+  semanticScore?: number | null;
+  penalty?: number;
 }
 
 export const MATCH_SCORE_THRESHOLD = 40;
@@ -232,7 +240,7 @@ function computeClusterBoost(
 
 // ─── Main scoring function ───
 
-export function computeMatchScore(row: JobRow, profile: Profile | null): MatchResult {
+export function computeMatchScore(row: JobRow, profile: Profile | null, options?: ScoringOptions): MatchResult {
   if (!profile || !isProfileSufficient(profile)) {
     return {
       score: computeQualityScore(row),
@@ -268,8 +276,8 @@ export function computeMatchScore(row: JobRow, profile: Profile | null): MatchRe
   );
   const educationScore = scoreEducationMatch(row.description_plain, profile.education);
 
-  // Weighted sum
-  let total =
+  // Business rules weighted sum
+  let businessRules =
     skillResult.score * W_SKILL_MATCH +
     proficiencyScore * W_SKILL_PROFICIENCY +
     experienceScore * W_EXPERIENCE_FIT +
@@ -279,19 +287,34 @@ export function computeMatchScore(row: JobRow, profile: Profile | null): MatchRe
 
   // ── Relevance gate ──
   if (skillResult.relevance === "mismatch") {
-    total *= 0.3;
+    businessRules *= 0.3;
   } else if (skillResult.relevance === "weakMatch") {
-    total *= 0.55;
+    businessRules *= 0.55;
   } else if (skillResult.relevance === "noData") {
-    total *= 0.45;
+    businessRules *= 0.45;
   }
 
   // ── Cluster affinity boost (applied after relevance gate) ──
   const userAffinities = computeClusterAffinities(augmentedProfileSkills);
   const clusterBoost = computeClusterBoost(effectiveJobSkills, userAffinities);
-  total = total + clusterBoost;
+  businessRules = businessRules + clusterBoost;
+
+  // ── Blend semantic + business rules ──
+  const semanticScore = options?.semanticScore ?? null;
+  let total: number;
+  if (semanticScore != null && semanticScore > 0) {
+    total = semanticScore * 0.4 + businessRules * 0.6;
+  } else {
+    total = businessRules;
+  }
+
+  // ── Negative signal penalty ──
+  const profileHeadline = options?.profileHeadline ?? profile.headline;
+  const penalty = computeSkillMismatchPenalty(profileHeadline ?? null, effectiveJobSkills);
+  total = total - penalty;
 
   let rawScore = Math.round(total * 100);
+  rawScore = Math.max(0, rawScore);
   rawScore = Math.min(rawScore, 98);
 
   // ── Uncertainty ranges for missing dimensions ──
@@ -313,7 +336,14 @@ export function computeMatchScore(row: JobRow, profile: Profile | null): MatchRe
   // Generate highlight
   const highlight = skillResult.reason ?? formatHighlight(row.skills_required);
 
-  return { score: rawScore, scoreRange, highlight, matchedSkills: skillResult.matched };
+  return {
+    score: rawScore,
+    scoreRange,
+    highlight,
+    matchedSkills: skillResult.matched,
+    semanticScore,
+    penalty: penalty > 0 ? penalty : undefined,
+  };
 }
 
 // ─── Dimension scorers (all return 0.0-1.0) ───
