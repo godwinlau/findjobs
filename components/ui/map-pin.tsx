@@ -60,15 +60,22 @@ const MapPinIcon = forwardRef<MapPinIconHandle, MapPinIconProps>(
       let active = true;
       const loop = async () => {
         while (active) {
-          await controls.start("animate");
-          await new Promise((r) => setTimeout(r, 2000));
-          await controls.start("normal");
-          await new Promise((r) => setTimeout(r, 500));
+          try {
+            if (!active) break;
+            await controls.start("animate");
+            await new Promise((r) => setTimeout(r, 2000));
+            if (!active) break;
+            await controls.start("normal");
+            await new Promise((r) => setTimeout(r, 500));
+          } catch {
+            break;
+          }
         }
       };
       loop();
       return () => {
         active = false;
+        controls.stop();
       };
     }, [controls]);
 

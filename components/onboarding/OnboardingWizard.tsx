@@ -70,6 +70,8 @@ export function OnboardingWizard({ initialProfile }: OnboardingWizardProps) {
       desired_salary_min: salarySkipped ? null : salaryMin * 1000,
       desired_salary_max: salarySkipped ? null : salaryMax * 1000,
       user_role: "job_seeker" as const,
+      selected_roles: selectedRoles,
+      headline: selectedRoles.length > 0 ? selectedRoles[0] : null,
     }),
     [initialProfile, firstName, employmentType, skills, selectedRoles, workSetup, salaryMin, salaryMax, salarySkipped]
   );

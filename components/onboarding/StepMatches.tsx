@@ -189,7 +189,9 @@ export function StepMatches({
                   </div>
                   <div className="ob-jc-right">
                     <div className="ob-jc-match">{m.match}%</div>
-                    <div className="ob-jc-salary">{m.salary}</div>
+                    {m.salary !== "Salary TBD" && (
+                      <div className="ob-jc-salary">{m.salary}</div>
+                    )}
                   </div>
                 </div>
               );

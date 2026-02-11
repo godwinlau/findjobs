@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase-server";
 import { computeMatchScore, isProfileSufficient } from "@/lib/matching";
+import { filterByRoleCategory } from "@/lib/role-gates";
 import type { Profile } from "@/lib/types";
 
 // Lightweight scoring columns
@@ -13,7 +14,11 @@ const SCORING_COLUMNS = [
 
 export async function POST(request: Request) {
   try {
-    const profileData = (await request.json()) as Partial<Profile>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const body = (await request.json()) as any;
+    const profileData = body as Partial<Profile>;
+    const selectedRoles: string[] = body.selected_roles || [];
+    const syntheticHeadline: string | null = selectedRoles[0] || body.headline || null;
 
     // Build a minimal profile for scoring
     const profile = {
@@ -37,7 +42,7 @@ export async function POST(request: Request) {
       preferred_industries: profileData.preferred_industries || [],
       willing_to_relocate: profileData.willing_to_relocate ?? false,
       years_of_experience: 0,
-      headline: null,
+      headline: syntheticHeadline,
       avatar_url: null,
       preferred_city: profileData.preferred_city || null,
       education: profileData.education || null,
@@ -82,11 +87,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ matches: [], stats: null, totalJobs: 0 });
     }
 
-    const totalJobs = scoringData.length;
+    // Filter by role category (same gating as dashboard)
+    const filteredJobs = filterByRoleCategory(scoringData, syntheticHeadline);
+    const totalJobs = filteredJobs.length;
 
-    // Score all jobs
+    // Score all jobs (unclassified title demotion applied inside computeMatchScore)
+    const scoringOptions = { profileHeadline: syntheticHeadline };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const scored = scoringData.map((row: any) => ({
+    const scored = filteredJobs.map((row: any) => ({
       role: row.title as string,
       company: row.company_name as string,
       salary_min: row.salary_min as number | null,
@@ -94,7 +102,7 @@ export async function POST(request: Request) {
       work_setup: row.work_setup as string | null,
       job_type: row.job_type as string | null,
       posted_at: row.posted_at as string | null,
-      result: computeMatchScore(row, profile),
+      result: computeMatchScore(row, profile, scoringOptions),
     }));
 
     scored.sort((a, b) => b.result.score - a.result.score);

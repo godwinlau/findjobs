@@ -1013,6 +1013,155 @@
   color: #F5F5F0;
 }
 
+/* ─── Danger Zone ─── */
+.danger-zone {
+  border: 3px solid #EF4444;
+  margin-top: 32px;
+}
+.danger-zone-header {
+  padding: 14px 24px;
+  background: #EF4444;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.danger-zone-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 24px;
+  background: #F5F5F0;
+}
+.danger-zone-info {
+  flex: 1;
+}
+.danger-zone-label {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+.danger-zone-desc {
+  font-size: 12px;
+  color: #888;
+  line-height: 1.5;
+}
+.danger-zone-btn {
+  padding: 10px 20px;
+  background: transparent;
+  color: #EF4444;
+  border: 2px solid #EF4444;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.danger-zone-btn:hover {
+  background: #EF4444;
+  color: #fff;
+}
+
+/* ─── Delete Account Modal ─── */
+.delete-account-modal {
+  width: 100%;
+  max-width: 440px;
+  background: #F5F5F0;
+  border: 3px solid #EF4444;
+}
+.delete-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 3px solid #EF4444;
+  background: #EF4444;
+  color: #fff;
+}
+.delete-modal-title {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.delete-modal-body {
+  padding: 24px 20px;
+}
+.delete-warning {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #555;
+  padding: 14px 16px;
+  border: 2px solid #EF4444;
+  background: rgba(239,68,68,.04);
+  margin-bottom: 20px;
+}
+.delete-confirm-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: #0A0A0A;
+  margin-bottom: 8px;
+}
+.delete-confirm-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid #0A0A0A;
+  background: #fff;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  outline: none;
+  box-sizing: border-box;
+}
+.delete-confirm-input:focus {
+  border-color: #EF4444;
+}
+.delete-error {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border: 2px solid #EF4444;
+  background: rgba(239,68,68,.06);
+  color: #EF4444;
+  font-size: 13px;
+  font-family: var(--font-mono);
+}
+.delete-modal-footer {
+  display: flex;
+  gap: 8px;
+  padding: 16px 20px;
+  border-top: 2px solid rgba(0,0,0,.08);
+}
+.delete-confirm-btn {
+  flex: 1;
+  padding: 12px 24px;
+  background: #EF4444;
+  color: #fff;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.delete-confirm-btn:hover:not(:disabled) {
+  background: #DC2626;
+}
+.delete-confirm-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
 /* ─── Public Profile View ─── */
 .ppv-page {
   min-height: 100vh;
@@ -1285,5 +1434,10 @@
   }
   .share-social-row {
     flex-direction: column;
+  }
+  .danger-zone-content {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
   }
 }

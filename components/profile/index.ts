@@ -13,3 +13,4 @@ export { ClaimUsernameCard } from "./ClaimUsernameCard";
 export { PublicProfileView } from "./PublicProfileView";
 export { PrivacySettingsDrawer } from "./PrivacySettingsDrawer";
 export { ShareProfileModal } from "./ShareProfileModal";
+export { DeleteAccountModal } from "./DeleteAccountModal";

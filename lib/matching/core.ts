@@ -1,5 +1,5 @@
 import { Profile } from "@/lib/types";
-import { computeSkillMismatchPenalty } from "@/lib/role-gates";
+import { computeSkillMismatchPenalty, computeUnclassifiedJobPenalty } from "@/lib/role-gates";
 import type { JobRow, ScoringOptions, MatchResult } from "./types";
 import { normalizeSkill, inferSkillsFromHeadline, getEffectiveJobSkills } from "./skills";
 import {
@@ -119,6 +119,10 @@ export function computeMatchScore(row: JobRow, profile: Profile | null, options?
   const profileHeadline = options?.profileHeadline ?? profile.headline;
   const penalty = computeSkillMismatchPenalty(profileHeadline ?? null, effectiveJobSkills);
   total = total - penalty;
+
+  // ── Unclassified job demotion ──
+  const unclassifiedPenalty = computeUnclassifiedJobPenalty(profileHeadline ?? null, row.title);
+  total = total - unclassifiedPenalty / 100; // convert point penalty to 0-1 scale
 
   let rawScore = Math.round(total * 100);
   rawScore = Math.max(0, rawScore);

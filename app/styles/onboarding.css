@@ -291,7 +291,7 @@
 }
 .ob-jc-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
 .ob-jc-match { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; padding: 5px 10px; background: #0A0A0A; color: #FBBF24; }
-.ob-jc-salary { font-family: 'Space Mono', monospace; font-size: 10px; color: #555; text-align: right; }
+.ob-jc-salary { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: #0A0A0A; background: #F5F5F0; padding: 3px 8px; text-align: right; }
 
 /* Featured (first) card */
 .ob-job-card.featured { background: #0A0A0A; color: #F5F5F0; grid-template-columns: 48px 1fr auto; }
@@ -300,7 +300,7 @@
 .ob-job-card.featured .ob-jc-title { font-size: 17px; }
 .ob-job-card.featured .ob-jc-tag { border-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.4); }
 .ob-job-card.featured .ob-jc-match { background: #FBBF24; color: #0A0A0A; font-size: 13px; padding: 6px 12px; }
-.ob-job-card.featured .ob-jc-salary { color: rgba(255,255,255,0.45); }
+.ob-job-card.featured .ob-jc-salary { color: #FBBF24; background: rgba(251,191,36,0.1); }
 .ob-job-card.featured:hover { background: #1A1A1A; box-shadow: 4px 4px 0 #FBBF24; }
 .ob-jc-best {
   font-family: 'Space Mono', monospace; font-size: 8px; text-transform: uppercase;

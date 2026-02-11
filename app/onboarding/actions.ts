@@ -100,6 +100,7 @@ export async function completeOnboarding(data: Partial<Profile>) {
   if (data.work_preference) updateData.work_preference = data.work_preference;
   if (data.desired_salary_min !== undefined) updateData.desired_salary_min = data.desired_salary_min;
   if (data.desired_salary_max !== undefined) updateData.desired_salary_max = data.desired_salary_max;
+  if (data.headline) updateData.headline = data.headline;
 
   const { error } = await supabase
     .from("profiles")

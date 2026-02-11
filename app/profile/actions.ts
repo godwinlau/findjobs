@@ -1,6 +1,8 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase-server";
 import { calculateCompletion } from "@/lib/profile";
 import { logActivity } from "@/lib/actions/activity";
 import { computeAndCacheMatches } from "@/lib/match-cache";
@@ -175,6 +177,43 @@ export async function claimUsername(
     console.error("Claim username error:", error);
     return { error: "Failed to claim username. Please try again." };
   }
+
+  return {};
+}
+
+export async function deleteAccount(
+  confirmationText: string
+): Promise<{ error?: string }> {
+  if (confirmationText !== "DELETE") {
+    return { error: "Please type DELETE to confirm." };
+  }
+
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated." };
+  }
+
+  // Use service role client to delete the auth user
+  // All related rows (profiles, activities, assessments, matches) cascade
+  const admin = createServiceClient();
+  const { error } = await admin.auth.admin.deleteUser(user.id);
+
+  if (error) {
+    console.error("Account deletion error:", error);
+    return { error: "Failed to delete account. Please try again." };
+  }
+
+  // Sign out to clear Supabase session cookies
+  await supabase.auth.signOut();
+
+  // Clear the onboarding cookie so re-signup doesn't skip onboarding
+  const cookieStore = await cookies();
+  cookieStore.delete("onboarding_completed");
 
   return {};
 }

@@ -14,6 +14,7 @@ import { EditProfileDrawer } from "./EditProfileDrawer";
 import { ClaimUsernameCard } from "./ClaimUsernameCard";
 import { PrivacySettingsDrawer } from "./PrivacySettingsDrawer";
 import { ShareProfileModal } from "./ShareProfileModal";
+import { DeleteAccountModal } from "./DeleteAccountModal";
 
 interface ProfileClientProps {
   profile: Profile;
@@ -24,6 +25,7 @@ export function ProfileClient({ profile, email }: ProfileClientProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [currentProfile, setCurrentProfile] = useState<Profile>(profile);
 
   function handleProfileUpdate(updated: Partial<Profile>) {
@@ -68,6 +70,25 @@ export function ProfileClient({ profile, email }: ProfileClientProps) {
         </div>
       </div>
 
+      {/* Danger zone */}
+      <div className="danger-zone">
+        <div className="danger-zone-header">Danger Zone</div>
+        <div className="danger-zone-content">
+          <div className="danger-zone-info">
+            <div className="danger-zone-label">Delete account</div>
+            <div className="danger-zone-desc">
+              Permanently delete your account and all associated data. This cannot be undone.
+            </div>
+          </div>
+          <button
+            className="danger-zone-btn"
+            onClick={() => setIsDeleteOpen(true)}
+          >
+            Delete Account
+          </button>
+        </div>
+      </div>
+
       <EditProfileDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
@@ -89,6 +110,11 @@ export function ProfileClient({ profile, email }: ProfileClientProps) {
           username={currentProfile.username}
         />
       )}
+
+      <DeleteAccountModal
+        isOpen={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+      />
     </div>
   );
 }

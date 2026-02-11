@@ -36,6 +36,7 @@ const CATEGORY_PATTERNS: { category: RoleCategory; patterns: RegExp[] }[] = [
       /\buser\s*experience/i,
       /\buser\s*interface/i,
       /\binteraction\s*design/i,
+      /\bux\s*engineer/i,
     ],
   },
   {
@@ -68,6 +69,9 @@ const CATEGORY_PATTERNS: { category: RoleCategory; patterns: RegExp[] }[] = [
     patterns: [
       /\bfull[\s-]?stack/i,
       /\bsoftware\s*(?:engineer|developer)/i,
+      /\bdesign\s*engineer/i,
+      /\bshopify/i,
+      /\bqa\s*(?:engineer|tester|analyst)/i,
     ],
   },
   {
@@ -79,6 +83,7 @@ const CATEGORY_PATTERNS: { category: RoleCategory; patterns: RegExp[] }[] = [
       /\bmotion\s*(?:design|graphic)/i,
       /\bprint\s*design/i,
       /\bbrand\s*design/i,
+      /\bvideo\s*edit/i,
     ],
   },
   {
@@ -301,4 +306,23 @@ export function computeSkillMismatchPenalty(
   }
 
   return Math.min(hits * PENALTY_PER_EXCLUSION, MAX_PENALTY);
+}
+
+/**
+ * Score penalty for jobs whose title can't be classified into any role category.
+ * Only applies when the user's profile has a classifiable headline.
+ * Returns a flat penalty (e.g. 15 points) to demote unclassified jobs below
+ * classified matches without hiding them entirely.
+ */
+const UNCLASSIFIED_JOB_PENALTY = 15;
+
+export function computeUnclassifiedJobPenalty(
+  profileHeadline: string | null,
+  jobTitle: string
+): number {
+  const userCategory = getRoleCategory(profileHeadline ?? "");
+  if (!userCategory) return 0; // User is unclassified → no penalty
+  const jobCategory = getRoleCategory(jobTitle);
+  if (jobCategory) return 0; // Job is classified → no penalty
+  return UNCLASSIFIED_JOB_PENALTY;
 }
