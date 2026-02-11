@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase-server";
 import { embedAndStoreJobs } from "@/lib/embeddings";
+import { logger } from "@/lib/logger";
+
+const log = logger.child({ module: "cron:backfill-embeddings" });
 
 // Backfill embeddings for existing jobs that don't have them yet.
 // Run manually: curl -H "Authorization: Bearer $CRON_SECRET" /api/cron/backfill-embeddings

@@ -3,6 +3,9 @@ import { runIngestionBatch, cleanupExpiredJobs } from "@/lib/ingest";
 import { runJSearchIngestion } from "@/lib/jsearch";
 import { resetStaleStreaks } from "@/lib/streaks";
 import { TOTAL_BATCHES } from "@/lib/queries";
+import { logger } from "@/lib/logger";
+
+const log = logger.child({ module: "cron:ingest" });
 
 // Vercel Cron calls this with 1 batch per invocation (PHT schedule):
 //   5:30 PM  → batch 0      5:40 PM → batch 1
@@ -76,7 +79,7 @@ export async function GET(req: NextRequest) {
   } catch (err) {
     // Count the error but continue to notification + response
     totalErrors++;
-    console.error("Ingestion error:", err instanceof Error ? err.message : err);
+    log.error({ err }, "Ingestion error");
   } finally {
     // Always send notification — even on partial completion or timeout edge
     const totalNewJobs = totalInserted + jsearch.totalInserted;
@@ -199,6 +202,6 @@ async function sendIngestionNotification(data: {
     });
   } catch {
     // Non-fatal — don't break ingestion if notification fails
-    console.error("Ingestion webhook notification failed");
+    log.error("Ingestion webhook notification failed");
   }
 }

@@ -9,7 +9,9 @@ import {
   type ScrapedDescription,
 } from "@/lib/linkedin-jobs";
 import { normalizeLocation, getQueriesForBatch } from "@/lib/queries";
-import { embedAndStoreJobs } from "@/lib/embeddings";
+import { logger } from "@/lib/logger";
+
+const log = logger.child({ module: "ingest" });
 
 // ─── Types ───
 
@@ -146,27 +148,7 @@ export async function runIngestionBatch(batch: number): Promise<BatchResult> {
       } else {
         result.inserted = inserted?.length || 0;
         result.duplicates += toInsert.length - result.inserted;
-
-        // Generate embeddings for newly inserted jobs (non-fatal)
-        if (inserted && inserted.length > 0) {
-          try {
-            // Re-fetch the inserted jobs to get full data for embedding
-            const insertedIds = (inserted as { id: string }[]).map((r) => r.id);
-            const { data: embeddingRows } = await supabase
-              .from("jobs")
-              .select("id, title, skills_required, experience_level, work_setup, description_plain")
-              .in("id", insertedIds);
-
-            if (embeddingRows && embeddingRows.length > 0) {
-              await embedAndStoreJobs(
-                embeddingRows as { id: string; title: string; skills_required: string[]; experience_level: string | null; work_setup: string | null; description_plain: string }[],
-                supabase,
-              );
-            }
-          } catch {
-            // Non-fatal: embedding failures don't block ingestion
-          }
-        }
+        // Embeddings are generated asynchronously by the backfill-embeddings cron
       }
     } catch (err) {
       result.errors++;

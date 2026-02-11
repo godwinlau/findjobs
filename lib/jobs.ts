@@ -1,6 +1,6 @@
 import { createServiceClient } from "@/lib/supabase-server";
 import { extractEducation, getEducationLabel } from "@/lib/queries";
-import { Job, PaginatedJobs, Profile } from "@/lib/types";
+import { Job, PaginatedJobs, CursorPaginatedJobs, Profile } from "@/lib/types";
 import type { SkillStructuredEntry } from "@/lib/skills/groq-extraction";
 import {
   computeMatchScore,
@@ -14,6 +14,9 @@ import { buildProfileEmbeddingText, generateEmbeddingSafe } from "@/lib/embeddin
 import { filterByRoleCategory } from "@/lib/role-gates";
 import { readMatchCache } from "@/lib/match-cache";
 import { unstable_cache } from "next/cache";
+import { logger } from "@/lib/logger";
+
+const log = logger.child({ module: "jobs" });
 
 // ─── Search helpers ───
 
@@ -202,7 +205,7 @@ export async function buildSemanticScoreMap(
     });
 
     if (error) {
-      console.error("Semantic matching RPC error:", error.message);
+      log.error({ err: error.message }, "Semantic matching RPC error");
       return map;
     }
 
@@ -212,7 +215,7 @@ export async function buildSemanticScoreMap(
       }
     }
   } catch (err) {
-    console.error("Semantic matching error:", err);
+    log.error({ err }, "Semantic matching error");
   }
 
   return map;
@@ -251,7 +254,7 @@ export async function getActiveJobs({
   const { data, error, count } = await builder.range(from, to);
 
   if (error) {
-    console.error("Failed to fetch jobs:", error.message);
+    log.error({ err: error.message }, "Failed to fetch jobs");
     return { jobs: [], total: 0, page, pageSize, totalPages: 0, isMatchFiltered: false };
   }
 
@@ -577,7 +580,7 @@ export async function fetchJobRow(id: string): Promise<JobRow | null> {
     .single();
 
   if (error || !data) {
-    console.error("Failed to fetch job:", error?.message);
+    log.error({ err: error?.message }, "Failed to fetch job");
     return null;
   }
 
@@ -979,6 +982,127 @@ function getDateCutoff(datePosted: string): string | null {
   return new Date(Date.now() - h * 3600000).toISOString();
 }
 
+// ─── Cursor-based explore (DB-sorted paths only) ───
+
+interface GetExploreJobsCursorParams {
+  cursor?: string;
+  workSetup?: string;
+  jobType?: string;
+  experienceLevel?: string;
+  location?: string;
+  salaryMin?: number;
+  salaryMax?: number;
+  datePosted?: string;
+  verifiedOnly?: boolean;
+  sort: "recency" | "salary_desc" | "salary_asc";
+  pageSize?: number;
+  profile?: Profile | null;
+}
+
+function parseCursor(cursor: string): { value: string; id: string } | null {
+  const sep = cursor.lastIndexOf("_");
+  if (sep === -1) return null;
+  return { value: cursor.slice(0, sep), id: cursor.slice(sep + 1) };
+}
+
+export async function getExploreJobsCursor({
+  cursor,
+  workSetup,
+  jobType,
+  experienceLevel,
+  location,
+  salaryMin,
+  salaryMax,
+  datePosted,
+  verifiedOnly,
+  sort = "recency",
+  pageSize = 20,
+  profile,
+}: GetExploreJobsCursorParams): Promise<CursorPaginatedJobs> {
+  const supabase = createServiceClient();
+  const limit = pageSize + 1; // fetch one extra to determine hasMore
+
+  // Build base query with filters (no count)
+  let builder = supabase
+    .from("jobs")
+    .select(FEED_COLUMNS)
+    .eq("is_active", true);
+
+  builder = applyExploreFilters(builder, {
+    workSetup, jobType, experienceLevel, location,
+    salaryMin, salaryMax, datePosted, verifiedOnly,
+  });
+
+  // Apply cursor + sort
+  const parsed = cursor ? parseCursor(cursor) : null;
+
+  if (sort === "salary_desc") {
+    if (parsed) {
+      // (salary_max, id) < (cursor_val, cursor_id) for descending
+      builder = builder.or(
+        `salary_max.lt.${parsed.value},and(salary_max.eq.${parsed.value},id.lt.${parsed.id})`
+      );
+    }
+    builder = builder
+      .order("salary_max", { ascending: false, nullsFirst: false })
+      .order("id", { ascending: false });
+  } else if (sort === "salary_asc") {
+    if (parsed) {
+      // (salary_min, id) > (cursor_val, cursor_id) for ascending
+      builder = builder.or(
+        `salary_min.gt.${parsed.value},and(salary_min.eq.${parsed.value},id.gt.${parsed.id})`
+      );
+    }
+    builder = builder
+      .order("salary_min", { ascending: true, nullsFirst: false })
+      .order("id", { ascending: true });
+  } else {
+    // recency (default): posted_at DESC, id DESC
+    if (parsed) {
+      builder = builder.or(
+        `posted_at.lt.${parsed.value},and(posted_at.eq.${parsed.value},id.lt.${parsed.id})`
+      );
+    }
+    builder = builder
+      .order("posted_at", { ascending: false })
+      .order("id", { ascending: false });
+  }
+
+  const { data, error } = await builder.limit(limit);
+
+  if (error) {
+    return { jobs: [], nextCursor: null, hasMore: false };
+  }
+
+  if (!data || data.length === 0) {
+    return { jobs: [], nextCursor: null, hasMore: false };
+  }
+
+  const hasMore = data.length > pageSize;
+  const rows = (hasMore ? data.slice(0, pageSize) : data) as unknown as JobRow[];
+  fixSalaryInMemory(rows);
+
+  const jobs: Job[] = rows.map((row) => {
+    const result = computeMatchScore(row, profile ?? null);
+    return mapRowToJob(row, result, false);
+  });
+
+  // Build next cursor from last row
+  let nextCursor: string | null = null;
+  if (hasMore && rows.length > 0) {
+    const lastRow = rows[rows.length - 1];
+    if (sort === "salary_desc") {
+      nextCursor = `${lastRow.salary_max ?? 0}_${lastRow.id}`;
+    } else if (sort === "salary_asc") {
+      nextCursor = `${lastRow.salary_min ?? 0}_${lastRow.id}`;
+    } else {
+      nextCursor = `${lastRow.posted_at}_${lastRow.id}`;
+    }
+  }
+
+  return { jobs, nextCursor, hasMore };
+}
+
 export async function getExploreJobs({
   query,
   workSetup,
@@ -1041,7 +1165,7 @@ export async function getExploreJobs({
   const { data, error, count } = await builder.range(from, to);
 
   if (error) {
-    console.error("Failed to fetch explore jobs:", error.message);
+    log.error({ err: error.message }, "Failed to fetch explore jobs");
     return { jobs: [], total: 0, page, pageSize, totalPages: 0, isMatchFiltered: false };
   }
 
@@ -1130,7 +1254,7 @@ async function getExploreJobsSearchRanked(
   const { data, error, count } = await builder;
 
   if (error) {
-    console.error("Failed to fetch explore jobs for search ranking:", error.message);
+    log.error({ err: error.message }, "Failed to fetch explore jobs for search ranking");
     return { jobs: [], total: 0, page, pageSize, totalPages: 0, isMatchFiltered: false };
   }
 

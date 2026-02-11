@@ -5,6 +5,9 @@ import { getAssessmentResults } from "@/lib/actions/assessments";
 import { getQuestionBank } from "@/lib/data/learn-data";
 import type { WeekActivity } from "@/lib/types";
 import type { QuizQuestion, QuizResult } from "@/lib/types/learn";
+import { logger } from "@/lib/logger";
+
+const log = logger.child({ module: "dashboard-stats" });
 
 const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -373,7 +376,7 @@ export async function getDashboardStats(): Promise<DashboardStats | null> {
       dailyActivity,
     };
   } catch (err) {
-    console.error("getDashboardStats error:", err);
+    log.error({ err }, "getDashboardStats error");
     return null;
   }
 }

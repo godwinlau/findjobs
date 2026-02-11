@@ -16,6 +16,9 @@ import type {
   Course,
   QuizQuestion,
 } from "@/lib/types/learn";
+import { logger } from "@/lib/logger";
+
+const log = logger.child({ module: "learn-data" });
 
 const focusAssessmentSet = new Set<string>(FOCUS_ASSESSMENT_CATEGORIES);
 
@@ -27,7 +30,7 @@ export async function getCourseCatalog(): Promise<Course[]> {
     const notionCourses = await fetchCourses();
     courses = notionCourses.length > 0 ? notionCourses : courseCatalog;
   } catch (e) {
-    console.warn("[learn-data] Notion courses fetch failed, using fallback:", e);
+    log.warn({ err: e }, "Notion courses fetch failed, using fallback");
     courses = courseCatalog;
   }
   return courses.filter((c) => isFocusCluster(c.categoryId));

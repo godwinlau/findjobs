@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cleanupExpiredJobs } from "@/lib/ingest";
+import { logger } from "@/lib/logger";
+
+const log = logger.child({ module: "cron:cleanup" });
 
 // Runs daily at 2AM — marks expired listings as inactive
 

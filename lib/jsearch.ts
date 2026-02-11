@@ -4,7 +4,9 @@ import { extractSkillsWithStructured } from "@/lib/skills/groq-extraction";
 import type { SkillStructuredEntry } from "@/lib/skills/groq-extraction";
 import { extractSalaryFromDescription } from "@/lib/linkedin-jobs";
 import { createServiceClient } from "@/lib/supabase-server";
-import { embedAndStoreJobs } from "@/lib/embeddings";
+import { logger } from "@/lib/logger";
+
+const log = logger.child({ module: "jsearch" });
 
 // ─── Constants ───
 
@@ -422,26 +424,7 @@ export async function runJSearchIngestion(
           } else {
             qInserted = inserted?.length || 0;
             qDuplicates += toInsert.length - qInserted;
-
-            // Generate embeddings for newly inserted jobs (non-fatal)
-            if (inserted && inserted.length > 0) {
-              try {
-                const insertedIds = (inserted as { id: string }[]).map((r) => r.id);
-                const { data: embeddingRows } = await supabase
-                  .from("jobs")
-                  .select("id, title, skills_required, experience_level, work_setup, description_plain")
-                  .in("id", insertedIds);
-
-                if (embeddingRows && embeddingRows.length > 0) {
-                  await embedAndStoreJobs(
-                    embeddingRows as { id: string; title: string; skills_required: string[]; experience_level: string | null; work_setup: string | null; description_plain: string }[],
-                    supabase,
-                  );
-                }
-              } catch {
-                // Non-fatal: embedding failures don't block ingestion
-              }
-            }
+            // Embeddings are generated asynchronously by the backfill-embeddings cron
           }
         }
       }

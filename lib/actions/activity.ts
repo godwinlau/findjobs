@@ -4,6 +4,9 @@ import { createClient } from "@/lib/supabase/server";
 import { validateLogActivity } from "@/lib/validation/schemas";
 import type { ActivityType } from "@/lib/types";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { logger } from "@/lib/logger";
+
+const log = logger.child({ module: "activity" });
 
 function getTodayPHT(): string {
   return new Date(
@@ -34,7 +37,7 @@ export async function logActivity({
     // Validate input
     const validation = validateLogActivity({ activityType, targetId, metadata });
     if (!validation.success) {
-      console.error("Activity validation failed:", validation.error);
+      log.error({ err: validation.error }, "Activity validation failed");
       return;
     }
 
@@ -59,13 +62,13 @@ export async function logActivity({
 
     // Unique violation means duplicate — not an error
     if (error && error.code !== "23505") {
-      console.error("Failed to log activity:", error.message);
+      log.error({ err: error.message }, "Failed to log activity");
       return;
     }
 
     await updateStreak(supabase, user.id, todayPHT);
   } catch (err) {
-    console.error("logActivity error:", err);
+    log.error({ err }, "logActivity error");
   }
 }
 
@@ -82,7 +85,7 @@ async function updateStreak(
       .single();
 
     if (fetchError || !profile) {
-      console.error("Failed to fetch profile for streak:", fetchError?.message);
+      log.error({ err: fetchError?.message }, "Failed to fetch profile for streak");
       return;
     }
 
@@ -112,9 +115,9 @@ async function updateStreak(
       .eq("id", userId);
 
     if (updateError) {
-      console.error("Failed to update streak:", updateError.message);
+      log.error({ err: updateError.message }, "Failed to update streak");
     }
   } catch (err) {
-    console.error("updateStreak error:", err);
+    log.error({ err }, "updateStreak error");
   }
 }

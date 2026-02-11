@@ -11,6 +11,7 @@
   "dependencies": {
     "@notionhq/client": "^5.9.0",
     "@phosphor-icons/react": "^2.1.10",
+    "@sentry/nextjs": "^10.38.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.94.0",
     "@vnedyalk0v/react19-simple-maps": "^2.0.2",
@@ -19,6 +20,7 @@
     "lucide-react": "^0.563.0",
     "motion": "^12.33.0",
     "next": "16.1.6",
+    "pino": "^10.3.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "recharts": "^3.7.0",

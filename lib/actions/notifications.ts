@@ -1,6 +1,9 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { logger } from "@/lib/logger";
+
+const log = logger.child({ module: "notifications" });
 
 export interface NotificationItem {
   id: string;
@@ -113,7 +116,7 @@ export async function getRecentActivities(
       .limit(limit);
 
     if (error) {
-      console.error("Failed to fetch activities:", error.message);
+      log.error({ err: error.message }, "Failed to fetch activities");
       return [];
     }
 
@@ -121,7 +124,7 @@ export async function getRecentActivities(
 
     return data.map(formatActivity);
   } catch (err) {
-    console.error("getRecentActivities error:", err);
+    log.error({ err }, "getRecentActivities error");
     return [];
   }
 }

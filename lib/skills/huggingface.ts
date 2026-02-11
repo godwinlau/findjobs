@@ -15,7 +15,7 @@ import {
     buildSkillIndex,
     type SkillNode,
   } from "./skills_ontology";
-  
+
   import {
     extractSkillsFromJD,
     extractSkillsFromJDSync,
@@ -27,6 +27,9 @@ import {
     type MatchResult,
     type EmbedFn,
   } from "./skills_extraction";
+  import { logger } from "@/lib/logger";
+
+  const log = logger.child({ module: "huggingface" });
   
   // ---------------------------------------------------------------------------
   // CONFIG
@@ -55,7 +58,7 @@ import {
   async function hfEmbed(texts: string[]): Promise<number[][]> {
     const apiKey = process.env.HUGGINGFACE_API_KEY;
     if (!apiKey) {
-      console.warn("HUGGINGFACE_API_KEY not set. Skipping embedding pass.");
+      log.warn("HUGGINGFACE_API_KEY not set, skipping embedding pass");
       return [];
     }
   
@@ -77,10 +80,7 @@ import {
   
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(
-          `HF Embedding API Error: ${response.status} ${response.statusText}`,
-          errorText
-        );
+        log.error({ status: response.status, statusText: response.statusText, errorText }, "HF Embedding API error");
         return [];
       }
   
@@ -88,13 +88,13 @@ import {
   
       // HF returns array of arrays for batch embedding
       if (!Array.isArray(result) || !Array.isArray(result[0])) {
-        console.warn("Unexpected HF embedding response format:", result);
+        log.warn({ result }, "Unexpected HF embedding response format");
         return [];
       }
   
       return result as number[][];
     } catch (error) {
-      console.error("Failed to query HF Embedding API:", error);
+      log.error({ err: error }, "Failed to query HF Embedding API");
       return [];
     }
   }
@@ -162,14 +162,12 @@ import {
   
       // Lazy-load cached ontology embeddings
       if (!_cachedOntologyEmbeddings) {
-        console.log("Computing ontology embeddings (one-time)...");
+        log.info("Computing ontology embeddings (one-time)");
         _cachedOntologyEmbeddings = await precomputeOntologyEmbeddings(
           SKILL_ONTOLOGY,
           hfEmbedFn
         );
-        console.log(
-          `Cached ${_cachedOntologyEmbeddings.size} ontology embeddings.`
-        );
+        log.info({ count: _cachedOntologyEmbeddings.size }, "Cached ontology embeddings");
       }
       extractionOptions.ontologyEmbeddings = _cachedOntologyEmbeddings!;
     }

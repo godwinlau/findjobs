@@ -9,6 +9,9 @@ import {
   type SkillTier,
 } from "./skills_ontology";
 import { extractSkillsFromJDSync } from "./skills_extraction";
+import { logger } from "@/lib/logger";
+
+const log = logger.child({ module: "groq-extraction" });
 
 // ---------------------------------------------------------------------------
 // TYPES
@@ -188,14 +191,14 @@ export async function extractSkillsLLM(
       if (res.status === 429) {
         // Rate limited — wait longer (TPM resets per minute)
         const delay = (attempt + 1) * 15_000; // 15s, 30s, 45s
-        console.warn(`Groq 429 — waiting ${delay / 1000}s (attempt ${attempt + 1}/3)`);
+        log.warn({ delay: delay / 1000, attempt: attempt + 1 }, "Groq 429 — rate limited, waiting");
         await new Promise((r) => setTimeout(r, delay));
         continue;
       }
 
       if (!res.ok) {
         const errText = await res.text();
-        console.error(`Groq API error ${res.status}: ${errText}`);
+        log.error({ status: res.status, errText }, "Groq API error");
         break;
       }
 
@@ -241,7 +244,7 @@ export async function extractSkillsLLM(
       break;
     } catch (err) {
       if (attempt === 2) {
-        console.error("Groq extraction failed after 3 attempts:", err);
+        log.error({ err }, "Groq extraction failed after 3 attempts");
       }
     }
   }

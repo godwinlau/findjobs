@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getExploreJobs, getDistinctLocations } from "@/lib/jobs";
+import { getExploreJobs, getExploreJobsCursor, getDistinctLocations } from "@/lib/jobs";
 import type { ExploreSort } from "@/lib/jobs";
 
 export async function GET(req: NextRequest) {
@@ -16,6 +16,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
 
   const query = searchParams.get("q") || undefined;
+  const cursor = searchParams.get("cursor") || undefined;
   const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10) || 1);
   const workSetup = searchParams.get("workSetup") || undefined;
   const jobType = searchParams.get("jobType") || undefined;
@@ -33,6 +34,29 @@ export async function GET(req: NextRequest) {
     getDistinctLocations(),
   ]);
 
+  // Use cursor-based pagination for DB-sorted paths (no search query, not match sort)
+  const isDbSorted = !query && sort !== "match";
+
+  if (isDbSorted) {
+    const cursorResult = await getExploreJobsCursor({
+      cursor,
+      workSetup,
+      jobType,
+      experienceLevel,
+      location,
+      salaryMin,
+      salaryMax,
+      datePosted,
+      verifiedOnly,
+      sort: sort as "recency" | "salary_desc" | "salary_asc",
+      pageSize: 20,
+      profile,
+    });
+
+    return NextResponse.json({ ...cursorResult, locations });
+  }
+
+  // Offset-based for match sort and search-ranked paths
   const jobResult = await getExploreJobs({
     query,
     workSetup,

@@ -13,6 +13,9 @@ import {
 } from "@/lib/matching";
 import { filterByRoleCategory } from "@/lib/role-gates";
 import type { Profile } from "@/lib/types";
+import { logger } from "@/lib/logger";
+
+const log = logger.child({ module: "match-cache" });
 
 // ─── Types ───
 
@@ -99,7 +102,7 @@ export async function writeMatchCache(
     .insert(rows);
 
   if (error) {
-    console.error("writeMatchCache error:", error.message);
+    log.error({ err: error.message }, "writeMatchCache error");
   }
 }
 

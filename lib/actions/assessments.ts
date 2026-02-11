@@ -4,6 +4,9 @@ import { createClient } from "@/lib/supabase/server";
 import { logActivity } from "@/lib/actions/activity";
 import { validateAssessmentResult } from "@/lib/validation/schemas";
 import type { QuizResult } from "@/lib/types/learn";
+import { logger } from "@/lib/logger";
+
+const log = logger.child({ module: "assessments" });
 
 export async function saveAssessmentResult(params: {
   categoryId: string;
@@ -57,7 +60,7 @@ export async function saveAssessmentResult(params: {
       });
 
     if (error) {
-      console.error("Failed to save assessment result:", error.message);
+      log.error({ err: error.message }, "Failed to save assessment result");
       return { success: false, error: "Failed to save assessment. Please try again." };
     }
 
@@ -66,11 +69,11 @@ export async function saveAssessmentResult(params: {
       activityType: "skill_assessment",
       targetId: params.categoryId,
       metadata: { score: params.score, total: params.total },
-    }).catch((err) => console.error("Activity log error:", err));
+    }).catch((err) => log.error({ err }, "Activity log error"));
 
     return { success: true };
   } catch (err) {
-    console.error("saveAssessmentResult error:", err);
+    log.error({ err }, "saveAssessmentResult error");
     return { success: false, error: "Unexpected error occurred." };
   }
 }
@@ -95,7 +98,7 @@ export async function getAssessmentResults(): Promise<Record<
       .order("completed_at", { ascending: false });
 
     if (error) {
-      console.error("Failed to fetch assessment results:", error.message);
+      log.error({ err: error.message }, "Failed to fetch assessment results");
       return null;
     }
 
@@ -117,7 +120,7 @@ export async function getAssessmentResults(): Promise<Record<
 
     return resultMap;
   } catch (err) {
-    console.error("getAssessmentResults error:", err);
+    log.error({ err }, "getAssessmentResults error");
     return null;
   }
 }

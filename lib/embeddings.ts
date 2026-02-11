@@ -1,4 +1,7 @@
 import { Profile } from "@/lib/types";
+import { logger } from "@/lib/logger";
+
+const log = logger.child({ module: "embeddings" });
 
 // ─── Types ───
 
@@ -102,14 +105,14 @@ export async function generateEmbeddings(
     });
 
     if (!res.ok) {
-      console.error(`HuggingFace API error: ${res.status} ${res.statusText}`);
+      log.error({ status: res.status, statusText: res.statusText }, "HuggingFace API error");
       return null;
     }
 
     const data: number[][] = await res.json();
     return data;
   } catch (err) {
-    console.error("HuggingFace embedding error:", err);
+    log.error({ err }, "HuggingFace embedding error");
     return null;
   }
 }
@@ -192,7 +195,7 @@ export async function embedAndStoreJobs(
         .eq("id", batch[j].id);
 
       if (error) {
-        console.error(`Embedding update failed for job ${batch[j].id}:`, error.message);
+        log.error({ jobId: batch[j].id, err: error.message }, "Embedding update failed");
         errors++;
       } else {
         embedded++;

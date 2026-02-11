@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase-server";
 import { computeAndCacheMatches } from "@/lib/match-cache";
 import type { Profile } from "@/lib/types";
+import { logger } from "@/lib/logger";
+
+const log = logger.child({ module: "cron:recompute-matches" });
 
 export const maxDuration = 300;
 
@@ -60,7 +63,7 @@ export async function GET(req: NextRequest) {
       await computeAndCacheMatches(profile.id, profile);
       processed++;
     } catch (err) {
-      console.error(`recompute-matches error for ${profile.id}:`, err);
+      log.error({ err, userId: profile.id }, "recompute-matches error");
       errors++;
     }
   }

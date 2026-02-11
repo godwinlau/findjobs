@@ -10,6 +10,9 @@ import {
     buildSkillIndex,
     type SkillTier,
   } from "./skills_ontology";
+  import { logger } from "@/lib/logger";
+
+  const log = logger.child({ module: "skills-extraction" });
   
   // ---------------------------------------------------------------------------
   // TYPES
@@ -687,19 +690,19 @@ import {
   
         if (response.status === 429) {
           const waitMs = Math.pow(2, attempt + 1) * 1000; // 2s, 4s, 8s
-          console.warn(`  Rate limited, waiting ${waitMs / 1000}s (attempt ${attempt + 1}/3)...`);
+          log.warn({ waitMs: waitMs / 1000, attempt: attempt + 1 }, "Rate limited, waiting");
           await new Promise((r) => setTimeout(r, waitMs));
           continue;
         }
   
         // Non-rate-limit error — don't retry
         lastError = await response.text().catch(() => "");
-        console.warn(`LLM verification failed (${response.status}): ${lastError.substring(0, 100)}`);
+        log.warn({ status: response.status, lastError: lastError.substring(0, 100) }, "LLM verification failed");
         return new Set(suspiciousSkills.map((s) => s.skillId));
       }
   
       if (!response || !response.ok) {
-        console.warn("LLM verification: max retries exceeded, keeping all skills");
+        log.warn("LLM verification: max retries exceeded, keeping all skills");
         return new Set(suspiciousSkills.map((s) => s.skillId));
       }
   
@@ -729,7 +732,7 @@ import {
       // Only fall back if we couldn't parse ANY lines at all
       // (parsedCount === 0 means the response format was completely unexpected)
       if (parsedCount === 0) {
-        console.warn("LLM verification: could not parse response, keeping all skills. Response:", text.substring(0, 200));
+        log.warn({ response: text.substring(0, 200) }, "LLM verification: could not parse response, keeping all skills");
         return new Set(suspiciousSkills.map((s) => s.skillId));
       }
   
@@ -737,7 +740,7 @@ import {
       // This is a valid outcome — the LLM said none of the fuzzy matches are real
       return verified;
     } catch (err) {
-      console.warn("LLM verification error:", err);
+      log.warn({ err }, "LLM verification error");
       return new Set(suspiciousSkills.map((s) => s.skillId));
     }
   }

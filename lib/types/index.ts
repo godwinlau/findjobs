@@ -103,3 +103,9 @@ export interface PaginatedJobs {
   totalPages: number;
   isMatchFiltered: boolean;
 }
+
+export interface CursorPaginatedJobs {
+  jobs: Job[];
+  nextCursor: string | null;
+  hasMore: boolean;
+}

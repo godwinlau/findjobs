@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runHealthCheck } from "@/lib/job-health-checker";
+import { logger } from "@/lib/logger";
+
+const log = logger.child({ module: "cron:check-jobs" });
 
 export const maxDuration = 300;
 

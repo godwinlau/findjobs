@@ -1,4 +1,7 @@
 import { createServiceClient } from "@/lib/supabase-server";
+import { logger } from "@/lib/logger";
+
+const log = logger.child({ module: "streaks" });
 
 /**
  * Safety-net cron: resets current_streak to 0 for users who haven't
@@ -24,7 +27,7 @@ export async function resetStaleStreaks(): Promise<{ reset: number }> {
     .select("id");
 
   if (error) {
-    console.error("resetStaleStreaks error:", error.message);
+    log.error({ err: error.message }, "resetStaleStreaks error");
     return { reset: 0 };
   }
 
