@@ -5,10 +5,10 @@ import { resetStaleStreaks } from "@/lib/streaks";
 import { TOTAL_BATCHES } from "@/lib/queries";
 
 // Vercel Cron calls this 4x daily with different batch sets (PHT schedule):
-//   6:40 AM  → batches 0,1
-//  11:40 AM  → batches 2,3
-//   3:40 PM  → batches 4,5
-//   9:40 PM  → batches 6 + JSearch + cleanup + streaks
+//   4:00 PM  → batches 0,1
+//   9:00 PM  → batches 2,3
+//   2:00 AM  → batches 4,5
+//   7:00 AM  → batches 6 + JSearch + cleanup + streaks
 // Accepts ?batches=0,1 to run specific batches.
 // The last run adds ?extras=true to also run JSearch, cleanup, and streaks.
 
