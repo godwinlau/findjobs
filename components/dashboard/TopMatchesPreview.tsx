@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useCallback } from "react";
 import { Target } from "@phosphor-icons/react";
 import { HeroJobCard } from "./HeroJobCard";
 import { JobCard } from "./JobCard";
@@ -36,6 +38,9 @@ export function TopMatchesPreview({
   lastUpdated,
   onJobSelect,
 }: TopMatchesPreviewProps) {
+  const router = useRouter();
+  const defaultJobSelect = useCallback((job: Job) => router.push(`/jobs/${job.id}`), [router]);
+  const handleJobSelect = onJobSelect ?? defaultJobSelect;
   const { isSaved, toggleSave } = useSavedJobs();
   const freshnessLabel = formatLastUpdated(lastUpdated);
   const displayCount = (topJob ? 1 : 0) + otherJobs.length;
@@ -147,7 +152,7 @@ export function TopMatchesPreview({
             job={topJob}
             isSaved={isSaved(topJob.id)}
             onToggleSave={() => toggleSave(topJob.id)}
-            onViewDetails={onJobSelect}
+            onViewDetails={handleJobSelect}
           />
         )}
 
@@ -161,7 +166,7 @@ export function TopMatchesPreview({
                 animationDelay={0.35 + i * 0.05}
                 isSaved={isSaved(job.id)}
                 onToggleSave={() => toggleSave(job.id)}
-                onViewDetails={onJobSelect}
+                onViewDetails={handleJobSelect}
               />
             ))}
           </div>

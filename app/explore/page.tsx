@@ -37,7 +37,8 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
     redirect("/login");
   }
 
-  const { data: profile } = await supabase
+  // Profile fetch can run in parallel with param parsing below
+  const profilePromise = supabase
     .from("profiles")
     .select("*")
     .eq("id", user.id)
@@ -54,6 +55,9 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
   const datePosted = params.datePosted || undefined;
   const verifiedOnly = params.verifiedOnly === "true" || undefined;
   const sort = (params.sort as ExploreSort) || "recency";
+
+  // Await profile here (was started above in parallel with param parsing)
+  const { data: profile } = await profilePromise;
 
   const [jobResult, locations] = await Promise.all([
     getExploreJobs({

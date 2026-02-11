@@ -12,6 +12,8 @@ import {
 } from "@/lib/matching";
 import { buildProfileEmbeddingText, generateEmbeddingSafe } from "@/lib/embeddings";
 import { filterByRoleCategory } from "@/lib/role-gates";
+import { readMatchCache } from "@/lib/match-cache";
+import { unstable_cache } from "next/cache";
 
 // ─── Search helpers ───
 
@@ -137,7 +139,7 @@ interface GetActiveJobsParams {
 }
 
 // Columns needed for the feed display (Phase 2 / fallback path)
-const FEED_COLUMNS = [
+export const FEED_COLUMNS = [
   "id", "source", "title", "company_name", "company_verified",
   "company_logo_url", "description_plain",
   "salary_min", "salary_max", "salary_is_estimate",
@@ -160,7 +162,7 @@ export const SCORING_COLUMNS = [
 
 const FETCH_PAGE_SIZE = 1000;
 
-async function fetchAllRows<T>(
+export async function fetchAllRows<T>(
   buildQuery: (from: number, to: number) => PromiseLike<{ data: T[] | null }>,
 ): Promise<T[]> {
   const allRows: T[] = [];
@@ -179,7 +181,7 @@ async function fetchAllRows<T>(
 
 // ─── Semantic score helpers ───
 
-async function buildSemanticScoreMap(
+export async function buildSemanticScoreMap(
   supabase: ReturnType<typeof createServiceClient>,
   profile: Profile,
 ): Promise<Map<string, number>> {
@@ -370,7 +372,7 @@ async function getActiveJobsMatchScored(
 
 // ── Shared row → Job mapper ──
 
-interface ScoringRow {
+export interface ScoringRow {
   id: string;
   title: string;
   skills_required: string[];
@@ -384,7 +386,7 @@ interface ScoringRow {
   posted_at: string;
 }
 
-function mapRowToJob(row: JobRow, result: { score: number; scoreRange?: [number, number]; highlight: string | null; matchedSkills?: string[] }, isTop: boolean): Job {
+export function mapRowToJob(row: JobRow, result: { score: number; scoreRange?: [number, number]; highlight: string | null; matchedSkills?: string[] }, isTop: boolean): Job {
   return {
     id: row.id,
     company: row.company_name ?? "",
@@ -449,6 +451,41 @@ export async function getTopMatchedJobs({
     });
 
     return { jobs, totalMatches: 0 };
+  }
+
+  // ── Cache-first path ──
+  const cached = await readMatchCache(profile!.id, limit);
+  if (cached) {
+    // Fetch full job data for cached IDs
+    const cachedIds = cached.rows.map((r) => r.job_id);
+    const { data: fullData } = await supabase
+      .from("jobs")
+      .select(FEED_COLUMNS)
+      .in("id", cachedIds)
+      .eq("is_active", true);
+
+    if (fullData && fullData.length > 0) {
+      const fullRows = fullData as unknown as JobRow[];
+      fixSalaryInMemory(fullRows);
+      const rowMap = new Map(fullRows.map((r) => [r.id, r]));
+
+      const jobs: Job[] = cached.rows
+        .map((c, i) => {
+          const row = rowMap.get(c.job_id);
+          if (!row) return null;
+          return mapRowToJob(
+            row,
+            { score: c.match_score, highlight: c.match_highlight, matchedSkills: c.matched_skills },
+            i === 0,
+          );
+        })
+        .filter((j): j is Job => j !== null);
+
+      if (jobs.length > 0) {
+        return { jobs, totalMatches: cached.totalMatches };
+      }
+    }
+    // If all cached jobs were deactivated, fall through to live computation
   }
 
   // Phase 1 — lightweight scoring + semantic in parallel
@@ -600,7 +637,7 @@ export async function getJobById(id: string, profile?: Profile | null): Promise<
 
 const PHP_MONTHLY_SANITY_THRESHOLD = 150_000;
 
-function fixSalaryInMemory(rows: JobRow[]): void {
+export function fixSalaryInMemory(rows: JobRow[]): void {
   for (const row of rows) {
     // Skip estimated salaries — already normalized during ingestion
     if (row.salary_is_estimate) continue;
@@ -1270,33 +1307,50 @@ export async function getSimilarJobs(
 ): Promise<Job[]> {
   const supabase = createServiceClient();
 
-  const { data } = await supabase
+  // Phase 1: fetch minimal columns for scoring (id + skills only)
+  const { data: candidates } = await supabase
     .from("jobs")
-    .select(FEED_COLUMNS)
+    .select("id, skills_required")
     .eq("is_active", true)
     .neq("id", jobId)
     .order("posted_at", { ascending: false })
-    .limit(100);
+    .limit(50);
 
-  if (!data || data.length === 0) return [];
-
-  const rows = data as unknown as JobRow[];
+  if (!candidates || candidates.length === 0) return [];
 
   // Score by overlapping skills
   const skillSet = new Set(skills.map((s) => s.toLowerCase()));
-  const scored = rows.map((row) => {
-    const overlap = (row.skills_required ?? []).filter((s) =>
+  const scored = (candidates as { id: string; skills_required: string[] }[]).map((c) => {
+    const overlap = (c.skills_required ?? []).filter((s) =>
       skillSet.has(s.toLowerCase()),
     ).length;
-    return { row, overlap };
+    return { id: c.id, overlap };
   });
 
   scored.sort((a, b) => b.overlap - a.overlap);
+  const topIds = scored.slice(0, limit).map((s) => s.id);
 
-  return scored.slice(0, limit).map(({ row }) => {
-    const result = computeMatchScore(row, profile);
-    return mapRowToJob(row, result, false);
-  });
+  if (topIds.length === 0) return [];
+
+  // Phase 2: fetch full data for only the top matches
+  const { data: fullData } = await supabase
+    .from("jobs")
+    .select(FEED_COLUMNS)
+    .in("id", topIds);
+
+  if (!fullData || fullData.length === 0) return [];
+
+  const rows = fullData as unknown as JobRow[];
+
+  // Preserve ranking order
+  const rowMap = new Map(rows.map((r) => [r.id, r]));
+  return topIds
+    .map((id) => rowMap.get(id))
+    .filter((row): row is JobRow => !!row)
+    .map((row) => {
+      const result = computeMatchScore(row, profile);
+      return mapRowToJob(row, result, false);
+    });
 }
 
 // ─── Job freshness indicator ───
@@ -1321,43 +1375,35 @@ export async function getJobsLastUpdated(): Promise<{ lastUpdated: string | null
   };
 }
 
-// ─── Distinct locations for filter dropdown (cached) ───
+// ─── Distinct locations for filter dropdown (cached 10 min via unstable_cache) ───
 
-let _locationCache: { data: string[]; ts: number } | null = null;
-const LOCATION_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+export const getDistinctLocations = unstable_cache(
+  async (): Promise<string[]> => {
+    const supabase = createServiceClient();
 
-export async function getDistinctLocations(): Promise<string[]> {
-  const now = Date.now();
-  if (_locationCache && now - _locationCache.ts < LOCATION_CACHE_TTL) {
-    return _locationCache.data;
-  }
+    const data = await fetchAllRows<{ location_city: string }>((from, to) =>
+      supabase
+        .from("jobs")
+        .select("location_city")
+        .eq("is_active", true)
+        .not("location_city", "is", null)
+        .order("location_city", { ascending: true })
+        .range(from, to),
+    );
 
-  const supabase = createServiceClient();
+    if (data.length === 0) return [];
 
-  const data = await fetchAllRows<{ location_city: string }>((from, to) =>
-    supabase
-      .from("jobs")
-      .select("location_city")
-      .eq("is_active", true)
-      .not("location_city", "is", null)
-      .order("location_city", { ascending: true })
-      .range(from, to),
-  );
+    const unique = [...new Set(
+      (data as { location_city: string }[])
+        .map((r) => r.location_city)
+        .filter(Boolean)
+    )];
 
-  if (data.length === 0) {
-    return _locationCache?.data ?? [];
-  }
-
-  const unique = [...new Set(
-    (data as { location_city: string }[])
-      .map((r) => r.location_city)
-      .filter(Boolean)
-  )];
-
-  const sorted = unique.sort();
-  _locationCache = { data: sorted, ts: now };
-  return sorted;
-}
+    return unique.sort();
+  },
+  ["distinct-locations"],
+  { revalidate: 600, tags: ["dashboard"] },
+);
 
 // ─── Home page data functions ───
 
@@ -1396,153 +1442,173 @@ function classifyJob(skillsRequired: string[]): string {
   return bestCategory;
 }
 
-/** Get job counts per work category */
-export async function getCategoryJobCounts(): Promise<CategoryCount[]> {
-  const supabase = createServiceClient();
+/** Get job counts per work category (cached 10 min) */
+export const getCategoryJobCounts = unstable_cache(
+  async (): Promise<CategoryCount[]> => {
+    const supabase = createServiceClient();
 
-  const data = await fetchAllRows<{ skills_required: string[] }>((from, to) =>
-    supabase
-      .from("jobs")
-      .select("skills_required")
-      .eq("is_active", true)
-      .range(from, to),
-  );
+    const data = await fetchAllRows<{ skills_required: string[] }>((from, to) =>
+      supabase
+        .from("jobs")
+        .select("skills_required")
+        .eq("is_active", true)
+        .range(from, to),
+    );
 
-  if (data.length === 0) {
+    if (data.length === 0) {
+      return Object.entries(CATEGORY_META).map(([id, meta]) => ({
+        id,
+        name: meta.name,
+        icon: meta.icon,
+        count: 0,
+      }));
+    }
+
+    const counts: Record<string, number> = {};
+    for (const row of data) {
+      const cat = classifyJob((row as { skills_required: string[] }).skills_required);
+      counts[cat] = (counts[cat] || 0) + 1;
+    }
+
     return Object.entries(CATEGORY_META).map(([id, meta]) => ({
       id,
       name: meta.name,
       icon: meta.icon,
-      count: 0,
+      count: counts[id] || 0,
     }));
-  }
-
-  const counts: Record<string, number> = {};
-  for (const row of data) {
-    const cat = classifyJob((row as { skills_required: string[] }).skills_required);
-    counts[cat] = (counts[cat] || 0) + 1;
-  }
-
-  return Object.entries(CATEGORY_META).map(([id, meta]) => ({
-    id,
-    name: meta.name,
-    icon: meta.icon,
-    count: counts[id] || 0,
-  }));
-}
+  },
+  ["category-job-counts"],
+  { revalidate: 600, tags: ["dashboard"] },
+);
 
 // Static growth/bar data per role (no historical data yet)
 const STATIC_ROLE_DATA: Record<string, { growth: number; bars: number[] }> = {
   default: { growth: 12, bars: [35, 40, 50, 55, 65, 72] },
 };
 
-/** Get trending roles — top 6 by open count, optionally filtered by category */
+/** Get trending roles — top 6 by open count, optionally filtered by category (cached 10 min) */
 export async function getTrendingRoles(category?: string): Promise<TrendingRole[]> {
-  const supabase = createServiceClient();
-
-  type RoleRow = { title: string; salary_min: number | null; salary_max: number | null; skills_required: string[] };
-
-  const rows = await fetchAllRows<RoleRow>((from, to) =>
-    supabase
-      .from("jobs")
-      .select("title, salary_min, salary_max, skills_required")
-      .eq("is_active", true)
-      .range(from, to),
-  );
-
-  if (rows.length === 0) return [];
-
-  // Filter by category if specified
-  const filtered = category && category !== "all"
-    ? rows.filter((r) => classifyJob(r.skills_required) === category)
-    : rows;
-
-  // Aggregate by title
-  const roleMap = new Map<string, { count: number; salaryMins: number[]; salaryMaxes: number[] }>();
-  for (const row of filtered) {
-    const title = row.title;
-    const entry = roleMap.get(title) || { count: 0, salaryMins: [], salaryMaxes: [] };
-    entry.count++;
-    if (row.salary_min) entry.salaryMins.push(row.salary_min);
-    if (row.salary_max) entry.salaryMaxes.push(row.salary_max);
-    roleMap.set(title, entry);
-  }
-
-  // Sort by count descending, take top 6
-  const sorted = [...roleMap.entries()]
-    .sort((a, b) => b[1].count - a[1].count)
-    .slice(0, 6);
-
-  return sorted.map(([title, { count, salaryMins, salaryMaxes }]) => {
-    const minSalary = salaryMins.length > 0 ? Math.min(...salaryMins) : null;
-    const maxSalary = salaryMaxes.length > 0 ? Math.max(...salaryMaxes) : null;
-
-    const salaryRange = minSalary && maxSalary
-      ? `\u20B1${Math.round(minSalary / 1000)}K \u2013 \u20B1${Math.round(maxSalary / 1000)}K`
-      : minSalary
-        ? `From \u20B1${Math.round(minSalary / 1000)}K`
-        : maxSalary
-          ? `Up to \u20B1${Math.round(maxSalary / 1000)}K`
-          : "Salary TBD";
-
-    const staticData = STATIC_ROLE_DATA[title] || STATIC_ROLE_DATA.default;
-
-    return {
-      title,
-      openCount: count,
-      salaryRange,
-      growthPercent: staticData.growth,
-      barHeights: staticData.bars,
-    };
-  });
+  return _getTrendingRolesCached(category ?? "all");
 }
 
-/** Get top hiring companies — top 5 by open jobs, optionally filtered by category */
+const _getTrendingRolesCached = unstable_cache(
+  async (category: string): Promise<TrendingRole[]> => {
+    const supabase = createServiceClient();
+
+    type RoleRow = { title: string; salary_min: number | null; salary_max: number | null; skills_required: string[] };
+
+    const rows = await fetchAllRows<RoleRow>((from, to) =>
+      supabase
+        .from("jobs")
+        .select("title, salary_min, salary_max, skills_required")
+        .eq("is_active", true)
+        .range(from, to),
+    );
+
+    if (rows.length === 0) return [];
+
+    // Filter by category if specified
+    const filtered = category && category !== "all"
+      ? rows.filter((r) => classifyJob(r.skills_required) === category)
+      : rows;
+
+    // Aggregate by title
+    const roleMap = new Map<string, { count: number; salaryMins: number[]; salaryMaxes: number[] }>();
+    for (const row of filtered) {
+      const title = row.title;
+      const entry = roleMap.get(title) || { count: 0, salaryMins: [], salaryMaxes: [] };
+      entry.count++;
+      if (row.salary_min) entry.salaryMins.push(row.salary_min);
+      if (row.salary_max) entry.salaryMaxes.push(row.salary_max);
+      roleMap.set(title, entry);
+    }
+
+    // Sort by count descending, take top 6
+    const sorted = [...roleMap.entries()]
+      .sort((a, b) => b[1].count - a[1].count)
+      .slice(0, 6);
+
+    return sorted.map(([title, { count, salaryMins, salaryMaxes }]) => {
+      const minSalary = salaryMins.length > 0 ? Math.min(...salaryMins) : null;
+      const maxSalary = salaryMaxes.length > 0 ? Math.max(...salaryMaxes) : null;
+
+      const salaryRange = minSalary && maxSalary
+        ? `\u20B1${Math.round(minSalary / 1000)}K \u2013 \u20B1${Math.round(maxSalary / 1000)}K`
+        : minSalary
+          ? `From \u20B1${Math.round(minSalary / 1000)}K`
+          : maxSalary
+            ? `Up to \u20B1${Math.round(maxSalary / 1000)}K`
+            : "Salary TBD";
+
+      const staticData = STATIC_ROLE_DATA[title] || STATIC_ROLE_DATA.default;
+
+      return {
+        title,
+        openCount: count,
+        salaryRange,
+        growthPercent: staticData.growth,
+        barHeights: staticData.bars,
+      };
+    });
+  },
+  ["trending-roles"],
+  { revalidate: 600, tags: ["dashboard"] },
+);
+
+/** Get top hiring companies — top 5 by open jobs, optionally filtered by category (cached 10 min) */
 export async function getTopHiringCompanies(category?: string): Promise<CompanyInfo[]> {
-  const supabase = createServiceClient();
-
-  type CoRow = { company_name: string; company_logo_url: string | null; location_city: string | null; skills_required: string[] };
-
-  const rows = await fetchAllRows<CoRow>((from, to) =>
-    supabase
-      .from("jobs")
-      .select("company_name, company_logo_url, location_city, skills_required")
-      .eq("is_active", true)
-      .range(from, to),
-  );
-
-  if (rows.length === 0) return [];
-
-  const filtered = category && category !== "all"
-    ? rows.filter((r) => classifyJob(r.skills_required) === category)
-    : rows;
-
-  // Aggregate by company
-  const companyMap = new Map<string, { count: number; logoUrl: string | null; location: string }>();
-  for (const row of filtered) {
-    const name = row.company_name;
-    if (!name) continue;
-    const entry = companyMap.get(name) || { count: 0, logoUrl: row.company_logo_url, location: row.location_city || "Philippines" };
-    entry.count++;
-    if (!entry.logoUrl && row.company_logo_url) entry.logoUrl = row.company_logo_url;
-    companyMap.set(name, entry);
-  }
-
-  // Sort by count descending, take top 5
-  const sorted = [...companyMap.entries()]
-    .sort((a, b) => b[1].count - a[1].count)
-    .slice(0, 5);
-
-  return sorted.map(([name, { count, logoUrl, location }]) => ({
-    name,
-    industry: "",
-    location,
-    size: "",
-    logoUrl,
-    openJobs: count,
-    rating: 4.2, // static default
-  }));
+  return _getTopHiringCompaniesCached(category ?? "all");
 }
+
+const _getTopHiringCompaniesCached = unstable_cache(
+  async (category: string): Promise<CompanyInfo[]> => {
+    const supabase = createServiceClient();
+
+    type CoRow = { company_name: string; company_logo_url: string | null; location_city: string | null; skills_required: string[] };
+
+    const rows = await fetchAllRows<CoRow>((from, to) =>
+      supabase
+        .from("jobs")
+        .select("company_name, company_logo_url, location_city, skills_required")
+        .eq("is_active", true)
+        .range(from, to),
+    );
+
+    if (rows.length === 0) return [];
+
+    const filtered = category && category !== "all"
+      ? rows.filter((r) => classifyJob(r.skills_required) === category)
+      : rows;
+
+    // Aggregate by company
+    const companyMap = new Map<string, { count: number; logoUrl: string | null; location: string }>();
+    for (const row of filtered) {
+      const name = row.company_name;
+      if (!name) continue;
+      const entry = companyMap.get(name) || { count: 0, logoUrl: row.company_logo_url, location: row.location_city || "Philippines" };
+      entry.count++;
+      if (!entry.logoUrl && row.company_logo_url) entry.logoUrl = row.company_logo_url;
+      companyMap.set(name, entry);
+    }
+
+    // Sort by count descending, take top 5
+    const sorted = [...companyMap.entries()]
+      .sort((a, b) => b[1].count - a[1].count)
+      .slice(0, 5);
+
+    return sorted.map(([name, { count, logoUrl, location }]) => ({
+      name,
+      industry: "",
+      location,
+      size: "",
+      logoUrl,
+      openJobs: count,
+      rating: 4.2, // static default
+    }));
+  },
+  ["top-hiring-companies"],
+  { revalidate: 600, tags: ["dashboard"] },
+);
 
 /** Get recently viewed jobs for user */
 export async function getRecentlyViewed(userId: string): Promise<RecentlyViewedJob[]> {
@@ -1588,6 +1654,23 @@ export async function getRecentlyViewed(userId: string): Promise<RecentlyViewedJ
     .filter((r): r is RecentlyViewedJob => r !== null);
 }
 
+/** Cached fetch of all salary rows (shared across users, 10 min TTL) */
+const _fetchSalaryRows = unstable_cache(
+  async () => {
+    const supabase = createServiceClient();
+    type Row = { title: string; salary_min: number | null; salary_max: number | null; skills_required: string[] };
+    return fetchAllRows<Row>((from, to) =>
+      supabase
+        .from("jobs")
+        .select("title, salary_min, salary_max, skills_required")
+        .eq("is_active", true)
+        .range(from, to),
+    );
+  },
+  ["salary-snapshot-rows"],
+  { revalidate: 600, tags: ["dashboard"] },
+);
+
 /** Get salary snapshot — top 3 roles relevant to user's skills with real salary data */
 export async function getSalarySnapshot(
   userSkills: string[],
@@ -1595,17 +1678,8 @@ export async function getSalarySnapshot(
   desiredSalaryMax?: number | null,
 ): Promise<SalarySnapshotData> {
   const empty: SalarySnapshotData = { roles: [], scaleCeiling: 0, userDesiredSalary: null };
-  const supabase = createServiceClient();
 
-  type Row = { title: string; salary_min: number | null; salary_max: number | null; skills_required: string[] };
-
-  const rows = await fetchAllRows<Row>((from, to) =>
-    supabase
-      .from("jobs")
-      .select("title, salary_min, salary_max, skills_required")
-      .eq("is_active", true)
-      .range(from, to),
-  );
+  const rows = await _fetchSalaryRows();
 
   if (rows.length === 0) return empty;
 

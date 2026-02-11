@@ -1,14 +1,16 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { colors } from "@/lib/constants/colors";
 import { Navbar } from "@/components/layout";
 import { SearchStrip, HomeClient } from "@/components/home";
+import { TopMatchesStream } from "@/components/home/TopMatchesStream";
+import { TopMatchesSkeleton } from "@/components/home/TopMatchesSkeleton";
 
 import {
   getCategoryJobCounts,
   getTrendingRoles,
   getTopHiringCompanies,
   getRecentlyViewed,
-  getTopMatchedJobs,
   getSalarySnapshot,
 } from "@/lib/jobs";
 import { createClient } from "@/lib/supabase/server";
@@ -59,30 +61,24 @@ export default async function Dashboard() {
     redirect("/login");
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
+  // Parallelize: profile + category counts are independent
+  const [{ data: profile }, categories] = await Promise.all([
+    supabase.from("profiles").select("*").eq("id", user.id).single(),
+    getCategoryJobCounts(),
+  ]);
 
-  // Find the first category with jobs to use as default
-  const categories = await getCategoryJobCounts();
   const firstWithJobs = categories.find((c) => c.count > 0);
   const defaultCategory = firstWithJobs?.id ?? categories[0]?.id ?? "tech_it";
 
   const userSkills = profile?.skills ?? [];
 
-  const [initialRoles, initialCompanies, recentlyViewed, matchedResult, salarySnapshot] = await Promise.all([
+  // Fetch lighter data in parallel (top matches streamed via Suspense below)
+  const [initialRoles, initialCompanies, recentlyViewed, salarySnapshot] = await Promise.all([
     getTrendingRoles(defaultCategory),
     getTopHiringCompanies(defaultCategory),
     getRecentlyViewed(user.id),
-    getTopMatchedJobs({ profile, limit: 5 }),
     getSalarySnapshot(userSkills, profile?.desired_salary_min, profile?.desired_salary_max),
   ]);
-
-  const topJob = matchedResult.jobs[0] ?? null;
-  const otherJobs = matchedResult.jobs.slice(1);
-  const totalMatches = matchedResult.totalMatches;
 
   const skillDemand = computeSkillDemand(userSkills);
 
@@ -101,18 +97,22 @@ export default async function Dashboard() {
 
       <SearchStrip />
 
-      <HomeClient
-        categories={categories}
-        initialRoles={initialRoles}
-        initialCompanies={initialCompanies}
-        recentlyViewed={recentlyViewed}
-        skillDemand={skillDemand}
-        fetchCategoryData={fetchCategoryData}
-        topJob={topJob}
-        otherJobs={otherJobs}
-        totalMatches={totalMatches}
-        salarySnapshot={salarySnapshot}
-      />
+      <div className="home-page">
+        {/* Top matches — streams in independently (heaviest fetch: embeddings + full scan) */}
+        <Suspense fallback={<TopMatchesSkeleton />}>
+          <TopMatchesStream profile={profile} />
+        </Suspense>
+
+        <HomeClient
+          categories={categories}
+          initialRoles={initialRoles}
+          initialCompanies={initialCompanies}
+          recentlyViewed={recentlyViewed}
+          skillDemand={skillDemand}
+          fetchCategoryData={fetchCategoryData}
+          salarySnapshot={salarySnapshot}
+        />
+      </div>
     </div>
   );
 }

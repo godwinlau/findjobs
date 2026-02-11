@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { calculateCompletion } from "@/lib/profile";
 import { logActivity } from "@/lib/actions/activity";
+import { computeAndCacheMatches } from "@/lib/match-cache";
 import { validateProfileUpdate } from "@/lib/validation/schemas";
 import type { Profile } from "@/lib/types";
 
@@ -90,6 +91,12 @@ export async function updateProfile(
   // Fire-and-forget: log profile update activity
   logActivity({ activityType: "profile_update", targetId: "profile" }).catch(
     (err) => console.error("Activity log error:", err)
+  );
+
+  // Fire-and-forget: recompute match cache with updated profile
+  const mergedProfile = { ...currentProfile, ...updateData } as Profile;
+  computeAndCacheMatches(user.id, mergedProfile).catch(
+    (err) => console.error("Match cache recomputation error:", err)
   );
 
   return {};

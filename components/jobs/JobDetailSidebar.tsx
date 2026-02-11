@@ -1,13 +1,13 @@
 import type { JobDetail } from "@/lib/jobs";
-import type { Job } from "@/lib/types";
-import { SimilarJobCard } from "./SimilarJobCard";
+import type { ReactNode } from "react";
 
 interface JobDetailSidebarProps {
   job: JobDetail;
-  similarJobs: Job[];
+  /** Slot for similar jobs section — can be a Suspense boundary */
+  similarJobsSlot?: ReactNode;
 }
 
-export function JobDetailSidebar({ job, similarJobs }: JobDetailSidebarProps) {
+export function JobDetailSidebar({ job, similarJobsSlot }: JobDetailSidebarProps) {
   const expiresDate = job.expiresAt
     ? new Date(job.expiresAt).toLocaleDateString("en-PH", {
         month: "short",
@@ -90,15 +90,8 @@ export function JobDetailSidebar({ job, similarJobs }: JobDetailSidebarProps) {
         </div>
       </div>
 
-      {/* Similar jobs */}
-      {similarJobs.length > 0 && (
-        <div className="jd-sidebar-similar">
-          <div className="jd-ss-title">Similar Jobs</div>
-          {similarJobs.map((sj) => (
-            <SimilarJobCard key={sj.id} job={sj} />
-          ))}
-        </div>
-      )}
+      {/* Similar jobs — streamed in via Suspense */}
+      {similarJobsSlot}
     </div>
   );
 }

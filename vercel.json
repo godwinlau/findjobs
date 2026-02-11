@@ -1,16 +1,28 @@
 {
   "crons": [
     {
-      "path": "/api/cron/ingest?batches=0,1",
+      "path": "/api/cron/ingest?batches=0",
       "schedule": "0 8 * * *"
     },
     {
-      "path": "/api/cron/ingest?batches=2,3",
+      "path": "/api/cron/ingest?batches=1",
+      "schedule": "10 8 * * *"
+    },
+    {
+      "path": "/api/cron/ingest?batches=2",
       "schedule": "0 13 * * *"
     },
     {
-      "path": "/api/cron/ingest?batches=4,5",
+      "path": "/api/cron/ingest?batches=3",
+      "schedule": "10 13 * * *"
+    },
+    {
+      "path": "/api/cron/ingest?batches=4",
       "schedule": "0 18 * * *"
+    },
+    {
+      "path": "/api/cron/ingest?batches=5",
+      "schedule": "10 18 * * *"
     },
     {
       "path": "/api/cron/ingest?batches=6&extras=true",
@@ -19,6 +31,10 @@
     {
       "path": "/api/cron/check-jobs",
       "schedule": "0 16 * * *"
+    },
+    {
+      "path": "/api/cron/recompute-matches",
+      "schedule": "30 8,13,18,23 * * *"
     }
   ]
 }

@@ -4,13 +4,12 @@ import { runJSearchIngestion } from "@/lib/jsearch";
 import { resetStaleStreaks } from "@/lib/streaks";
 import { TOTAL_BATCHES } from "@/lib/queries";
 
-// Vercel Cron calls this 4x daily with different batch sets (PHT schedule):
-//   4:00 PM  → batches 0,1
-//   9:00 PM  → batches 2,3
-//   2:00 AM  → batches 4,5
-//   7:00 AM  → batches 6 + JSearch + cleanup + streaks
-// Accepts ?batches=0,1 to run specific batches.
-// The last run adds ?extras=true to also run JSearch, cleanup, and streaks.
+// Vercel Cron calls this with 1 batch per invocation (PHT schedule):
+//   4:00 PM  → batch 0      4:10 PM → batch 1
+//   9:00 PM  → batch 2      9:10 PM → batch 3
+//   2:00 AM  → batch 4      2:10 AM → batch 5
+//   7:00 AM  → batch 6 + JSearch + cleanup + streaks
+// Each batch has 5 queries × ~60s = ~300s max, fits within maxDuration.
 
 export const maxDuration = 300;
 
@@ -23,28 +22,32 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // Parse which batches to run from query param
+  const batchesParam = req.nextUrl.searchParams.get("batches");
+  const runExtras = req.nextUrl.searchParams.get("extras") === "true";
+
+  let batchesToRun: number[];
+  if (batchesParam) {
+    batchesToRun = batchesParam
+      .split(",")
+      .map((s) => parseInt(s.trim(), 10))
+      .filter((n) => !isNaN(n) && n >= 0 && n < TOTAL_BATCHES);
+  } else {
+    // No param = run all batches (backward compatible)
+    batchesToRun = Array.from({ length: TOTAL_BATCHES }, (_, i) => i);
+  }
+
+  let totalFetched = 0;
+  let totalInserted = 0;
+  let totalDuplicates = 0;
+  let totalErrors = 0;
+  const batchResults: { batch: number; fetched: number; inserted: number; duplicates: number; errors: number; durationMs: number }[] = [];
+
+  let jsearch = { totalFetched: 0, totalInserted: 0, totalDuplicates: 0, totalErrors: 0, queries: [] as string[], requestsUsed: 0, durationMs: 0 };
+  let cleanup = { deactivated: 0 };
+  let streaks = { reset: 0 };
+
   try {
-    // Parse which batches to run from query param
-    const batchesParam = req.nextUrl.searchParams.get("batches");
-    const runExtras = req.nextUrl.searchParams.get("extras") === "true";
-
-    let batchesToRun: number[];
-    if (batchesParam) {
-      batchesToRun = batchesParam
-        .split(",")
-        .map((s) => parseInt(s.trim(), 10))
-        .filter((n) => !isNaN(n) && n >= 0 && n < TOTAL_BATCHES);
-    } else {
-      // No param = run all batches (backward compatible)
-      batchesToRun = Array.from({ length: TOTAL_BATCHES }, (_, i) => i);
-    }
-
-    let totalFetched = 0;
-    let totalInserted = 0;
-    let totalDuplicates = 0;
-    let totalErrors = 0;
-    const batchResults = [];
-
     for (const batch of batchesToRun) {
       const result = await runIngestionBatch(batch);
       totalFetched += result.totalFetched;
@@ -65,21 +68,23 @@ export async function GET(req: NextRequest) {
     // or when no batches param (full backward-compatible run)
     const shouldRunExtras = runExtras || !batchesParam;
 
-    let jsearch = { totalFetched: 0, totalInserted: 0, totalDuplicates: 0, totalErrors: 0, queries: [] as string[], requestsUsed: 0, durationMs: 0 };
-    let cleanup = { deactivated: 0 };
-    let streaks = { reset: 0 };
-
     if (shouldRunExtras) {
       jsearch = await runJSearchIngestion();
       cleanup = await cleanupExpiredJobs();
       streaks = await resetStaleStreaks();
     }
-
+  } catch (err) {
+    // Count the error but continue to notification + response
+    totalErrors++;
+    console.error("Ingestion error:", err instanceof Error ? err.message : err);
+  } finally {
+    // Always send notification — even on partial completion or timeout edge
     const totalNewJobs = totalInserted + jsearch.totalInserted;
+    const shouldRunExtras = runExtras || !batchesParam;
 
-    // Send webhook notification if configured
     await sendIngestionNotification({
       batchesRun: batchesToRun,
+      batchesCompleted: batchResults.map((r) => r.batch),
       totalFetched: totalFetched + jsearch.totalFetched,
       totalInserted: totalNewJobs,
       totalDuplicates: totalDuplicates + jsearch.totalDuplicates,
@@ -87,38 +92,34 @@ export async function GET(req: NextRequest) {
       jsearchInserted: jsearch.totalInserted,
       cleanup: shouldRunExtras ? cleanup.deactivated : 0,
     });
-
-    return NextResponse.json({
-      success: true,
-      batchesRun: batchesToRun,
-      totalFetched: totalFetched + jsearch.totalFetched,
-      totalInserted: totalNewJobs,
-      totalDuplicates: totalDuplicates + jsearch.totalDuplicates,
-      totalErrors: totalErrors + jsearch.totalErrors,
-      batches: batchResults,
-      ...(shouldRunExtras && {
-        jsearch: {
-          queries: jsearch.queries,
-          requestsUsed: jsearch.requestsUsed,
-          fetched: jsearch.totalFetched,
-          inserted: jsearch.totalInserted,
-          duplicates: jsearch.totalDuplicates,
-          errors: jsearch.totalErrors,
-          durationMs: jsearch.durationMs,
-        },
-        cleanup: { deactivated: cleanup.deactivated },
-        streaks: { reset: streaks.reset },
-      }),
-    });
-  } catch (err) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: err instanceof Error ? err.message : String(err),
-      },
-      { status: 500 }
-    );
   }
+
+  const totalNewJobs = totalInserted + jsearch.totalInserted;
+  const shouldRunExtras = runExtras || !batchesParam;
+
+  return NextResponse.json({
+    success: totalErrors === 0,
+    batchesRun: batchesToRun,
+    batchesCompleted: batchResults.map((r) => r.batch),
+    totalFetched: totalFetched + jsearch.totalFetched,
+    totalInserted: totalNewJobs,
+    totalDuplicates: totalDuplicates + jsearch.totalDuplicates,
+    totalErrors: totalErrors + jsearch.totalErrors,
+    batches: batchResults,
+    ...(shouldRunExtras && {
+      jsearch: {
+        queries: jsearch.queries,
+        requestsUsed: jsearch.requestsUsed,
+        fetched: jsearch.totalFetched,
+        inserted: jsearch.totalInserted,
+        duplicates: jsearch.totalDuplicates,
+        errors: jsearch.totalErrors,
+        durationMs: jsearch.durationMs,
+      },
+      cleanup: { deactivated: cleanup.deactivated },
+      streaks: { reset: streaks.reset },
+    }),
+  });
 }
 
 // ─── Slack notification ───
@@ -126,6 +127,7 @@ export async function GET(req: NextRequest) {
 
 async function sendIngestionNotification(data: {
   batchesRun: number[];
+  batchesCompleted: number[];
   totalFetched: number;
   totalInserted: number;
   totalDuplicates: number;
@@ -147,10 +149,13 @@ async function sendIngestionNotification(data: {
     });
 
     const hasNewJobs = data.totalInserted > 0;
-    const emoji = hasNewJobs ? ":white_check_mark:" : ":recycle:";
-    const status = hasNewJobs
-      ? `*${data.totalInserted} new jobs* added`
-      : "_No new jobs — all duplicates_";
+    const partial = data.batchesCompleted.length < data.batchesRun.length;
+    const emoji = partial ? ":warning:" : hasNewJobs ? ":white_check_mark:" : ":recycle:";
+    const status = partial
+      ? `*Partial run* — completed [${data.batchesCompleted.join(", ")}] of [${data.batchesRun.join(", ")}]`
+      : hasNewJobs
+        ? `*${data.totalInserted} new jobs* added`
+        : "_No new jobs — all duplicates_";
 
     // Stats line
     const stats = [
@@ -166,7 +171,7 @@ async function sendIngestionNotification(data: {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `${emoji}  *Ingestion Report* — ${now}\nBatches [${data.batchesRun.join(", ")}]`,
+          text: `${emoji}  *Ingestion Report* — ${now}\nBatch [${data.batchesCompleted.join(", ")}]`,
         },
       },
       {

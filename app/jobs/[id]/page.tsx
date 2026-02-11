@@ -1,7 +1,8 @@
 import "@/app/styles/job-detail-page.css";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { fetchJobRow, buildJobDetail, getSimilarJobs } from "@/lib/jobs";
+import { fetchJobRow, buildJobDetail } from "@/lib/jobs";
 import { createClient } from "@/lib/supabase/server";
 import { logActivity } from "@/lib/actions/activity";
 import { Navbar } from "@/components/layout/Navbar";
@@ -11,6 +12,8 @@ import {
   JobDetailSidebar,
   JobDetailApplyBar,
 } from "@/components/jobs";
+import { SimilarJobsStream } from "@/components/jobs/SimilarJobsStream";
+import { SimilarJobsSkeleton } from "@/components/jobs/SimilarJobsSkeleton";
 
 export const dynamic = "force-dynamic";
 
@@ -43,9 +46,6 @@ export default async function JobDetailPage({
 
   const profile = profileResult?.data ?? null;
   const job = buildJobDetail(row, profile);
-
-  // Fetch similar jobs in parallel (won't block render significantly)
-  const similarJobs = await getSimilarJobs(id, job.skills, profile, 3);
 
   // Navbar props
   const fullName = profile?.full_name ?? undefined;
@@ -113,8 +113,15 @@ export default async function JobDetailPage({
           />
         </div>
 
-        {/* Right — Sidebar */}
-        <JobDetailSidebar job={job} similarJobs={similarJobs} />
+        {/* Right — Sidebar (similar jobs stream in independently) */}
+        <JobDetailSidebar
+          job={job}
+          similarJobsSlot={
+            <Suspense fallback={<SimilarJobsSkeleton />}>
+              <SimilarJobsStream jobId={id} skills={job.skills} profile={profile} />
+            </Suspense>
+          }
+        />
       </div>
     </div>
   );

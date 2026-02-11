@@ -27,30 +27,27 @@ export async function GET(req: NextRequest) {
   const verifiedOnly = searchParams.get("verifiedOnly") === "true" || undefined;
   const sort = (searchParams.get("sort") as ExploreSort) || "recency";
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
-
-  const [jobResult, locations] = await Promise.all([
-    getExploreJobs({
-      query,
-      workSetup,
-      jobType,
-      experienceLevel,
-      location,
-      salaryMin,
-      salaryMax,
-      datePosted,
-      verifiedOnly,
-      sort,
-      page,
-      pageSize: 20,
-      profile,
-    }),
+  // Profile + locations in parallel (locations is cached)
+  const [{ data: profile }, locations] = await Promise.all([
+    supabase.from("profiles").select("*").eq("id", user.id).single(),
     getDistinctLocations(),
   ]);
+
+  const jobResult = await getExploreJobs({
+    query,
+    workSetup,
+    jobType,
+    experienceLevel,
+    location,
+    salaryMin,
+    salaryMax,
+    datePosted,
+    verifiedOnly,
+    sort,
+    page,
+    pageSize: 20,
+    profile,
+  });
 
   return NextResponse.json({ ...jobResult, locations });
 }
