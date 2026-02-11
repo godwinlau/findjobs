@@ -1,11 +1,27 @@
 import { TITLE_SKILL_PATTERNS, SKILL_ALIASES } from "@/lib/constants/skill-mappings";
+import { getOntologyIndex, findSkill } from "@/lib/skills/ontology-index";
 import type { JobRow } from "./types";
 
 // ─── Skill normalization ───
 
 export function normalizeSkill(raw: string): string {
-  const key = raw.toLowerCase().trim();
-  return SKILL_ALIASES[key] ?? key;
+  const key = raw.trim();
+  if (!key) return key;
+
+  // 1. Ontology lookup (label, synonym, or id — case-insensitive)
+  const node = findSkill(key, getOntologyIndex());
+  if (node) return node.label;
+
+  // 2. SKILL_ALIASES fallback — look up alias, then resolve alias through ontology
+  const aliased = SKILL_ALIASES[key.toLowerCase()];
+  if (aliased) {
+    const aliasNode = findSkill(aliased, getOntologyIndex());
+    if (aliasNode) return aliasNode.label;
+    return aliased; // alias value even if not in ontology
+  }
+
+  // 3. Pass-through — lowercase for consistent matching of unknown skills
+  return key.toLowerCase();
 }
 
 // ─── Title-to-skills inference for profile headline ───
@@ -47,7 +63,7 @@ export function getEffectiveJobSkills(row: JobRow, profileSkills: string[]): str
     if (existing.has(key)) continue;
 
     const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const re = new RegExp(`\\b${escaped}\\b`);
+    const re = new RegExp(`\\b${escaped}\\b`, "i");
     if (re.test(searchText)) {
       existing.add(key);
     }

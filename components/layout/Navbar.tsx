@@ -64,6 +64,7 @@ export function Navbar({ fullName, email }: NavbarProps) {
             alignItems: "center",
             gap: 10,
             paddingRight: 24,
+            paddingLeft: 24,
             borderRight: "2px solid rgba(255,255,255,0.1)",
             flexShrink: 0,
             cursor: "pointer",

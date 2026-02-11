@@ -7,6 +7,7 @@ import { calculateCompletion } from "@/lib/profile";
 import { logActivity } from "@/lib/actions/activity";
 import { computeAndCacheMatches } from "@/lib/match-cache";
 import { validateProfileUpdate, usernameSchema } from "@/lib/validation/schemas";
+import { normalizeSkill } from "@/lib/matching/skills";
 import type { Profile } from "@/lib/types";
 
 const ALLOWED_FIELDS = [
@@ -77,6 +78,19 @@ export async function updateProfile(
   // Trim full_name if present
   if (typeof updateData.full_name === "string") {
     updateData.full_name = (updateData.full_name as string).trim();
+  }
+
+  // Normalize skill names to ontology canonical labels
+  if (Array.isArray(updateData.skills)) {
+    updateData.skills = (updateData.skills as string[]).map(normalizeSkill);
+  }
+  if (updateData.skill_proficiencies && typeof updateData.skill_proficiencies === "object") {
+    const raw = updateData.skill_proficiencies as Record<string, string>;
+    const normalized: Record<string, string> = {};
+    for (const [key, val] of Object.entries(raw)) {
+      normalized[normalizeSkill(key)] = val;
+    }
+    updateData.skill_proficiencies = normalized;
   }
 
   // Recalculate profile completion with merged data

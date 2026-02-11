@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { POPULAR_SKILLS_PH } from "@/lib/constants/onboardingRoles";
+import { normalizeSkill } from "@/lib/matching/skills";
 
 interface StepSkillsNewProps {
   skills: string[];
@@ -12,15 +13,31 @@ export function StepSkillsNew({ skills, onSkillsChange }: StepSkillsNewProps) {
   const [customInput, setCustomInput] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Normalized lookup: maps normalized label → original stored string
+  const normalizedMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const s of skills) map.set(normalizeSkill(s), s);
+    return map;
+  }, [skills]);
+
+  function isSelected(skill: string): boolean {
+    return normalizedMap.has(normalizeSkill(skill));
+  }
+
+  function getStoredName(skill: string): string | undefined {
+    return normalizedMap.get(normalizeSkill(skill));
+  }
+
   // Merge popular skills with any custom ones the user added
   const allPills = [
     ...POPULAR_SKILLS_PH,
-    ...skills.filter((s) => !POPULAR_SKILLS_PH.includes(s as typeof POPULAR_SKILLS_PH[number])),
+    ...skills.filter((s) => !POPULAR_SKILLS_PH.some((p) => normalizeSkill(p) === normalizeSkill(s))),
   ];
 
   function toggleSkill(skill: string) {
-    if (skills.includes(skill)) {
-      onSkillsChange(skills.filter((s) => s !== skill));
+    const stored = getStoredName(skill);
+    if (stored) {
+      onSkillsChange(skills.filter((s) => s !== stored));
     } else {
       onSkillsChange([...skills, skill]);
     }
@@ -29,7 +46,7 @@ export function StepSkillsNew({ skills, onSkillsChange }: StepSkillsNewProps) {
   function addCustomSkill() {
     const val = customInput.trim();
     if (!val) return;
-    if (!skills.includes(val)) {
+    if (!isSelected(val)) {
       onSkillsChange([...skills, val]);
     }
     setCustomInput("");
@@ -57,7 +74,7 @@ export function StepSkillsNew({ skills, onSkillsChange }: StepSkillsNewProps) {
 
         <div className="ob-pills">
           {allPills.map((skill) => {
-            const selected = skills.includes(skill);
+            const selected = isSelected(skill);
             return (
               <div
                 key={skill}

@@ -6,6 +6,7 @@ import { VISIBLE_SKILL_CATEGORIES } from "@/lib/constants/onboarding";
 import { SKILL_AFFINITIES } from "@/lib/constants/skillAffinities";
 import { CATEGORY_SKILL_MAP } from "@/lib/constants/categorySkillMap";
 import { SKILL_CLUSTERS } from "@/lib/constants/skillTaxonomy";
+import { normalizeSkill } from "@/lib/matching/skills";
 import type { SkillProficiency } from "@/lib/types";
 
 interface SkillChipSelectorProps {
@@ -49,6 +50,21 @@ export function SkillChipSelector({
 }: SkillChipSelectorProps) {
   const isLearning = variant === "learning";
 
+  // Normalized lookup: maps normalized label → original stored string
+  const normalizedMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const s of selected) map.set(normalizeSkill(s), s);
+    return map;
+  }, [selected]);
+
+  function isSelected(skill: string): boolean {
+    return normalizedMap.has(normalizeSkill(skill));
+  }
+
+  function getStoredName(skill: string): string | undefined {
+    return normalizedMap.get(normalizeSkill(skill));
+  }
+
   // Colors for learning variant
   const variantColors = isLearning
     ? {
@@ -65,12 +81,13 @@ export function SkillChipSelector({
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
 
   function toggleSkill(skill: string) {
-    if (selected.includes(skill)) {
-      onChange(selected.filter((s) => s !== skill));
+    const stored = getStoredName(skill);
+    if (stored) {
+      onChange(selected.filter((s) => s !== stored));
       // Remove proficiency when deselecting
       if (onProficiencyChange) {
         const newProf = { ...proficiencies };
-        delete newProf[skill];
+        delete newProf[stored];
         onProficiencyChange(newProf);
       }
     } else if (selected.length < maxSkills) {
@@ -112,8 +129,8 @@ export function SkillChipSelector({
         for (const s of skills) all.add(s);
       }
     }
-    return Array.from(all).filter((s) => !selected.includes(s)).slice(0, 8);
-  }, [selectedCategories, selected]);
+    return Array.from(all).filter((s) => !isSelected(s)).slice(0, 8);
+  }, [selectedCategories, normalizedMap]);
 
   // Compute suggested skills based on affinity scoring
   const suggestions = useMemo(() => {
@@ -121,10 +138,13 @@ export function SkillChipSelector({
 
     const scores: Record<string, number> = {};
     for (const skill of selected) {
-      const affinities = SKILL_AFFINITIES[skill];
+      // Try exact key first, then find by normalized match
+      const affinities = SKILL_AFFINITIES[skill]
+        ?? (Object.entries(SKILL_AFFINITIES)
+          .find(([k]) => normalizeSkill(k) === normalizeSkill(skill))?.[1] as string[] | undefined);
       if (!affinities) continue;
       for (const related of affinities) {
-        if (!selected.includes(related)) {
+        if (!isSelected(related)) {
           scores[related] = (scores[related] || 0) + 1;
         }
       }
@@ -134,7 +154,7 @@ export function SkillChipSelector({
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5)
       .map(([skill]) => skill);
-  }, [selected]);
+  }, [selected, normalizedMap]);
 
   // Counter color
   let counterColor: string = colors.textMuted;
@@ -250,7 +270,7 @@ export function SkillChipSelector({
                 {showProficiency && onProficiencyChange && (
                   <div style={{ display: "flex", gap: 2 }}>
                     {PROFICIENCY_OPTIONS.map((opt) => {
-                      const isActive = (proficiencies[skill] ?? "intermediate") === opt.value;
+                      const isActive = (proficiencies[getStoredName(skill) ?? skill] ?? "intermediate") === opt.value;
                       return (
                         <button
                           key={opt.value}
@@ -407,8 +427,8 @@ export function SkillChipSelector({
             </span>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
               {visibleSkills.map((skill) => {
-                const isSelected = selected.includes(skill);
-                const isDisabled = !isSelected && atMax;
+                const skillIsSelected = isSelected(skill);
+                const isDisabled = !skillIsSelected && atMax;
                 return (
                   <button
                     key={skill}
@@ -418,25 +438,25 @@ export function SkillChipSelector({
                     style={{
                       padding: "5px 10px",
                       borderRadius: 6,
-                      border: `1px solid ${isSelected ? variantColors.selected : colors.border}`,
-                      background: isSelected
+                      border: `1px solid ${skillIsSelected ? variantColors.selected : colors.border}`,
+                      background: skillIsSelected
                         ? variantColors.selectedBg
                         : isDisabled
                           ? colors.surfaceAlt
                           : colors.surface,
-                      color: isSelected
+                      color: skillIsSelected
                         ? variantColors.selected
                         : isDisabled
                           ? colors.textMuted
                           : colors.textSec,
                       fontSize: 12,
-                      fontWeight: isSelected ? 500 : 400,
+                      fontWeight: skillIsSelected ? 500 : 400,
                       cursor: isDisabled ? "not-allowed" : "pointer",
                       opacity: isDisabled ? 0.5 : 1,
                       transition: "all 0.15s ease",
                     }}
                   >
-                    {isLearning && isSelected ? "📚 " : ""}{skill}
+                    {isLearning && skillIsSelected ? "📚 " : ""}{skill}
                   </button>
                 );
               })}

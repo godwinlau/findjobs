@@ -236,7 +236,7 @@
 .ob-hs-sub.visible { opacity: 1; }
 
 /* Mini stats */
-.ob-mini-stats { display: flex; gap: 0; justify-content: center; margin-bottom: 32px; flex-wrap: wrap; }
+.ob-mini-stats { display: flex; gap: 0; justify-content: center; margin-bottom: 32px; }
 .ob-ms {
   padding: 12px 20px; border: 2px solid #0A0A0A; margin-left: -2px; text-align: center;
   opacity: 0; transform: translateY(10px);
@@ -270,7 +270,7 @@
   transition: opacity 0.4s cubic-bezier(0.22,1,0.36,1), transform 0.4s cubic-bezier(0.22,1,0.36,1), background 0.15s, box-shadow 0.15s;
 }
 .ob-job-card:hover { background: #EEEEE8; box-shadow: 4px 4px 0 #0A0A0A; transform: translate(-2px, -2px); z-index: 2; position: relative; }
-@media (max-width: 500px) { .ob-job-card { grid-template-columns: 1fr auto; gap: 10px; } .ob-jc-logo { display: none; } }
+@media (max-width: 500px) { .ob-job-card { gap: 10px; } .ob-jc-logo { display: none; } }
 
 .ob-jc-logo {
   width: 40px; height: 40px; border: 1.5px solid #0A0A0A;

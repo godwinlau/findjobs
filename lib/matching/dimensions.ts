@@ -144,6 +144,13 @@ export function scoreSkillProficiency(
   const jobSet = new Set(jobSkills.map(normalizeSkill));
   const profileSet = new Set(profileSkills.map(normalizeSkill));
 
+  // Build normalized proficiency map — proficiencies is keyed by original
+  // user-selected name, but we compare against normalized keys
+  const normProf: Record<string, SkillProficiency> = {};
+  for (const [k, v] of Object.entries(proficiencies)) {
+    normProf[normalizeSkill(k)] = v;
+  }
+
   let totalRatio = 0;
   let matchCount = 0;
 
@@ -151,7 +158,7 @@ export function scoreSkillProficiency(
     if (!profileSet.has(skill)) continue;
     matchCount++;
 
-    const userLevel = PROFICIENCY_LEVEL[proficiencies[skill] ?? "intermediate"] ?? 2;
+    const userLevel = PROFICIENCY_LEVEL[normProf[skill] ?? "intermediate"] ?? 2;
     totalRatio += Math.min(userLevel / reqLevel, 1.0);
   }
 

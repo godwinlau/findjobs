@@ -3,11 +3,10 @@
 // Replaces the 4-pass pipeline with a single LLM call + ontology normalization.
 
 import {
-  SKILL_ONTOLOGY,
-  buildSkillIndex,
   type SkillNode,
   type SkillTier,
 } from "./skills_ontology";
+import { getOntologyIndex } from "./ontology-index";
 import { extractSkillsFromJDSync } from "./skills_extraction";
 import { logger } from "@/lib/logger";
 
@@ -65,11 +64,11 @@ export interface SkillStructuredEntry {
 }
 
 // ---------------------------------------------------------------------------
-// RATE LIMITING (Groq free tier: 30 req/min)
+// RATE LIMITING (Groq developer tier: 1000 req/min)
 // ---------------------------------------------------------------------------
 
 let _lastCallTime = 0;
-const MIN_INTERVAL_MS = 4000; // ~15 calls/min to stay within Groq free tier TPM
+const MIN_INTERVAL_MS = 200; // ~300 calls/min, well within developer tier 1K RPM
 
 async function waitForRateLimit(): Promise<void> {
   const now = Date.now();
@@ -78,19 +77,6 @@ async function waitForRateLimit(): Promise<void> {
     await new Promise((r) => setTimeout(r, MIN_INTERVAL_MS - elapsed));
   }
   _lastCallTime = Date.now();
-}
-
-// ---------------------------------------------------------------------------
-// ONTOLOGY INDEX (lazy singleton)
-// ---------------------------------------------------------------------------
-
-let _index: ReturnType<typeof buildSkillIndex> | null = null;
-
-function getIndex() {
-  if (!_index) {
-    _index = buildSkillIndex(SKILL_ONTOLOGY);
-  }
-  return _index;
 }
 
 // ---------------------------------------------------------------------------
@@ -188,10 +174,10 @@ export async function extractSkillsLLM(
         }),
       });
 
-      if (res.status === 429) {
-        // Rate limited — wait longer (TPM resets per minute)
+      if (res.status === 429 || res.status === 503) {
+        // 429 = rate limited, 503 = model overloaded — back off and retry
         const delay = (attempt + 1) * 15_000; // 15s, 30s, 45s
-        log.warn({ delay: delay / 1000, attempt: attempt + 1 }, "Groq 429 — rate limited, waiting");
+        log.warn({ status: res.status, delay: delay / 1000, attempt: attempt + 1 }, `Groq ${res.status} — backing off`);
         await new Promise((r) => setTimeout(r, delay));
         continue;
       }
@@ -265,7 +251,7 @@ export async function extractSkillsLLM(
 export function normalizeAgainstOntology(
   llmSkills: LLMExtractedSkill[]
 ): Pick<StructuredExtractionResult, "mapped" | "unmapped" | "raw"> {
-  const { byId, byLabel, bySynonym } = getIndex();
+  const { byId, byLabel, bySynonym } = getOntologyIndex();
   const mapped: NormalizedExtractedSkill[] = [];
   const unmapped: LLMExtractedSkill[] = [];
   const seenIds = new Set<string>();

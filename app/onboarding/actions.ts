@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { calculateCompletion } from "@/lib/profile";
 import { logActivity } from "@/lib/actions/activity";
 import { validateProfileUpdate } from "@/lib/validation/schemas";
+import { normalizeSkill } from "@/lib/matching/skills";
 import type { Profile } from "@/lib/types";
 
 export async function saveOnboardingStep(step: number, data: Partial<Profile>) {
@@ -40,9 +41,9 @@ export async function saveOnboardingStep(step: number, data: Partial<Profile>) {
     if (data.employment_type) updateData.employment_type = data.employment_type;
   }
 
-  // Step 1: Skills (skills)
+  // Step 1: Skills (skills) — normalize to ontology canonical labels
   if (step === 1) {
-    if (data.skills) updateData.skills = data.skills;
+    if (data.skills) updateData.skills = data.skills.map(normalizeSkill);
   }
 
   // Step 2: Preferences (preferred_industries, work_preference, desired_salary_min/max)
@@ -95,7 +96,7 @@ export async function completeOnboarding(data: Partial<Profile>) {
   // Save fields from the 4-step flow
   if (data.full_name) updateData.full_name = data.full_name.trim();
   if (data.employment_type) updateData.employment_type = data.employment_type;
-  if (data.skills) updateData.skills = data.skills;
+  if (data.skills) updateData.skills = data.skills.map(normalizeSkill);
   if (data.preferred_industries) updateData.preferred_industries = data.preferred_industries;
   if (data.work_preference) updateData.work_preference = data.work_preference;
   if (data.desired_salary_min !== undefined) updateData.desired_salary_min = data.desired_salary_min;

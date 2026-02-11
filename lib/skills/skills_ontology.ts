@@ -205,6 +205,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
       "Experimentation Strategy",
       "Growth Experiments",
       "Hypothesis Testing",
+      "A/B Testing",
     ],
   },
   {
@@ -237,7 +238,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     domain: "product",
     tier: "important",
     isSoftSkill: false,
-    synonyms: ["Budget Planning", "P&L Management", "Budget Ownership", "Managing Budget"],
+    synonyms: ["Budget Planning", "P&L Management", "Budget Ownership", "Managing Budget", "Budgeting & Forecasting"],
   },
   {
     id: "market_research",
@@ -379,7 +380,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     domain: "design",
     tier: "core",
     isSoftSkill: false,
-    synonyms: ["Wireframes", "Lo-fi Wireframes", "Low-Fidelity Design"],
+    synonyms: ["Wireframes", "Lo-fi Wireframes", "Low-Fidelity Design", "Wireframing & Prototyping"],
   },
   {
     id: "prototyping",
@@ -643,7 +644,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     subdomain: "frontend",
     tier: "core",
     isSoftSkill: false,
-    synonyms: ["HTML5", "Semantic HTML", "Markup"],
+    synonyms: ["HTML5", "Semantic HTML", "Markup", "HTML / CSS"],
   },
   {
     id: "css",
@@ -796,7 +797,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     subdomain: "frontend",
     tier: "core",
     isSoftSkill: false,
-    synonyms: ["Sass", "SCSS", "CSS Preprocessor"],
+    synonyms: ["Sass", "SCSS", "CSS Preprocessor", "SASS/SCSS"],
   },
   {
     id: "frontend_performance_optimization",
@@ -875,7 +876,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     subdomain: "backend",
     tier: "core",
     isSoftSkill: false,
-    synonyms: ["Python3", "Python Programming"],
+    synonyms: ["Python3", "Python Programming", "Python (Data Science)"],
   },
   {
     id: "java",
@@ -902,7 +903,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     subdomain: "backend",
     tier: "core",
     isSoftSkill: false,
-    synonyms: [".NET Framework", ".NET Core", "Dotnet", ". NET", ".NET 6", ".NET 7", ".NET 8", "ASP.NET", "ASP. NET"],
+    synonyms: [".NET Framework", ".NET Core", "Dotnet", ". NET", ".NET 6", ".NET 7", ".NET 8", "ASP.NET", "ASP. NET", "C#/.NET", "C#"],
   },
   {
     id: "sql_server",
@@ -956,7 +957,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     subdomain: "backend",
     tier: "core",
     isSoftSkill: false,
-    synonyms: ["Golang", "Go Language"],
+    synonyms: ["Golang", "Go Language", "Go (Golang)"],
   },
   {
     id: "rust",
@@ -1172,7 +1173,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     subdomain: "backend",
     tier: "core",
     isSoftSkill: false,
-    synonyms: ["Laravel", "PHP Development"],
+    synonyms: ["Laravel", "PHP Development", "PHP / Laravel"],
   },
   {
     id: "rest_api_design",
@@ -1181,7 +1182,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     subdomain: "backend",
     tier: "core",
     isSoftSkill: false,
-    synonyms: ["RESTful APIs", "REST API", "API Design", "API Development", "API Integration", "Integrating APIs", "Third-party API Integration"],
+    synonyms: ["RESTful APIs", "REST API", "API Design", "API Development", "API Integration", "Integrating APIs", "Third-party API Integration", "REST API Development"],
   },
   {
     id: "cms_management",
@@ -1328,7 +1329,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     subdomain: "devops",
     tier: "core",
     isSoftSkill: false,
-    synonyms: ["Linux OS", "Ubuntu", "CentOS", "Debian", "Linux Terminal", "Linux Command Line"],
+    synonyms: ["Linux OS", "Ubuntu", "CentOS", "Debian", "Linux Terminal", "Linux Command Line", "Linux / CLI", "CLI"],
   },
   {
     id: "terraform",
@@ -1436,7 +1437,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     subdomain: "devops",
     tier: "core",
     isSoftSkill: false,
-    synonyms: ["GCP", "Google Cloud", "GKE", "Cloud Run"],
+    synonyms: ["GCP", "Google Cloud", "GKE", "Cloud Run", "Google Cloud (GCP)"],
   },
   {
     id: "vercel",
@@ -1459,6 +1460,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
       "Continuous Deployment",
       "GitHub Actions",
       "Jenkins",
+      "CI/CD Pipelines",
     ],
   },
   {
@@ -1502,7 +1504,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     subdomain: "ai_ml",
     tier: "core",
     isSoftSkill: false,
-    synonyms: ["ML", "ML Development", "ML Engineering", "Machine Learning Engineering"],
+    synonyms: ["ML", "ML Development", "ML Engineering", "Machine Learning Engineering", "Machine Learning (Basics)"],
   },
   {
     id: "deep_learning",
@@ -1529,7 +1531,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     subdomain: "ai_ml",
     tier: "core",
     isSoftSkill: false,
-    synonyms: ["NLP", "Text Processing", "Language Models", "LLM", "Large Language Models"],
+    synonyms: ["NLP", "Text Processing", "Language Models", "LLM", "Large Language Models", "NLP (Natural Language Processing)"],
   },
   {
     id: "computer_vision",
@@ -1583,7 +1585,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     subdomain: "ai_ml",
     tier: "core",
     isSoftSkill: false,
-    synonyms: ["Data Analytics", "Analyze Data", "Data-Driven Analysis", "Statistical Analysis"],
+    synonyms: ["Data Analytics", "Analyze Data", "Data-Driven Analysis", "Statistical Analysis", "SQL (Data Analysis)"],
   },
   {
     id: "data_visualization",
@@ -1601,7 +1603,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     subdomain: "ai_ml",
     tier: "core",
     isSoftSkill: false,
-    synonyms: ["Python Pandas"],
+    synonyms: ["Python Pandas", "Pandas / NumPy"],
   },
   {
     id: "numpy",
@@ -1686,7 +1688,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     subdomain: "ios",
     tier: "core",
     isSoftSkill: false,
-    synonyms: ["Swift Programming", "Swift Language", "Swift 5"],
+    synonyms: ["Swift Programming", "Swift Language", "Swift 5", "Swift (iOS)"],
   },
   {
     id: "ios_development",
@@ -1713,7 +1715,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     subdomain: "android",
     tier: "core",
     isSoftSkill: false,
-    synonyms: ["Kotlin Programming", "Kotlin Language", "Kotlin Android"],
+    synonyms: ["Kotlin Programming", "Kotlin Language", "Kotlin Android", "Kotlin (Android)"],
   },
   {
     id: "mobile_performance_optimization",
@@ -1874,6 +1876,9 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
       "Shopify Developer",
       "Shopify Storefront",
       "Shopify Stores",
+      "Shopify",
+      "Shopify / Liquid",
+      "Shopify Marketing",
     ],
   },
   {
@@ -1988,6 +1993,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
       "Facebook Advertising",
       "Facebook Marketing",
       "Facebook Campaign Management",
+      "Facebook/Meta Ads",
     ],
   },
   {
@@ -2010,6 +2016,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
       "Google Search Ads",
       "Google Display Ads",
       "SEM",
+      "Google Ads (SEM)",
     ],
   },
   {
@@ -2302,6 +2309,20 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
   // VA / ADMIN
   // =========================================================================
   {
+    id: "general_va",
+    label: "Virtual Assistance",
+    domain: "va_admin",
+    tier: "core",
+    isSoftSkill: false,
+    synonyms: [
+      "Virtual Assistant",
+      "VA",
+      "General Virtual Assistant",
+      "Executive Virtual Assistant",
+      "Remote Assistant",
+    ],
+  },
+  {
     id: "email_management",
     label: "Email Management",
     domain: "va_admin",
@@ -2439,7 +2460,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     domain: "va_admin",
     tier: "core",
     isSoftSkill: false,
-    synonyms: ["Live Chat Support", "Chat Support", "CS Chat", "Online Chat Agent"],
+    synonyms: ["Live Chat Support", "Chat Support", "CS Chat", "Online Chat Agent", "Customer Service (Non-Voice)", "Non-Voice Support"],
   },
   {
     id: "customer_support_phone",
@@ -2806,6 +2827,8 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
       "Customer Relations",
       "Client Service",
       "CSR",
+      "Customer Service (Voice)",
+      "Customer Support",
     ],
   },
   {
@@ -2984,6 +3007,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
       "Film Editing",
       "Post Production",
       "Video Post-Production",
+      "Video Editor",
     ],
   },
   {
@@ -3153,7 +3177,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     domain: "ops_pm",
     tier: "important",
     isSoftSkill: false,
-    synonyms: ["Managing Projects", "Project Coordination and Planning", "Project Lead"],
+    synonyms: ["Managing Projects", "Project Coordination and Planning", "Project Lead", "Project Management (Asana/Trello)", "Project Management (Construction)"],
   },
   {
     id: "sprint_planning",
@@ -3169,7 +3193,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     domain: "ops_pm",
     tier: "important",
     isSoftSkill: false,
-    synonyms: ["Agile", "Agile Framework", "Agile Development"],
+    synonyms: ["Agile", "Agile Framework", "Agile Development", "Agile / Scrum", "Scrum", "Scrum Master"],
   },
   {
     id: "business_analysis",
@@ -3193,7 +3217,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     domain: "ops_pm",
     tier: "important",
     isSoftSkill: false,
-    synonyms: ["Information Security", "IT Risk and Security", "IT Risk Management", "Cybersecurity", "InfoSec"],
+    synonyms: ["Information Security", "IT Risk and Security", "IT Risk Management", "Cybersecurity", "InfoSec", "Cybersecurity Basics"],
   },
   {
     id: "iso_27001",
@@ -3638,6 +3662,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
       "Microsoft 365",
       "Windows Office",
       "MS Office Suite",
+      "Microsoft Office Suite",
     ],
   },
   {
@@ -3647,7 +3672,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     subdomain: "productivity",
     tier: "core",
     isSoftSkill: false,
-    synonyms: ["MS Excel", "Excel Spreadsheet", "Advanced Excel"],
+    synonyms: ["MS Excel", "Excel Spreadsheet", "Advanced Excel", "Excel", "Excel (Advanced)"],
   },
   {
     id: "ms_powerpoint",
@@ -3692,7 +3717,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     subdomain: "communication",
     tier: "core",
     isSoftSkill: false,
-    synonyms: [],
+    synonyms: ["Slack / Teams Communication"],
   },
   {
     id: "zoom",
@@ -3701,7 +3726,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     subdomain: "communication",
     tier: "core",
     isSoftSkill: false,
-    synonyms: ["Zoom Meetings"],
+    synonyms: ["Zoom Meetings", "Zoom / Google Meet Hosting"],
   },
   {
     id: "google_meet",
@@ -3748,7 +3773,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     subdomain: "crm",
     tier: "core",
     isSoftSkill: false,
-    synonyms: ["Salesforce CRM", "Salesforce Administration", "SFDC"],
+    synonyms: ["Salesforce CRM", "Salesforce Administration", "SFDC", "Salesforce Service Cloud"],
   },
   {
     id: "zendesk",
@@ -4307,7 +4332,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     subdomain: "ai_ml",
     tier: "important",
     isSoftSkill: false,
-    synonyms: ["Extract Transform Load", "Data Pipelines", "Data Engineering", "Data Warehousing"],
+    synonyms: ["Extract Transform Load", "Data Pipelines", "Data Engineering", "Data Warehousing", "ETL / Data Pipelines"],
   },
   {
     id: "google_sheets_advanced",
@@ -4316,7 +4341,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     subdomain: "productivity",
     tier: "important",
     isSoftSkill: false,
-    synonyms: ["Google Sheets Formulas", "Google Apps Script", "Google Sheets Automation"],
+    synonyms: ["Google Sheets Formulas", "Google Apps Script", "Google Sheets Automation", "Google Sheets (Advanced)"],
   },
   {
     id: "looker_studio",
@@ -4325,7 +4350,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     subdomain: "analytics",
     tier: "important",
     isSoftSkill: false,
-    synonyms: ["Google Data Studio", "Looker", "Data Studio Dashboards"],
+    synonyms: ["Google Data Studio", "Looker", "Data Studio Dashboards", "Google Data Studio / Looker", "Data Studio"],
   },
 
   // ==========================================================================
@@ -4517,7 +4542,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     subdomain: "marketing",
     tier: "supporting",
     isSoftSkill: false,
-    synonyms: ["Hootsuite Social Media"],
+    synonyms: ["Hootsuite Social Media", "Hootsuite / Buffer"],
   },
   {
     id: "buffer",
@@ -4623,7 +4648,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     domain: "marketing_ads",
     tier: "important",
     isSoftSkill: false,
-    synonyms: ["SEMrush", "Ahrefs", "Moz", "Keyword Research Tools", "Ubersuggest", "Screaming Frog"],
+    synonyms: ["SEMrush", "Ahrefs", "Moz", "Keyword Research Tools", "Ubersuggest", "Screaming Frog", "Semrush / Ahrefs"],
   },
 
   // ==========================================================================
@@ -5061,7 +5086,7 @@ export const SKILL_ONTOLOGY: SkillNode[] = [
     domain: "marketing_ads",
     tier: "supporting",
     isSoftSkill: false,
-    synonyms: ["PR", "Media Relations", "Press Releases", "Media Outreach", "Communications Strategy"],
+    synonyms: ["PR", "Media Relations", "Press Releases", "Media Outreach", "Communications Strategy", "PR & Communications"],
   },
 
 ];
