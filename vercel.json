@@ -2,31 +2,31 @@
   "crons": [
     {
       "path": "/api/cron/ingest?batches=0",
-      "schedule": "0 8 * * *"
+      "schedule": "30 9 * * *"
     },
     {
       "path": "/api/cron/ingest?batches=1",
-      "schedule": "10 8 * * *"
+      "schedule": "40 9 * * *"
     },
     {
       "path": "/api/cron/ingest?batches=2",
-      "schedule": "0 13 * * *"
+      "schedule": "30 14 * * *"
     },
     {
       "path": "/api/cron/ingest?batches=3",
-      "schedule": "10 13 * * *"
+      "schedule": "40 14 * * *"
     },
     {
       "path": "/api/cron/ingest?batches=4",
-      "schedule": "0 18 * * *"
+      "schedule": "30 19 * * *"
     },
     {
       "path": "/api/cron/ingest?batches=5",
-      "schedule": "10 18 * * *"
+      "schedule": "40 19 * * *"
     },
     {
       "path": "/api/cron/ingest?batches=6&extras=true",
-      "schedule": "0 23 * * *"
+      "schedule": "30 0 * * *"
     },
     {
       "path": "/api/cron/check-jobs",
@@ -34,7 +34,7 @@
     },
     {
       "path": "/api/cron/recompute-matches",
-      "schedule": "30 8,13,18,23 * * *"
+      "schedule": "0 10,15,20,1 * * *"
     }
   ]
 }

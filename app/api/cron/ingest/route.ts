@@ -5,10 +5,10 @@ import { resetStaleStreaks } from "@/lib/streaks";
 import { TOTAL_BATCHES } from "@/lib/queries";
 
 // Vercel Cron calls this with 1 batch per invocation (PHT schedule):
-//   4:00 PM  → batch 0      4:10 PM → batch 1
-//   9:00 PM  → batch 2      9:10 PM → batch 3
-//   2:00 AM  → batch 4      2:10 AM → batch 5
-//   7:00 AM  → batch 6 + JSearch + cleanup + streaks
+//   5:30 PM  → batch 0      5:40 PM → batch 1
+//  10:30 PM  → batch 2     10:40 PM → batch 3
+//   3:30 AM  → batch 4      3:40 AM → batch 5
+//   8:30 AM  → batch 6 + JSearch + cleanup + streaks
 // Each batch has 5 queries × ~60s = ~300s max, fits within maxDuration.
 
 export const maxDuration = 300;
