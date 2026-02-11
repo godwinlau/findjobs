@@ -1,12 +1,24 @@
 {
   "crons": [
     {
-      "path": "/api/cron/ingest",
-      "schedule": "0 1 * * *"
+      "path": "/api/cron/ingest?batches=0,1",
+      "schedule": "40 22 * * *"
+    },
+    {
+      "path": "/api/cron/ingest?batches=2,3",
+      "schedule": "40 3 * * *"
+    },
+    {
+      "path": "/api/cron/ingest?batches=4,5",
+      "schedule": "40 7 * * *"
+    },
+    {
+      "path": "/api/cron/ingest?batches=6&extras=true",
+      "schedule": "40 13 * * *"
     },
     {
       "path": "/api/cron/check-jobs",
-      "schedule": "0 3 * * *"
+      "schedule": "0 16 * * *"
     }
   ]
 }

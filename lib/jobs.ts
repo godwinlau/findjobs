@@ -1,7 +1,7 @@
 import { createServiceClient } from "@/lib/supabase-server";
-import { extractSalaryFromDescription } from "@/lib/linkedin-jobs";
 import { extractEducation, getEducationLabel } from "@/lib/queries";
 import { Job, PaginatedJobs, Profile } from "@/lib/types";
+import type { SkillStructuredEntry } from "@/lib/skills/groq-extraction";
 import {
   computeMatchScore,
   isProfileSufficient,
@@ -17,7 +17,11 @@ import { filterByRoleCategory } from "@/lib/role-gates";
 
 /** Strip characters that are unsafe in PostgREST filter values */
 function sanitizeSearchQuery(raw: string): string {
-  return raw.replace(/[\\%_(),:!]/g, "").trim();
+  return raw
+    .replace(/[\-–—]/g, " ")        // Replace dashes with space (avoid FTS negation operator)
+    .replace(/[\\%_(),:!]/g, "")     // Strip unsafe chars
+    .replace(/\s+/g, " ")           // Collapse multiple spaces
+    .trim();
 }
 
 /**
@@ -40,6 +44,46 @@ function buildSearchFilter(query: string): string {
   return `title.ilike.${pattern},company_name.ilike.${pattern},location_city.ilike.${pattern},location_area.ilike.${pattern}`;
 }
 
+// ─── Title relevance scoring (for search-ranked results) ───
+
+const TITLE_STOP_WORDS = new Set(["a", "an", "the", "and", "or", "of", "for", "in", "at", "to", "with"]);
+
+/**
+ * Score how well a job title matches the search query (0-100).
+ * Used to rank search results so title matches appear before description-only matches.
+ */
+function computeTitleRelevance(title: string, query: string): number {
+  const normalize = (s: string) =>
+    s.toLowerCase().replace(/[\-–—\/\\|,()]/g, " ").replace(/\s+/g, " ").trim();
+
+  const titleNorm = normalize(title);
+  const queryNorm = normalize(query);
+
+  // Exact match
+  if (titleNorm === queryNorm) return 100;
+
+  // Title contains the full query string
+  if (titleNorm.includes(queryNorm)) return 80;
+
+  // Query contains the full title (query is more specific than title)
+  if (queryNorm.includes(titleNorm)) return 75;
+
+  // Word-level matching
+  const queryWords = queryNorm.split(/\s+/).filter((w) => w.length > 1 && !TITLE_STOP_WORDS.has(w));
+  const titleWords = titleNorm.split(/\s+/).filter((w) => w.length > 1 && !TITLE_STOP_WORDS.has(w));
+
+  if (queryWords.length === 0) return 0;
+
+  let matchCount = 0;
+  for (const qw of queryWords) {
+    if (titleWords.some((tw) => tw === qw || tw.startsWith(qw) || qw.startsWith(tw))) {
+      matchCount++;
+    }
+  }
+
+  return Math.round((matchCount / queryWords.length) * 60);
+}
+
 // ─── DB row type ───
 
 interface JobRow {
@@ -60,6 +104,7 @@ interface JobRow {
   job_type: string | null;
   experience_level: string | null;
   skills_required: string[];
+  skills_structured?: SkillStructuredEntry[];
   apply_url: string;
   posted_at: string;
   expires_at: string | null;
@@ -101,14 +146,36 @@ const FEED_COLUMNS = [
   "posted_at", "expires_at", "is_active", "applicant_count",
 ].join(",");
 
-// Lightweight columns for scoring only (Phase 1) — no text-heavy fields.
-// ~200 bytes/row vs ~5KB/row with description_plain.
+// Lightweight columns for scoring only (Phase 1).
+// Includes description_plain for education scoring + title-only detection.
 export const SCORING_COLUMNS = [
-  "id", "title", "skills_required",
+  "id", "title", "skills_required", "skills_structured",
   "salary_min", "salary_max",
   "location_city", "work_setup", "job_type", "experience_level",
-  "posted_at",
+  "posted_at", "description_plain",
 ].join(",");
+
+// ─── Paginated fetch (bypasses Supabase 1000-row default limit) ───
+// Supabase returns max 1000 rows per select(). This helper paginates to get all.
+
+const FETCH_PAGE_SIZE = 1000;
+
+async function fetchAllRows<T>(
+  buildQuery: (from: number, to: number) => PromiseLike<{ data: T[] | null }>,
+): Promise<T[]> {
+  const allRows: T[] = [];
+  let offset = 0;
+
+  while (true) {
+    const { data } = await buildQuery(offset, offset + FETCH_PAGE_SIZE - 1);
+    if (!data || data.length === 0) break;
+    allRows.push(...data);
+    if (data.length < FETCH_PAGE_SIZE) break;
+    offset += FETCH_PAGE_SIZE;
+  }
+
+  return allRows;
+}
 
 // ─── Semantic score helpers ───
 
@@ -192,7 +259,7 @@ export async function getActiveJobs({
   }
 
   const rows = data as unknown as JobRow[];
-  backfillSalaryIfNeeded(rows, supabase);
+  fixSalaryInMemory(rows);
 
   const isFirstPageNoSearch = page === 1 && !query;
   const jobs: Job[] = rows.map((row, i) => {
@@ -215,32 +282,26 @@ async function getActiveJobsMatchScored(
   const { query, page, pageSize, from, to, profile } = opts;
 
   // Fetch scoring rows and semantic scores in parallel
-  let scoringBuilder = supabase
-    .from("jobs")
-    .select(SCORING_COLUMNS, { count: "exact" })
-    .eq("is_active", true)
-    .order("posted_at", { ascending: false });
+  const searchFilter = query ? buildSearchFilter(query) : "";
 
-  if (query) {
-    const filter = buildSearchFilter(query);
-    if (filter) scoringBuilder = scoringBuilder.or(filter);
-  }
-
-  const [scoringResult, semanticMap] = await Promise.all([
-    scoringBuilder,
+  const [scoringData, semanticMap] = await Promise.all([
+    fetchAllRows((from, to) => {
+      let b = supabase
+        .from("jobs")
+        .select(SCORING_COLUMNS)
+        .eq("is_active", true)
+        .order("posted_at", { ascending: false })
+        .range(from, to);
+      if (searchFilter) b = b.or(searchFilter);
+      return b;
+    }),
     buildSemanticScoreMap(supabase, profile),
   ]);
 
-  const { data: scoringData, error, count } = scoringResult;
+  const total = scoringData.length;
 
-  if (error) {
-    console.error("Failed to fetch jobs for scoring:", error.message);
+  if (total === 0) {
     return { jobs: [], total: 0, page, pageSize, totalPages: 0, isMatchFiltered: !query };
-  }
-
-  const total = count ?? 0;
-  if (!scoringData || scoringData.length === 0) {
-    return { jobs: [], total, page, pageSize, totalPages: Math.ceil(total / pageSize), isMatchFiltered: !query };
   }
 
   // Apply role category gate
@@ -290,7 +351,7 @@ async function getActiveJobsMatchScored(
   }
 
   const fullRows = fullData as unknown as JobRow[];
-  backfillSalaryIfNeeded(fullRows, supabase);
+  fixSalaryInMemory(fullRows);
 
   // Build a map to maintain score-sorted order
   const rowMap = new Map(fullRows.map((r) => [r.id, r]));
@@ -313,6 +374,7 @@ interface ScoringRow {
   id: string;
   title: string;
   skills_required: string[];
+  skills_structured?: SkillStructuredEntry[];
   salary_min: number | null;
   salary_max: number | null;
   location_city: string | null;
@@ -379,7 +441,7 @@ export async function getTopMatchedJobs({
     }
 
     const rows = data as unknown as JobRow[];
-    backfillSalaryIfNeeded(rows, supabase);
+    fixSalaryInMemory(rows);
 
     const jobs: Job[] = rows.map((row, i) => {
       const result = computeMatchScore(row, profile);
@@ -390,18 +452,19 @@ export async function getTopMatchedJobs({
   }
 
   // Phase 1 — lightweight scoring + semantic in parallel
-  const [scoringResult, semanticMap] = await Promise.all([
-    supabase
-      .from("jobs")
-      .select(SCORING_COLUMNS)
-      .eq("is_active", true)
-      .order("posted_at", { ascending: false }),
+  const [scoringData, semanticMap] = await Promise.all([
+    fetchAllRows((from, to) =>
+      supabase
+        .from("jobs")
+        .select(SCORING_COLUMNS)
+        .eq("is_active", true)
+        .order("posted_at", { ascending: false })
+        .range(from, to),
+    ),
     buildSemanticScoreMap(supabase, profile!),
   ]);
 
-  const { data: scoringData } = scoringResult;
-
-  if (!scoringData || scoringData.length === 0) {
+  if (scoringData.length === 0) {
     return { jobs: [], totalMatches: 0 };
   }
 
@@ -447,7 +510,7 @@ export async function getTopMatchedJobs({
   }
 
   const fullRows = fullData as unknown as JobRow[];
-  backfillSalaryIfNeeded(fullRows, supabase);
+  fixSalaryInMemory(fullRows);
 
   const rowMap = new Map(fullRows.map((r) => [r.id, r]));
 
@@ -482,7 +545,7 @@ export async function fetchJobRow(id: string): Promise<JobRow | null> {
   }
 
   const row = data as JobRow;
-  backfillSalaryIfNeeded([row], supabase);
+  fixSalaryInMemory([row]);
   return row;
 }
 
@@ -531,43 +594,15 @@ export async function getJobById(id: string, profile?: Profile | null): Promise<
   return buildJobDetail(row, profile);
 }
 
-// ─── Lazy salary backfill ───
-// Re-parse salary from description for jobs with null salary.
-// Updates the DB row in-place and mutates the row object so callers see the result.
+// ─── Salary sanity fix (read-only, no DB writes) ───
+// Normalizes unrealistic salary values in-memory for display purposes.
+// Salary extraction now happens at ingestion time (lib/ingest.ts).
 
-// Threshold: ₱150K+/month without explicit monthly indicator is likely annual
 const PHP_MONTHLY_SANITY_THRESHOLD = 150_000;
 
-async function backfillSalaryIfNeeded(
-  rows: JobRow[],
-  supabase: ReturnType<typeof createServiceClient>
-): Promise<void> {
+function fixSalaryInMemory(rows: JobRow[]): void {
   for (const row of rows) {
-    // Case 1: No salary at all — try extracting from description
-    if (row.salary_min === null && row.salary_max === null && row.description_plain) {
-      const salary = extractSalaryFromDescription(row.description_plain);
-      if (salary.min === null && salary.max === null) continue;
-
-      row.salary_min = salary.min;
-      row.salary_max = salary.max;
-      row.salary_is_estimate = true;
-
-      supabase
-        .from("jobs")
-        .update({
-          salary_min: salary.min,
-          salary_max: salary.max,
-          salary_is_estimate: true,
-        })
-        .eq("id", row.id)
-        .then(({ error }) => {
-          if (error) console.error(`Salary backfill failed for job ${row.id}:`, error.message);
-        });
-      continue;
-    }
-
-    // Case 2: Salary is unrealistically high — likely annual, fix to monthly
-    // Skip estimated salaries — extractSalaryFromDescription already normalizes periods
+    // Skip estimated salaries — already normalized during ingestion
     if (row.salary_is_estimate) continue;
 
     const hasHighSalary =
@@ -575,22 +610,8 @@ async function backfillSalaryIfNeeded(
       (row.salary_max !== null && row.salary_max >= PHP_MONTHLY_SANITY_THRESHOLD);
 
     if (hasHighSalary) {
-      const fixedMin = row.salary_min !== null ? Math.round(row.salary_min / 12) : null;
-      const fixedMax = row.salary_max !== null ? Math.round(row.salary_max / 12) : null;
-
-      row.salary_min = fixedMin;
-      row.salary_max = fixedMax;
-
-      supabase
-        .from("jobs")
-        .update({
-          salary_min: fixedMin,
-          salary_max: fixedMax,
-        })
-        .eq("id", row.id)
-        .then(({ error }) => {
-          if (error) console.error(`Salary fix failed for job ${row.id}:`, error.message);
-        });
+      row.salary_min = row.salary_min !== null ? Math.round(row.salary_min / 12) : null;
+      row.salary_max = row.salary_max !== null ? Math.round(row.salary_max / 12) : null;
     }
   }
 }
@@ -950,16 +971,24 @@ export async function getExploreJobs({
     });
   }
 
-  // DB-sorted paths: recency, salary_desc, salary_asc
-  const columns = FEED_COLUMNS;
+  // When searching, boost title-relevant results to the top
+  if (query) {
+    return getExploreJobsSearchRanked(supabase, {
+      query, workSetup, jobType, experienceLevel, location,
+      salaryMin, salaryMax, datePosted, verifiedOnly,
+      sort: sort ?? "recency", page, pageSize, from, to, profile: profile ?? null,
+    });
+  }
+
+  // DB-sorted paths (no search query): recency, salary_desc, salary_asc
   let builder = supabase
     .from("jobs")
-    .select(columns, { count: "exact" })
+    .select(FEED_COLUMNS, { count: "exact" })
     .eq("is_active", true);
 
   // Apply filters
   builder = applyExploreFilters(builder, {
-    query, workSetup, jobType, experienceLevel, location,
+    workSetup, jobType, experienceLevel, location,
     salaryMin, salaryMax, datePosted, verifiedOnly,
   });
 
@@ -985,7 +1014,7 @@ export async function getExploreJobs({
   }
 
   const rows = data as unknown as JobRow[];
-  backfillSalaryIfNeeded(rows, supabase);
+  fixSalaryInMemory(rows);
 
   const jobs: Job[] = rows.map((row) => {
     const result = computeMatchScore(row, profile ?? null);
@@ -1033,6 +1062,107 @@ function applyExploreFilters(builder: any, filters: {
   return builder;
 }
 
+// ── Search-ranked fetch: title-relevant results first ──
+// Two-phase: lightweight fetch → score by title relevance → sort → page → full fetch
+// This ensures "Software Engineer" search shows Software Engineer jobs first,
+// not description-only matches like "Customer Support" that mentions "software".
+
+const SEARCH_RANK_COLUMNS = "id,title,posted_at,salary_min,salary_max";
+
+async function getExploreJobsSearchRanked(
+  supabase: ReturnType<typeof createServiceClient>,
+  opts: {
+    query: string; workSetup?: string; jobType?: string;
+    experienceLevel?: string; location?: string;
+    salaryMin?: number; salaryMax?: number;
+    datePosted?: string; verifiedOnly?: boolean;
+    sort: ExploreSort; page: number; pageSize: number; from: number; to: number;
+    profile: Profile | null;
+  },
+): Promise<PaginatedJobs> {
+  const { query, sort, page, pageSize, from, to, profile } = opts;
+
+  // Phase 1: lightweight fetch of all matching jobs
+  let builder = supabase
+    .from("jobs")
+    .select(SEARCH_RANK_COLUMNS, { count: "exact" })
+    .eq("is_active", true);
+
+  builder = applyExploreFilters(builder, opts);
+
+  const { data, error, count } = await builder;
+
+  if (error) {
+    console.error("Failed to fetch explore jobs for search ranking:", error.message);
+    return { jobs: [], total: 0, page, pageSize, totalPages: 0, isMatchFiltered: false };
+  }
+
+  const total = count ?? 0;
+  if (!data || data.length === 0) {
+    return { jobs: [], total, page, pageSize, totalPages: Math.ceil(total / pageSize), isMatchFiltered: false };
+  }
+
+  type SearchRow = { id: string; title: string; posted_at: string; salary_min: number | null; salary_max: number | null };
+  const rows = data as SearchRow[];
+
+  // Score by title relevance and sort
+  const scored = rows.map((row) => ({
+    ...row,
+    titleRelevance: computeTitleRelevance(row.title, query),
+  }));
+
+  scored.sort((a, b) => {
+    // Tier grouping: strong title match (>=60) > partial (>0) > description-only (0)
+    // Within each tier, sort by the user's chosen sort criterion
+    const tierA = a.titleRelevance >= 60 ? 2 : a.titleRelevance > 0 ? 1 : 0;
+    const tierB = b.titleRelevance >= 60 ? 2 : b.titleRelevance > 0 ? 1 : 0;
+    if (tierB !== tierA) return tierB - tierA;
+
+    // Within same tier: apply user-chosen sort
+    if (sort === "salary_desc") {
+      return (b.salary_max ?? 0) - (a.salary_max ?? 0);
+    }
+    if (sort === "salary_asc") {
+      return (a.salary_min ?? Infinity) - (b.salary_min ?? Infinity);
+    }
+    // Default (recency): most recent first
+    return new Date(b.posted_at).getTime() - new Date(a.posted_at).getTime();
+  });
+
+  // Paginate
+  const pageSlice = scored.slice(from, to + 1);
+  if (pageSlice.length === 0) {
+    return { jobs: [], total, page, pageSize, totalPages: Math.ceil(total / pageSize), isMatchFiltered: false };
+  }
+
+  // Phase 2: full detail fetch for page slice only
+  const pageIds = pageSlice.map((s) => s.id);
+  const { data: fullData } = await supabase
+    .from("jobs")
+    .select(FEED_COLUMNS)
+    .in("id", pageIds);
+
+  if (!fullData || fullData.length === 0) {
+    return { jobs: [], total, page, pageSize, totalPages: Math.ceil(total / pageSize), isMatchFiltered: false };
+  }
+
+  const fullRows = fullData as unknown as JobRow[];
+  fixSalaryInMemory(fullRows);
+
+  // Maintain title-relevance sort order
+  const rowMap = new Map(fullRows.map((r) => [r.id, r]));
+  const jobs: Job[] = pageSlice
+    .map(({ id }) => {
+      const row = rowMap.get(id);
+      if (!row) return null;
+      const result = computeMatchScore(row, profile);
+      return mapRowToJob(row, result, false);
+    })
+    .filter((j): j is Job => j !== null);
+
+  return { jobs, total, page, pageSize, totalPages: Math.ceil(total / pageSize), isMatchFiltered: false };
+}
+
 async function getExploreJobsMatchSorted(
   supabase: ReturnType<typeof createServiceClient>,
   opts: {
@@ -1052,28 +1182,25 @@ async function getExploreJobsMatchSorted(
   }
 
   // Phase 1 — lightweight scoring + semantic in parallel
-  let scoringBuilder = supabase
-    .from("jobs")
-    .select(SCORING_COLUMNS, { count: "exact" })
-    .eq("is_active", true)
-    .order("posted_at", { ascending: false });
-
-  scoringBuilder = applyExploreFilters(scoringBuilder, opts);
-
-  const [scoringResult, semanticMap] = await Promise.all([
-    scoringBuilder,
+  const [scoringData, semanticMap] = await Promise.all([
+    fetchAllRows((from, to) =>
+      applyExploreFilters(
+        supabase
+          .from("jobs")
+          .select(SCORING_COLUMNS)
+          .eq("is_active", true)
+          .order("posted_at", { ascending: false })
+          .range(from, to),
+        opts,
+      ),
+    ),
     profile ? buildSemanticScoreMap(supabase, profile) : Promise.resolve(new Map<string, number>()),
   ]);
 
-  const { data: scoringData, error, count } = scoringResult;
+  const count = scoringData.length;
 
-  if (error) {
-    console.error("Failed to fetch explore jobs for scoring:", error.message);
-    return { jobs: [], total: 0, page, pageSize, totalPages: 0, isMatchFiltered: false };
-  }
-
-  if (!scoringData || scoringData.length === 0) {
-    const total = count ?? 0;
+  if (scoringData.length === 0) {
+    const total = count;
     return { jobs: [], total, page, pageSize, totalPages: Math.ceil(total / pageSize), isMatchFiltered: false };
   }
 
@@ -1119,7 +1246,7 @@ async function getExploreJobsMatchSorted(
   }
 
   const fullRows = fullData as unknown as JobRow[];
-  backfillSalaryIfNeeded(fullRows, supabase);
+  fixSalaryInMemory(fullRows);
 
   const rowMap = new Map(fullRows.map((r) => [r.id, r]));
   const jobs: Job[] = pageSlice
@@ -1207,16 +1334,17 @@ export async function getDistinctLocations(): Promise<string[]> {
 
   const supabase = createServiceClient();
 
-  const { data, error } = await supabase
-    .from("jobs")
-    .select("location_city")
-    .eq("is_active", true)
-    .not("location_city", "is", null)
-    .order("location_city", { ascending: true });
+  const data = await fetchAllRows<{ location_city: string }>((from, to) =>
+    supabase
+      .from("jobs")
+      .select("location_city")
+      .eq("is_active", true)
+      .not("location_city", "is", null)
+      .order("location_city", { ascending: true })
+      .range(from, to),
+  );
 
-  if (error || !data) {
-    console.error("Failed to fetch locations:", error?.message);
-    // Return stale cache if available
+  if (data.length === 0) {
     return _locationCache?.data ?? [];
   }
 
@@ -1233,7 +1361,7 @@ export async function getDistinctLocations(): Promise<string[]> {
 
 // ─── Home page data functions ───
 
-import type { TrendingRole, CompanyInfo, RecentlyViewedJob, CategoryCount } from "@/lib/types/home";
+import type { TrendingRole, CompanyInfo, RecentlyViewedJob, CategoryCount, SalarySnapshotData } from "@/lib/types/home";
 import { CATEGORY_SKILL_MAP } from "@/lib/constants/categorySkillMap";
 
 const CATEGORY_META: Record<string, { name: string; icon: string }> = {
@@ -1272,12 +1400,15 @@ function classifyJob(skillsRequired: string[]): string {
 export async function getCategoryJobCounts(): Promise<CategoryCount[]> {
   const supabase = createServiceClient();
 
-  const { data } = await supabase
-    .from("jobs")
-    .select("skills_required")
-    .eq("is_active", true);
+  const data = await fetchAllRows<{ skills_required: string[] }>((from, to) =>
+    supabase
+      .from("jobs")
+      .select("skills_required")
+      .eq("is_active", true)
+      .range(from, to),
+  );
 
-  if (!data || data.length === 0) {
+  if (data.length === 0) {
     return Object.entries(CATEGORY_META).map(([id, meta]) => ({
       id,
       name: meta.name,
@@ -1309,16 +1440,17 @@ const STATIC_ROLE_DATA: Record<string, { growth: number; bars: number[] }> = {
 export async function getTrendingRoles(category?: string): Promise<TrendingRole[]> {
   const supabase = createServiceClient();
 
-  let builder = supabase
-    .from("jobs")
-    .select("title, salary_min, salary_max, skills_required")
-    .eq("is_active", true);
-
-  const { data } = await builder;
-  if (!data || data.length === 0) return [];
-
   type RoleRow = { title: string; salary_min: number | null; salary_max: number | null; skills_required: string[] };
-  const rows = data as RoleRow[];
+
+  const rows = await fetchAllRows<RoleRow>((from, to) =>
+    supabase
+      .from("jobs")
+      .select("title, salary_min, salary_max, skills_required")
+      .eq("is_active", true)
+      .range(from, to),
+  );
+
+  if (rows.length === 0) return [];
 
   // Filter by category if specified
   const filtered = category && category !== "all"
@@ -1369,15 +1501,17 @@ export async function getTrendingRoles(category?: string): Promise<TrendingRole[
 export async function getTopHiringCompanies(category?: string): Promise<CompanyInfo[]> {
   const supabase = createServiceClient();
 
-  const { data } = await supabase
-    .from("jobs")
-    .select("company_name, company_logo_url, location_city, skills_required")
-    .eq("is_active", true);
-
-  if (!data || data.length === 0) return [];
-
   type CoRow = { company_name: string; company_logo_url: string | null; location_city: string | null; skills_required: string[] };
-  const rows = data as CoRow[];
+
+  const rows = await fetchAllRows<CoRow>((from, to) =>
+    supabase
+      .from("jobs")
+      .select("company_name, company_logo_url, location_city, skills_required")
+      .eq("is_active", true)
+      .range(from, to),
+  );
+
+  if (rows.length === 0) return [];
 
   const filtered = category && category !== "all"
     ? rows.filter((r) => classifyJob(r.skills_required) === category)
@@ -1452,4 +1586,81 @@ export async function getRecentlyViewed(userId: string): Promise<RecentlyViewedJ
       };
     })
     .filter((r): r is RecentlyViewedJob => r !== null);
+}
+
+/** Get salary snapshot — top 3 roles relevant to user's skills with real salary data */
+export async function getSalarySnapshot(
+  userSkills: string[],
+  desiredSalaryMin?: number | null,
+  desiredSalaryMax?: number | null,
+): Promise<SalarySnapshotData> {
+  const empty: SalarySnapshotData = { roles: [], scaleCeiling: 0, userDesiredSalary: null };
+  const supabase = createServiceClient();
+
+  type Row = { title: string; salary_min: number | null; salary_max: number | null; skills_required: string[] };
+
+  const rows = await fetchAllRows<Row>((from, to) =>
+    supabase
+      .from("jobs")
+      .select("title, salary_min, salary_max, skills_required")
+      .eq("is_active", true)
+      .range(from, to),
+  );
+
+  if (rows.length === 0) return empty;
+
+  // Filter jobs by skill overlap with user
+  const userSkillSet = new Set(userSkills.map((s) => s.toLowerCase()));
+
+  let matched = userSkillSet.size > 0
+    ? rows.filter((r) =>
+        (r.skills_required ?? []).some((s) => userSkillSet.has(s.toLowerCase()))
+      )
+    : [];
+
+  // Fallback: if < 5 skill-matched jobs, use category classification
+  if (matched.length < 5) {
+    const userCategory = classifyJob(userSkills);
+    matched = rows.filter((r) => classifyJob(r.skills_required) === userCategory);
+  }
+
+  // If still nothing, bail
+  if (matched.length === 0) return empty;
+
+  // Aggregate by title
+  const roleMap = new Map<string, { mins: number[]; maxes: number[] }>();
+  for (const row of matched) {
+    if (row.salary_min === null && row.salary_max === null) continue;
+    const entry = roleMap.get(row.title) ?? { mins: [], maxes: [] };
+    if (row.salary_min !== null) entry.mins.push(row.salary_min);
+    if (row.salary_max !== null) entry.maxes.push(row.salary_max);
+    roleMap.set(row.title, entry);
+  }
+
+  // Build role objects, only those with salary data
+  const roleEntries = [...roleMap.entries()]
+    .filter(([, v]) => v.mins.length > 0 || v.maxes.length > 0)
+    .map(([title, { mins, maxes }]) => {
+      const minSalary = mins.length > 0 ? Math.min(...mins) : Math.min(...maxes);
+      const maxSalary = maxes.length > 0 ? Math.max(...maxes) : Math.max(...mins);
+      const allMidpoints = mins.length > 0 && maxes.length > 0
+        ? mins.map((m, i) => (m + (maxes[i] ?? maxes[0])) / 2)
+        : mins.length > 0 ? mins : maxes;
+      const avgSalary = Math.round(allMidpoints.reduce((a, b) => a + b, 0) / allMidpoints.length);
+      return { title, minSalary, maxSalary, avgSalary, jobCount: mins.length + maxes.length };
+    });
+
+  // Sort by job count descending, take top 3
+  roleEntries.sort((a, b) => b.jobCount - a.jobCount);
+  const roles = roleEntries.slice(0, 3);
+
+  if (roles.length === 0) return empty;
+
+  const scaleCeiling = Math.max(...roles.map((r) => r.maxSalary));
+  const userDesiredSalary =
+    desiredSalaryMin && desiredSalaryMax
+      ? { min: desiredSalaryMin, max: desiredSalaryMax }
+      : null;
+
+  return { roles, scaleCeiling, userDesiredSalary };
 }

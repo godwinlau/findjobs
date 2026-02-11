@@ -8,6 +8,7 @@ import type {
   RecentlyViewedJob,
   SkillDemandItem,
   CategoryCount,
+  SalarySnapshotData,
 } from "@/lib/types/home";
 import type { Job } from "@/lib/types";
 import { TopMatchesPreview } from "@/components/dashboard";
@@ -29,6 +30,7 @@ interface HomeClientProps {
   topJob: Job | null;
   otherJobs: Job[];
   totalMatches: number;
+  salarySnapshot: SalarySnapshotData;
   /** Server action to fetch filtered roles/companies */
   fetchCategoryData: (category: string) => Promise<{
     roles: TrendingRole[];
@@ -45,6 +47,7 @@ export function HomeClient({
   topJob,
   otherJobs,
   totalMatches,
+  salarySnapshot,
   fetchCategoryData,
 }: HomeClientProps) {
   const router = useRouter();
@@ -93,7 +96,7 @@ export function HomeClient({
 
         <div>
           <SkillsDemandSidebar skills={skillDemand} />
-          <SalarySnapshotSidebar />
+          <SalarySnapshotSidebar data={salarySnapshot} />
           <RecentlyViewedSidebar jobs={recentlyViewed} />
         </div>
       </div>

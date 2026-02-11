@@ -575,12 +575,67 @@
   z-index: 1;
 }
 
+.ss-role-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.ss-role-count {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: var(--hb-text-muted);
+  letter-spacing: 0.02em;
+}
+
+.ss-bar-user {
+  width: 3px;
+  height: 12px;
+  background: #22c55e;
+  position: absolute;
+  top: -2px;
+  z-index: 2;
+}
+
 .ss-range {
   display: flex;
   justify-content: space-between;
   font-family: 'Space Mono', monospace;
   font-size: 9px;
   color: var(--hb-text-muted);
+}
+
+.ss-legend {
+  display: flex;
+  gap: 14px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.ss-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: var(--hb-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.ss-legend-dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+}
+
+.ss-legend-dot--avg {
+  background: var(--hb-accent);
+}
+
+.ss-legend-dot--user {
+  background: #22c55e;
 }
 
 /* Recently viewed */

@@ -2,10 +2,13 @@ import { createServiceClient } from "@/lib/supabase-server";
 import {
   fetchLinkedInJobs,
   scrapeJobDescription,
+  extractSalaryFromDescription,
   normalizeJob,
+  generateSourceHash,
   NormalizedJob,
+  type ScrapedDescription,
 } from "@/lib/linkedin-jobs";
-import { getQueriesForBatch } from "@/lib/queries";
+import { normalizeLocation, getQueriesForBatch } from "@/lib/queries";
 import { embedAndStoreJobs } from "@/lib/embeddings";
 
 // ─── Types ───
@@ -61,25 +64,16 @@ export async function runIngestionBatch(batch: number): Promise<BatchResult> {
         continue;
       }
 
-      // 2. Scrape descriptions and normalize all jobs
-      const normalized: NormalizedJob[] = [];
-      for (const raw of rawJobs) {
-        try {
-          const desc = await scrapeJobDescription(raw.jobUrl);
-          normalized.push(normalizeJob(raw, desc));
-          // Small delay between description scrapes
-          await sleep(500);
-        } catch {
-          result.errors++;
-        }
-      }
-
-      // 3. Check for cross-source duplicates by hash
-      const hashes = normalized.map((j) => j.source_hash);
+      // 2. Early dedup — check DB before scraping/normalizing
+      const earlyHashes = rawJobs.map((r) => {
+        const loc = normalizeLocation(r.location);
+        return { raw: r, hash: generateSourceHash(r.company, r.position, loc.city) };
+      });
+      const hashList = earlyHashes.map((h) => h.hash);
       const { data: existingByHash } = await supabase
         .from("jobs")
         .select("source_hash")
-        .in("source_hash", hashes);
+        .in("source_hash", hashList);
 
       const existingHashes = new Set(
         (existingByHash || []).map(
@@ -87,12 +81,49 @@ export async function runIngestionBatch(batch: number): Promise<BatchResult> {
         )
       );
 
-      // 4. Filter out cross-source dupes
-      const toInsert = normalized.filter(
-        (j) => !existingHashes.has(j.source_hash)
-      );
-      const crossDupes = normalized.length - toInsert.length;
-      result.duplicates += crossDupes;
+      const newJobs = earlyHashes.filter((h) => !existingHashes.has(h.hash));
+      result.duplicates += rawJobs.length - newJobs.length;
+
+      if (newJobs.length === 0) {
+        result.durationMs = Date.now() - queryStart;
+        results.push(result);
+        continue;
+      }
+
+      // 3. Scrape descriptions only for new jobs (fast: ~500ms each)
+      const scraped: { raw: typeof rawJobs[0]; desc: ScrapedDescription }[] = [];
+      for (const { raw } of newJobs) {
+        try {
+          const desc = await scrapeJobDescription(raw.jobUrl);
+          scraped.push({ raw, desc });
+          await sleep(500);
+        } catch {
+          result.errors++;
+        }
+      }
+
+      // 4. Sort by salary presence — jobs with salary info first
+      scraped.sort((a, b) => {
+        const aHasSalary = hasSalarySignal(a.raw.salary, a.desc.plain);
+        const bHasSalary = hasSalarySignal(b.raw.salary, b.desc.plain);
+        if (aHasSalary && !bHasSalary) return -1;
+        if (!aHasSalary && bHasSalary) return 1;
+        return 0;
+      });
+
+      // 5. Normalize (LLM extraction) — salary jobs processed first
+      const normalized: NormalizedJob[] = [];
+      for (const { raw, desc } of scraped) {
+        try {
+          normalized.push(await normalizeJob(raw, desc));
+          // Throttle Groq calls to avoid 429s
+          await sleep(3000);
+        } catch {
+          result.errors++;
+        }
+      }
+
+      const toInsert = normalized;
 
       if (toInsert.length === 0) {
         result.durationMs = Date.now() - queryStart;
@@ -100,7 +131,7 @@ export async function runIngestionBatch(batch: number): Promise<BatchResult> {
         continue;
       }
 
-      // 5. Upsert — ON CONFLICT (source, source_id) handles exact dupes
+      // 7. Upsert — ON CONFLICT (source, source_id) handles exact dupes
       const { data: inserted, error } = await supabase
         .from("jobs")
         .upsert(toInsert, {
@@ -193,6 +224,14 @@ export async function cleanupExpiredJobs(): Promise<{ deactivated: number }> {
 }
 
 // ─── Helpers ───
+
+/** Quick check: does this job have any salary signal (API field or description regex)? */
+function hasSalarySignal(apiSalary: string, plainText: string): boolean {
+  if (apiSalary && apiSalary.trim() !== "") return true;
+  if (!plainText) return false;
+  const descSalary = extractSalaryFromDescription(plainText);
+  return descSalary.min !== null || descSalary.max !== null;
+}
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));

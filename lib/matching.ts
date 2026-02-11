@@ -3,6 +3,7 @@ import { extractEducation, EducationLevel } from "@/lib/queries";
 import { TITLE_SKILL_PATTERNS, SKILL_ALIASES } from "@/lib/constants/skill-mappings";
 import { resolveSkillCluster } from "@/lib/constants/skillTaxonomy";
 import { computeSkillMismatchPenalty } from "@/lib/role-gates";
+import type { SkillStructuredEntry } from "@/lib/skills/groq-extraction";
 
 // ─── Types ───
 
@@ -38,6 +39,7 @@ export interface JobRow {
   job_type: string | null;
   experience_level: string | null;
   skills_required: string[];
+  skills_structured?: SkillStructuredEntry[];
   posted_at: string;
 }
 
@@ -68,12 +70,13 @@ export function normalizeSkill(raw: string): string {
 function inferSkillsFromHeadline(headline: string | null): string[] {
   if (!headline) return [];
   const lower = headline.toLowerCase();
+  const inferred = new Set<string>();
   for (const { pattern, skills } of TITLE_SKILL_PATTERNS) {
     if (pattern.test(lower)) {
-      return skills.map(normalizeSkill);
+      for (const skill of skills) inferred.add(normalizeSkill(skill));
     }
   }
-  return [];
+  return Array.from(inferred);
 }
 
 // ─── Effective skill extraction ───
@@ -87,7 +90,6 @@ function getEffectiveJobSkills(row: JobRow, profileSkills: string[]): string[] {
   for (const { pattern, skills } of TITLE_SKILL_PATTERNS) {
     if (pattern.test(titleLower)) {
       for (const skill of skills) existing.add(normalizeSkill(skill));
-      break;
     }
   }
 
@@ -259,8 +261,12 @@ export function computeMatchScore(row: JobRow, profile: Profile | null, options?
 
   const effectiveJobSkills = getEffectiveJobSkills(row, augmentedProfileSkills);
 
+  // Title-only job: has a title but no JD and no extracted skills
+  const isTitleOnly = (row.skills_required?.length ?? 0) === 0
+    && (!row.description_plain || row.description_plain.length < 50);
+
   // Score each dimension (all return 0.0-1.0)
-  const skillResult = scoreSkillMatch(effectiveJobSkills, augmentedProfileSkills);
+  const skillResult = scoreSkillMatch(effectiveJobSkills, augmentedProfileSkills, row.skills_structured);
   const proficiencyScore = scoreSkillProficiency(
     effectiveJobSkills, augmentedProfileSkills,
     profile.skill_proficiencies ?? {}, row.experience_level
@@ -291,7 +297,9 @@ export function computeMatchScore(row: JobRow, profile: Profile | null, options?
   } else if (skillResult.relevance === "weakMatch") {
     businessRules *= 0.55;
   } else if (skillResult.relevance === "noData") {
-    businessRules *= 0.45;
+    // Title-only jobs with inferred skills get a softer penalty
+    // (title inference found something to score against)
+    businessRules *= (isTitleOnly && effectiveJobSkills.length > 0) ? 0.65 : 0.45;
   }
 
   // ── Cluster affinity boost (applied after relevance gate) ──
@@ -300,12 +308,15 @@ export function computeMatchScore(row: JobRow, profile: Profile | null, options?
   businessRules = businessRules + clusterBoost;
 
   // ── Blend semantic + business rules ──
+  // When semantic is available: semantic(40%) + business(60%)
+  // When not available: assume neutral semantic (0.5) so non-embedded jobs
+  // don't have an unfair advantage over poorly-embedded ones.
   const semanticScore = options?.semanticScore ?? null;
   let total: number;
   if (semanticScore != null && semanticScore > 0) {
     total = semanticScore * 0.4 + businessRules * 0.6;
   } else {
-    total = businessRules;
+    total = 0.5 * 0.4 + businessRules * 0.6;
   }
 
   // ── Negative signal penalty ──
@@ -321,8 +332,9 @@ export function computeMatchScore(row: JobRow, profile: Profile | null, options?
   let missingDimensions = 0;
   if (row.salary_min === null && row.salary_max === null) missingDimensions++;
   if (!row.experience_level) missingDimensions++;
-  if (!row.description_plain) missingDimensions++; // education can't be extracted
+  if (!row.description_plain || row.description_plain.length < 50) missingDimensions++; // education can't be extracted
   if (!row.location_city && row.work_setup !== "remote") missingDimensions++;
+  if (isTitleOnly) missingDimensions++; // extra uncertainty for title-only jobs
 
   let scoreRange: [number, number] | undefined;
   if (missingDimensions > 0) {
@@ -350,9 +362,17 @@ export function computeMatchScore(row: JobRow, profile: Profile | null, options?
 
 type SkillRelevance = "match" | "weakMatch" | "noData" | "mismatch";
 
+// Importance weights for structured skill scoring
+const IMPORTANCE_WEIGHT: Record<string, number> = {
+  core: 3.0,
+  important: 2.0,
+  nice_to_have: 1.0,
+};
+
 function scoreSkillMatch(
   jobSkills: string[],
-  profileSkills: string[]
+  profileSkills: string[],
+  skillsStructured?: SkillStructuredEntry[],
 ): { score: number; reason: string | null; relevance: SkillRelevance; matched: string[] } {
   const jLen = jobSkills?.length ?? 0;
   const pLen = profileSkills?.length ?? 0;
@@ -369,8 +389,63 @@ function scoreSkillMatch(
     return { score: 0.2, reason: null, relevance: "match", matched: [] };
   }
 
-  const jobSet = new Set(jobSkills.map((s) => normalizeSkill(s)));
   const profileSet = new Set(profileSkills.map((s) => normalizeSkill(s)));
+
+  // ── Weighted scoring path (when structured data exists) ──
+  if (skillsStructured && skillsStructured.length > 0) {
+    let totalWeight = 0;
+    let matchedWeight = 0;
+    let coreMatches = 0;
+    let totalCore = 0;
+    const matchedSkills: string[] = [];
+
+    for (const entry of skillsStructured) {
+      const weight = (IMPORTANCE_WEIGHT[entry.importance] ?? 2.0) * entry.confidence;
+      totalWeight += weight;
+
+      if (entry.importance === "core") totalCore++;
+
+      const normalized = normalizeSkill(entry.label);
+      if (profileSet.has(normalized)) {
+        matchedWeight += weight;
+        matchedSkills.push(entry.label);
+        if (entry.importance === "core") coreMatches++;
+      }
+    }
+
+    if (totalWeight === 0) {
+      return { score: 0.5, reason: null, relevance: "match", matched: [] };
+    }
+
+    const score = matchedWeight / totalWeight;
+    const weightedRatio = matchedWeight / totalWeight;
+
+    // Relevance gate based on weighted match
+    let relevance: SkillRelevance;
+    if (weightedRatio < 0.1 && coreMatches === 0) {
+      relevance = "mismatch";
+    } else if (weightedRatio < 0.25 || (totalCore > 0 && coreMatches === 0)) {
+      relevance = "weakMatch";
+    } else {
+      relevance = "match";
+    }
+
+    const displayNames = matchedSkills.map((s) => s.charAt(0).toUpperCase() + s.slice(1));
+
+    let reason: string | null = null;
+    if (matchedSkills.length === 0) {
+      reason = null;
+    } else if (matchedSkills.length <= 2) {
+      reason = `Matches your ${displayNames.join(" & ")} skills`;
+    } else {
+      reason = `${matchedSkills.length} of your skills match`;
+    }
+
+    return { score: Math.min(score, 1.0), reason, relevance, matched: displayNames };
+  }
+
+  // ── Fallback: unweighted overlap (backward compatible) ──
+  const jobSet = new Set(jobSkills.map((s) => normalizeSkill(s)));
 
   let overlapCount = 0;
   const matchedSkills: string[] = [];
@@ -386,7 +461,6 @@ function scoreSkillMatch(
     return { score: 0, reason: null, relevance: "mismatch", matched: [] };
   }
 
-  // MVP: all skills count as required → matched / total_required
   const score = overlapCount / jobSet.size;
 
   const overlapRatio = overlapCount / Math.max(pLen, jLen);

@@ -30,15 +30,24 @@ export async function computeMatchPotential(
 
   const supabase = createServiceClient();
 
-  const { data: scoringData } = await supabase
-    .from("jobs")
-    .select(SCORING_COLUMNS)
-    .eq("is_active", true);
-
-  if (!scoringData || scoringData.length === 0) return null;
-
+  // Paginate to bypass Supabase 1000-row default limit
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const rows = scoringData as any[];
+  const rows: any[] = [];
+  let offset = 0;
+  const PAGE = 1000;
+  while (true) {
+    const { data: page } = await supabase
+      .from("jobs")
+      .select(SCORING_COLUMNS)
+      .eq("is_active", true)
+      .range(offset, offset + PAGE - 1);
+    if (!page || page.length === 0) break;
+    rows.push(...page);
+    if (page.length < PAGE) break;
+    offset += PAGE;
+  }
+
+  if (rows.length === 0) return null;
   const totalJobsAnalyzed = rows.length;
 
   // Score all jobs with current profile

@@ -153,7 +153,8 @@ export function cosineSimilarity(a: number[], b: number[]): number {
  */
 export async function embedAndStoreJobs(
   jobRows: { id: string; title: string; skills_required: string[]; experience_level: string | null; work_setup: string | null; description_plain?: string }[],
-  supabase: { from: (table: string) => { update: (data: Record<string, unknown>) => { eq: (col: string, val: string) => { then: (cb: (result: { error: Error | null }) => void) => void } } } },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any,
   batchSize = 32
 ): Promise<{ embedded: number; errors: number }> {
   const apiKey = getApiKey();
@@ -182,18 +183,20 @@ export async function embedAndStoreJobs(
       // Format as pgvector string: [0.1,0.2,...]
       const vectorStr = `[${embedding.join(",")}]`;
 
-      supabase
+      const { error } = await supabase
         .from("jobs")
         .update({
           embedding: vectorStr,
           embedding_generated_at: new Date().toISOString(),
         })
-        .eq("id", batch[j].id)
-        .then(({ error }) => {
-          if (error) console.error(`Embedding update failed for job ${batch[j].id}:`, error.message);
-        });
+        .eq("id", batch[j].id);
 
-      embedded++;
+      if (error) {
+        console.error(`Embedding update failed for job ${batch[j].id}:`, error.message);
+        errors++;
+      } else {
+        embedded++;
+      }
     }
   }
 

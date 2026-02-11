@@ -9,6 +9,7 @@ import {
   getTopHiringCompanies,
   getRecentlyViewed,
   getTopMatchedJobs,
+  getSalarySnapshot,
 } from "@/lib/jobs";
 import { createClient } from "@/lib/supabase/server";
 import { industrySkillDemand } from "@/lib/constants/industrySkillDemand";
@@ -69,18 +70,20 @@ export default async function Dashboard() {
   const firstWithJobs = categories.find((c) => c.count > 0);
   const defaultCategory = firstWithJobs?.id ?? categories[0]?.id ?? "tech_it";
 
-  const [initialRoles, initialCompanies, recentlyViewed, matchedResult] = await Promise.all([
+  const userSkills = profile?.skills ?? [];
+
+  const [initialRoles, initialCompanies, recentlyViewed, matchedResult, salarySnapshot] = await Promise.all([
     getTrendingRoles(defaultCategory),
     getTopHiringCompanies(defaultCategory),
     getRecentlyViewed(user.id),
     getTopMatchedJobs({ profile, limit: 5 }),
+    getSalarySnapshot(userSkills, profile?.desired_salary_min, profile?.desired_salary_max),
   ]);
 
   const topJob = matchedResult.jobs[0] ?? null;
   const otherJobs = matchedResult.jobs.slice(1);
   const totalMatches = matchedResult.totalMatches;
 
-  const userSkills = profile?.skills ?? [];
   const skillDemand = computeSkillDemand(userSkills);
 
   return (
@@ -108,6 +111,7 @@ export default async function Dashboard() {
         topJob={topJob}
         otherJobs={otherJobs}
         totalMatches={totalMatches}
+        salarySnapshot={salarySnapshot}
       />
     </div>
   );

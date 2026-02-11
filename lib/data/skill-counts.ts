@@ -17,12 +17,24 @@ export const getTopSkillCounts = unstable_cache(
     try {
       const supabase = createServiceClient();
 
-      const { data, error } = await supabase
-        .from("jobs")
-        .select("skills_required")
-        .eq("is_active", true);
+      // Paginate to bypass Supabase 1000-row default limit
+      const allRows: { skills_required: string[] }[] = [];
+      let offset = 0;
+      const PAGE = 1000;
+      while (true) {
+        const { data: page, error } = await supabase
+          .from("jobs")
+          .select("skills_required")
+          .eq("is_active", true)
+          .range(offset, offset + PAGE - 1);
+        if (error || !page || page.length === 0) break;
+        allRows.push(...page);
+        if (page.length < PAGE) break;
+        offset += PAGE;
+      }
+      const data = allRows;
 
-      if (error || !data || data.length === 0) return [];
+      if (data.length === 0) return [];
 
       // Aggregate: normalize each skill, count occurrences
       const counts = new Map<string, number>();

@@ -1,5 +1,10 @@
 // Home page type definitions
 
+import type { SkillStructuredEntry } from "@/lib/skills/groq-extraction";
+
+/** Re-export for convenience */
+export type { SkillStructuredEntry };
+
 export interface TrendingRole {
   title: string;
   openCount: number;
@@ -36,4 +41,18 @@ export interface CategoryCount {
   name: string;
   icon: string;
   count: number;
+}
+
+export interface SalarySnapshotRole {
+  title: string;
+  minSalary: number;
+  maxSalary: number;
+  avgSalary: number;
+  jobCount: number;
+}
+
+export interface SalarySnapshotData {
+  roles: SalarySnapshotRole[];
+  scaleCeiling: number;
+  userDesiredSalary: { min: number; max: number } | null;
 }

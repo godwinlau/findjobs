@@ -1,4 +1,5 @@
-import { normalizeLocation, extractSkills } from "@/lib/queries";
+import { normalizeLocation } from "@/lib/queries";
+import { extractSkillsWithStructured, type SkillStructuredEntry } from "@/lib/skills/groq-extraction";
 import crypto from "crypto";
 import * as cheerio from "cheerio";
 
@@ -35,14 +36,15 @@ export interface NormalizedJob {
   location_area: string | null;
   work_setup: "onsite" | "hybrid" | "remote" | null;
   job_type:
-    | "full_time"
-    | "part_time"
-    | "contract"
-    | "freelance"
-    | "internship"
-    | null;
+  | "full_time"
+  | "part_time"
+  | "contract"
+  | "freelance"
+  | "internship"
+  | null;
   experience_level: "entry" | "junior" | "mid" | "senior" | null;
   skills_required: string[];
+  skills_structured: SkillStructuredEntry[];
   apply_url: string;
   posted_at: string;
   expires_at: string | null;
@@ -62,7 +64,7 @@ export async function fetchLinkedInJobs(
   // Dynamic import for CommonJS package
   const linkedIn = (await import("linkedin-jobs-api")).default;
 
-  const pagesToFetch = options?.pages ?? 4; // Fetch pages 0-3 by default
+  const pagesToFetch = options?.pages ?? 2; // Fetch pages 0-1 (4x daily now)
   const limit = options?.limit ?? "25";
   const allResults: LinkedInJobResult[] = [];
 
@@ -149,15 +151,15 @@ export async function scrapeJobDescription(
 
 // ─── Normalize a LinkedIn job into our schema ───
 
-export function normalizeJob(
+export async function normalizeJob(
   raw: LinkedInJobResult,
   desc: ScrapedDescription = { html: "", plain: "" },
   jobType?: string
-): NormalizedJob {
+): Promise<NormalizedJob> {
   const location = normalizeLocation(raw.location);
   const salary = parseSalary(raw.salary);
 
-  // Fallback: extract salary from description if structured field is empty
+  // Fallback chain for salary: structured field → regex from description → LLM extraction
   let finalSalary = salary;
   let salaryIsEstimate = false;
   if (salary.min === null && salary.max === null && desc.plain) {
@@ -166,16 +168,33 @@ export function normalizeJob(
       finalSalary = descSalary;
       salaryIsEstimate = true;
     }
+    // LLM salary fallback is applied after extraction below
   }
 
   // Extract source ID from jobUrl (LinkedIn job view ID)
   const sourceId = extractJobId(raw.jobUrl) || raw.jobUrl;
 
-  // Infer experience level from title or description
-  const experienceLevel = inferExperienceLevel(raw.position);
+  // Infer experience level from title (fallback if LLM doesn't find it)
+  const titleExperienceLevel = inferExperienceLevel(raw.position);
 
-  // Extract skills from plain text description
-  const skills = desc.plain ? extractSkills(desc.plain) : [];
+  // Extract skills, experience, and salary from JD using LLM + ontology normalization
+  const extraction = desc.plain
+    ? await extractSkillsWithStructured(desc.plain)
+    : { skills_required: [], skills_structured: [], experience_level: null, salary_min: null, salary_max: null, salary_is_estimate: false };
+
+  const skills = extraction.skills_required;
+  const skills_structured = extraction.skills_structured;
+
+  // LLM experience takes priority over title-only inference
+  const experienceLevel = extraction.experience_level ?? titleExperienceLevel;
+
+  // LLM salary fallback — if neither structured nor regex found salary
+  if (finalSalary.min === null && finalSalary.max === null) {
+    if (extraction.salary_min !== null || extraction.salary_max !== null) {
+      finalSalary = { min: extraction.salary_min, max: extraction.salary_max };
+      salaryIsEstimate = true;
+    }
+  }
 
   // Infer work setup from title, location, AND description
   const workSetup = inferWorkSetup(raw.position, raw.location, desc.plain);
@@ -206,6 +225,7 @@ export function normalizeJob(
     job_type: mapJobType(jobType),
     experience_level: experienceLevel,
     skills_required: skills,
+    skills_structured,
     apply_url: raw.jobUrl,
     posted_at: raw.date || new Date().toISOString(),
     expires_at: null,
@@ -354,7 +374,7 @@ export function extractSalaryFromDescription(text: string): ParsedSalary {
     {
       re: new RegExp(
         SALARY_KEYWORDS.source +
-          `[:\\s]+${CUR}\\s?(\\d+)\\s*k${SEP}${CUR}\\s?(\\d+)\\s*k`,
+        `[:\\s]+${CUR}\\s?(\\d+)\\s*k${SEP}${CUR}\\s?(\\d+)\\s*k`,
         "gi"
       ),
       kNotation: true,
@@ -363,7 +383,7 @@ export function extractSalaryFromDescription(text: string): ParsedSalary {
     {
       re: new RegExp(
         SALARY_KEYWORDS.source +
-          `[:\\s]+${CUR}\\s?${NUM}${SEP}${CUR}\\s?${NUM}`,
+        `[:\\s]+${CUR}\\s?${NUM}${SEP}${CUR}\\s?${NUM}`,
         "gi"
       ),
       kNotation: false,
@@ -380,7 +400,7 @@ export function extractSalaryFromDescription(text: string): ParsedSalary {
     {
       re: new RegExp(
         SALARY_KEYWORDS.source +
-          `[:\\s]+${CUR}\\s?${NUM}`,
+        `[:\\s]+${CUR}\\s?${NUM}`,
         "gi"
       ),
       kNotation: false,
@@ -472,19 +492,19 @@ export function extractSalaryFromDescription(text: string): ParsedSalary {
 
   if (annualTerms.test(lower)) {
     if (/[\d,]+\s*k?\s*(?:per\s*year|\/year|per\s*annum|\/yr|annual)/i.test(text) ||
-        /(?:per\s*year|\/year|per\s*annum|\/yr|annual)\s*[\d,]+/i.test(text)) {
+      /(?:per\s*year|\/year|per\s*annum|\/yr|annual)\s*[\d,]+/i.test(text)) {
       periodMultiplier = 1 / 12;
       hadExplicitPeriod = true;
     }
   } else if (hourlyTerms.test(lower)) {
     if (/[\d,]+\s*k?\s*(?:\/hr|per\s*hour|\/hour)/i.test(text) ||
-        /(?:\/hr|per\s*hour|\/hour)\s*[\d,]+/i.test(text)) {
+      /(?:\/hr|per\s*hour|\/hour)\s*[\d,]+/i.test(text)) {
       periodMultiplier = 160;
       hadExplicitPeriod = true;
     }
   } else if (weeklyTerms.test(lower)) {
     if (/[\d,]+\s*k?\s*(?:\/wk|per\s*week|\/week)/i.test(text) ||
-        /(?:\/wk|per\s*week|\/week)\s*[\d,]+/i.test(text)) {
+      /(?:\/wk|per\s*week|\/week)\s*[\d,]+/i.test(text)) {
       periodMultiplier = 4;
       hadExplicitPeriod = true;
     }
@@ -584,7 +604,7 @@ function inferExperienceLevel(
 
 // ─── Cross-source dedup hash ───
 
-function generateSourceHash(
+export function generateSourceHash(
   company: string,
   title: string,
   city: string | null

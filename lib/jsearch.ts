@@ -1,5 +1,7 @@
 import crypto from "crypto";
-import { normalizeLocation, extractSkills, SEARCH_QUERIES } from "@/lib/queries";
+import { normalizeLocation, SEARCH_QUERIES } from "@/lib/queries";
+import { extractSkillsWithStructured } from "@/lib/skills/groq-extraction";
+import type { SkillStructuredEntry } from "@/lib/skills/groq-extraction";
 import { extractSalaryFromDescription } from "@/lib/linkedin-jobs";
 import { createServiceClient } from "@/lib/supabase-server";
 import { embedAndStoreJobs } from "@/lib/embeddings";
@@ -99,11 +101,41 @@ async function fetchJSearchJobs(
 
 // ─── Normalize a JSearch job into our DB schema ───
 
-function normalizeJSearchJob(raw: JSearchJob) {
+async function normalizeJSearchJob(raw: JSearchJob) {
   const location = normalizeLocation(raw.job_city);
   const plainText = stripHtml(raw.job_description || "");
 
-  // Structured salary from JSearch, then fallback to description extraction
+  // ── LLM extraction (skills + experience + salary) ──
+  const extraction = plainText
+    ? await extractSkillsWithStructured(plainText)
+    : { skills_required: [], skills_structured: [], experience_level: null, salary_min: null, salary_max: null, salary_is_estimate: false };
+
+  // ── Skills: prefer JSearch API structured list, fall back to LLM ──
+  let skills: string[];
+  let skills_structured: SkillStructuredEntry[];
+  if (raw.job_required_skills && raw.job_required_skills.length > 0) {
+    skills = raw.job_required_skills.map((s) => s.toLowerCase());
+    // Still use LLM structured entries for ontology-normalized data if available
+    skills_structured = extraction.skills_structured.length > 0
+      ? extraction.skills_structured
+      : skills.map((s) => ({
+          skillId: s.toLowerCase().replace(/\s+/g, "_"),
+          label: s,
+          importance: "important" as const,
+          confidence: 0.95,
+          domain: "other",
+          tier: "important" as const,
+        }));
+  } else {
+    skills = extraction.skills_required;
+    skills_structured = extraction.skills_structured;
+  }
+
+  // ── Experience: JSearch API structured data → title inference → LLM fallback ──
+  const apiExperience = inferExperienceLevel(raw);
+  const experienceLevel = apiExperience ?? extraction.experience_level;
+
+  // ── Salary: Tier 1 (API) → Tier 2 (regex) → Tier 3 (LLM) ──
   let salary = convertSalary(raw);
   let salaryIsEstimate = false;
   if (salary.min === null && salary.max === null && plainText) {
@@ -113,12 +145,13 @@ function normalizeJSearchJob(raw: JSearchJob) {
       salaryIsEstimate = true;
     }
   }
-
-  // Prefer JSearch's structured skills, fall back to extraction
-  const skills =
-    raw.job_required_skills && raw.job_required_skills.length > 0
-      ? raw.job_required_skills.map((s) => s.toLowerCase())
-      : extractSkills(plainText);
+  // Tier 3: LLM extraction fallback
+  if (salary.min === null && salary.max === null) {
+    if (extraction.salary_min !== null || extraction.salary_max !== null) {
+      salary = { min: extraction.salary_min, max: extraction.salary_max };
+      salaryIsEstimate = true;
+    }
+  }
 
   return {
     source: "jsearch" as const,
@@ -142,8 +175,9 @@ function normalizeJSearchJob(raw: JSearchJob) {
       ? ("remote" as const)
       : inferWorkSetup(raw.job_title, raw.job_city || "", plainText),
     job_type: mapEmploymentType(raw.job_employment_type || ""),
-    experience_level: inferExperienceLevel(raw),
+    experience_level: experienceLevel,
     skills_required: skills,
+    skills_structured,
     apply_url: raw.job_apply_link,
     posted_at: raw.job_posted_at_datetime_utc || new Date().toISOString(),
     expires_at: null,
@@ -349,8 +383,11 @@ export async function runJSearchIngestion(
       qFetched = rawJobs.length;
 
       if (rawJobs.length > 0) {
-        // Normalize all jobs (no scraping needed — descriptions included)
-        const normalized = rawJobs.map(normalizeJSearchJob);
+        // Normalize jobs sequentially (LLM extraction needs rate limiting)
+        const normalized = [];
+        for (const job of rawJobs) {
+          normalized.push(await normalizeJSearchJob(job));
+        }
 
         // Cross-source dedup by hash
         const hashes = normalized.map((j) => j.source_hash);
