@@ -39,9 +39,10 @@ export async function updateSession(request: NextRequest) {
   const isSignOut = pathname === "/auth/signout";
 
   const isLandingPage = pathname === "/";
+  const isPublicProfile = pathname.startsWith("/u/");
 
-  // Skip protection for API routes, auth callback, and landing page
-  if (isPublicApi || isAuthCallback || isSignOut || isLandingPage) {
+  // Skip protection for API routes, auth callback, landing page, and public profiles
+  if (isPublicApi || isAuthCallback || isSignOut || isLandingPage || isPublicProfile) {
     return supabaseResponse;
   }
 

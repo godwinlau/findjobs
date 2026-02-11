@@ -25,6 +25,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  try {
   // Parse which batches to run from query param
   const batchesParam = req.nextUrl.searchParams.get("batches");
   const runExtras = req.nextUrl.searchParams.get("extras") === "true";
@@ -80,8 +81,10 @@ export async function GET(req: NextRequest) {
     // Count the error but continue to notification + response
     totalErrors++;
     log.error({ err }, "Ingestion error");
-  } finally {
-    // Always send notification — even on partial completion or timeout edge
+  }
+
+  // Always send notification — even on partial completion or timeout edge
+  try {
     const totalNewJobs = totalInserted + jsearch.totalInserted;
     const shouldRunExtras = runExtras || !batchesParam;
 
@@ -95,6 +98,8 @@ export async function GET(req: NextRequest) {
       jsearchInserted: jsearch.totalInserted,
       cleanup: shouldRunExtras ? cleanup.deactivated : 0,
     });
+  } catch {
+    log.error("Failed to send ingestion notification");
   }
 
   const totalNewJobs = totalInserted + jsearch.totalInserted;
@@ -123,6 +128,14 @@ export async function GET(req: NextRequest) {
       streaks: { reset: streaks.reset },
     }),
   });
+
+  } catch (err) {
+    log.error({ err }, "Ingestion cron failed");
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Unknown error" },
+      { status: 500 }
+    );
+  }
 }
 
 // ─── Slack notification ───

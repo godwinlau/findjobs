@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { calculateCompletion } from "@/lib/profile";
 import { logActivity } from "@/lib/actions/activity";
 import { computeAndCacheMatches } from "@/lib/match-cache";
-import { validateProfileUpdate } from "@/lib/validation/schemas";
+import { validateProfileUpdate, usernameSchema } from "@/lib/validation/schemas";
 import type { Profile } from "@/lib/types";
 
 const ALLOWED_FIELDS = [
@@ -25,6 +25,9 @@ const ALLOWED_FIELDS = [
   "employment_type",
   "preferred_industries",
   "willing_to_relocate",
+  "username",
+  "is_profile_public",
+  "public_sections",
 ] as const;
 
 export async function updateProfile(
@@ -98,6 +101,80 @@ export async function updateProfile(
   computeAndCacheMatches(user.id, mergedProfile).catch(
     (err) => console.error("Match cache recomputation error:", err)
   );
+
+  return {};
+}
+
+export async function checkUsernameAvailability(
+  username: string
+): Promise<{ available: boolean; error?: string }> {
+  const result = usernameSchema.safeParse(username);
+  if (!result.success) {
+    const issues = result.error.issues || [];
+    return {
+      available: false,
+      error: issues[0]?.message || "Invalid username",
+    };
+  }
+
+  const supabase = await createClient();
+
+  const { data } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("username", username)
+    .maybeSingle();
+
+  if (data) {
+    return { available: false, error: "This username is already taken" };
+  }
+
+  return { available: true };
+}
+
+export async function claimUsername(
+  username: string
+): Promise<{ error?: string }> {
+  const validation = usernameSchema.safeParse(username);
+  if (!validation.success) {
+    const issues = validation.error.issues || [];
+    return { error: issues[0]?.message || "Invalid username" };
+  }
+
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated." };
+  }
+
+  // Check if user already has a username
+  const { data: existing } = await supabase
+    .from("profiles")
+    .select("username")
+    .eq("id", user.id)
+    .single();
+
+  if (existing?.username) {
+    return { error: "You already have a username." };
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ username, is_profile_public: true })
+    .eq("id", user.id);
+
+  if (error) {
+    // Unique violation
+    if (error.code === "23505") {
+      return { error: "This username is already taken." };
+    }
+    console.error("Claim username error:", error);
+    return { error: "Failed to claim username. Please try again." };
+  }
 
   return {};
 }

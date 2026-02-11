@@ -677,6 +677,529 @@
   font-family: var(--font-mono);
 }
 
+/* ─── Username Badge (ProfileHero) ─── */
+.ph-username-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #FBBF24;
+  letter-spacing: 0.03em;
+  opacity: 0.7;
+}
+.ph-edit-secondary {
+  background: transparent;
+  color: #F5F5F0;
+  border: 1.5px solid rgba(255,255,255,.15);
+}
+.ph-edit-secondary:hover {
+  border-color: rgba(255,255,255,.4);
+  background: rgba(255,255,255,.05);
+  box-shadow: none;
+  transform: none;
+}
+.ph-edit-accent {
+  background: #FBBF24;
+  color: #0A0A0A;
+}
+.ph-edit-accent:hover {
+  background: #F5F5F0;
+  box-shadow: 4px 4px 0 rgba(251,191,36,.3);
+  transform: translate(-2px, -2px);
+}
+
+/* ─── Claim Username Card ─── */
+.claim-username-card {
+  border: 3px solid #0A0A0A;
+  background: #F5F5F0;
+  padding: 28px 32px;
+  margin-top: 0;
+  border-top: 0;
+}
+.claim-username-card.claimed {
+  background: #0A0A0A;
+  color: #F5F5F0;
+}
+.claim-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.claim-icon {
+  width: 44px;
+  height: 44px;
+  border: 2px solid #0A0A0A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+.claim-check {
+  width: 44px;
+  height: 44px;
+  background: #FBBF24;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 800;
+  color: #0A0A0A;
+  flex-shrink: 0;
+}
+.claim-title {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.claim-subtitle {
+  font-size: 13px;
+  color: #888;
+  margin-top: 2px;
+}
+.claim-input-row {
+  display: flex;
+  align-items: center;
+  border: 2px solid #0A0A0A;
+  background: #fff;
+  margin-bottom: 12px;
+}
+.claim-prefix {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 10px 0 10px 14px;
+  color: #888;
+  white-space: nowrap;
+  user-select: none;
+}
+.claim-input {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 14px 10px 2px;
+  border: none;
+  background: transparent;
+  outline: none;
+  color: #0A0A0A;
+  min-width: 0;
+}
+.claim-feedback {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  margin-bottom: 14px;
+  letter-spacing: 0.02em;
+}
+.claim-feedback.checking {
+  color: #888;
+}
+.claim-feedback.available {
+  color: #22C55E;
+  font-weight: 700;
+}
+.claim-feedback.error {
+  color: #EF4444;
+  font-weight: 700;
+}
+.claim-btn {
+  width: 100%;
+  padding: 12px 24px;
+  background: #0A0A0A;
+  color: #F5F5F0;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.claim-btn:hover:not(:disabled) {
+  background: #FBBF24;
+  color: #0A0A0A;
+}
+.claim-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.claim-url-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1.5px solid rgba(255,255,255,.12);
+  padding: 12px 16px;
+}
+.claim-url-text {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  flex: 1;
+  color: #FBBF24;
+}
+.claim-copy-btn {
+  padding: 6px 16px;
+  background: #FBBF24;
+  color: #0A0A0A;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.claim-copy-btn:hover {
+  background: #F5F5F0;
+}
+
+/* ─── Privacy Settings Drawer (extras) ─── */
+.privacy-url-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  border: 2px solid #0A0A0A;
+  margin-bottom: 24px;
+  background: rgba(0,0,0,.02);
+}
+.privacy-url-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.privacy-url-value {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: #0A0A0A;
+}
+.privacy-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  cursor: pointer;
+}
+.privacy-toggle-row:last-of-type {
+  border-bottom: 0;
+}
+.privacy-toggle-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #0A0A0A;
+}
+.privacy-toggle-desc {
+  font-size: 12px;
+  color: #888;
+  line-height: 1.5;
+  margin-top: 8px;
+}
+
+/* ─── Share Modal ─── */
+.share-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,10,10,.5);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.share-modal {
+  width: 100%;
+  max-width: 420px;
+  background: #F5F5F0;
+  border: 3px solid #0A0A0A;
+}
+.share-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 3px solid #0A0A0A;
+  background: #0A0A0A;
+  color: #F5F5F0;
+}
+.share-modal-title {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.share-modal-close {
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid rgba(255,255,255,.12);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: rgba(255,255,255,.5);
+  font-size: 18px;
+  font-family: var(--font-mono);
+  transition: all 0.15s;
+}
+.share-modal-close:hover {
+  border-color: rgba(255,255,255,.3);
+  color: #F5F5F0;
+}
+.share-url-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  border-bottom: 2px solid #0A0A0A;
+}
+.share-url-text {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: #0A0A0A;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.share-copy-btn {
+  padding: 6px 16px;
+  background: #0A0A0A;
+  color: #F5F5F0;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.share-copy-btn:hover {
+  background: #FBBF24;
+  color: #0A0A0A;
+}
+.share-social-row {
+  display: flex;
+  gap: 8px;
+  padding: 16px 20px;
+}
+.share-social-btn {
+  flex: 1;
+  text-align: center;
+  padding: 10px 12px;
+  border: 2px solid #0A0A0A;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #0A0A0A;
+  text-decoration: none;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+.share-social-btn:hover {
+  background: #0A0A0A;
+  color: #F5F5F0;
+}
+
+/* ─── Public Profile View ─── */
+.ppv-page {
+  min-height: 100vh;
+  background: #F5F5F0;
+}
+.ppv-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  border-bottom: 3px solid #0A0A0A;
+  background: #0A0A0A;
+  color: #F5F5F0;
+}
+.ppv-brand {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #FBBF24;
+  text-decoration: none;
+}
+.ppv-share-btn {
+  padding: 8px 20px;
+  background: transparent;
+  color: #F5F5F0;
+  border: 1.5px solid rgba(255,255,255,.2);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.ppv-share-btn:hover {
+  border-color: #FBBF24;
+  color: #FBBF24;
+}
+.ppv-hero {
+  text-align: center;
+  padding: 48px 32px 40px;
+  border-bottom: 3px solid #0A0A0A;
+}
+.ppv-avatar {
+  width: 88px;
+  height: 88px;
+  background: #FBBF24;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 32px;
+  font-weight: 700;
+  color: #0A0A0A;
+  margin: 0 auto 20px;
+  border: 3px solid #0A0A0A;
+}
+.ppv-name {
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  margin-bottom: 8px;
+  color: #0A0A0A;
+}
+.ppv-headline {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 16px;
+}
+.ppv-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.ppv-content {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+.ppv-section {
+  padding: 28px 0;
+  border-bottom: 2px solid #0A0A0A;
+}
+.ppv-section:last-child {
+  border-bottom: 0;
+}
+.ppv-section-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #888;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ppv-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(0,0,0,.08);
+}
+.ppv-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.ppv-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 6px 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: 1.5px solid #0A0A0A;
+  color: #0A0A0A;
+}
+.ppv-tag-more {
+  border-color: rgba(0,0,0,.15);
+  color: #888;
+}
+.ppv-edu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ppv-edu-degree {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.ppv-edu-field {
+  font-size: 14px;
+  color: #555;
+}
+.ppv-edu-school {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.ppv-salary {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.ppv-cta {
+  text-align: center;
+  padding: 40px 32px;
+  border-top: 3px solid #0A0A0A;
+  margin-top: 20px;
+}
+.ppv-cta-text {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 16px;
+}
+.ppv-cta-btn {
+  display: inline-block;
+  padding: 14px 36px;
+  background: #0A0A0A;
+  color: #F5F5F0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.ppv-cta-btn:hover {
+  background: #FBBF24;
+  color: #0A0A0A;
+  box-shadow: 4px 4px 0 rgba(0,0,0,.15);
+  transform: translate(-2px, -2px);
+}
+
 /* ─── Responsive ─── */
 @media (max-width: 800px) {
   .profile-main-grid {
@@ -734,5 +1257,33 @@
   }
   .drawer-panel {
     width: 100vw;
+  }
+  .ph-actions {
+    flex-wrap: wrap;
+  }
+  .claim-username-card {
+    padding: 20px;
+  }
+  .claim-input-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .claim-prefix {
+    padding: 10px 14px 0;
+  }
+  .claim-input {
+    padding: 6px 14px 10px;
+  }
+  .ppv-hero {
+    padding: 32px 20px;
+  }
+  .ppv-name {
+    font-size: 28px;
+  }
+  .ppv-content {
+    padding: 0 20px;
+  }
+  .share-social-row {
+    flex-direction: column;
   }
 }

@@ -9,3 +9,7 @@ export { JobPreferences } from "./JobPreferences";
 export { RecentActivity } from "./RecentActivity";
 export { EditProfileDrawer } from "./EditProfileDrawer";
 export { ProfileEditor } from "./ProfileEditor";
+export { ClaimUsernameCard } from "./ClaimUsernameCard";
+export { PublicProfileView } from "./PublicProfileView";
+export { PrivacySettingsDrawer } from "./PrivacySettingsDrawer";
+export { ShareProfileModal } from "./ShareProfileModal";

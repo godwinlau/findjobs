@@ -2,6 +2,40 @@
 
 import { z } from "zod";
 
+// ─── Username & Public Profile Schemas ───
+
+export const RESERVED_USERNAMES = new Set([
+  "api", "auth", "admin", "home", "login", "signup", "settings", "profile",
+  "onboarding", "explore", "learn", "u", "app", "help", "about", "terms",
+  "privacy", "contact", "support", "status", "blog", "docs", "search",
+  "jobs", "companies", "dashboard", "account", "notifications", "messages",
+  "null", "undefined", "www", "mail", "ftp",
+]);
+
+export const usernameSchema = z
+  .string()
+  .min(3, "Username must be at least 3 characters")
+  .max(30, "Username must be 30 characters or fewer")
+  .regex(
+    /^[a-z0-9][a-z0-9-]*[a-z0-9]$/,
+    "Only lowercase letters, numbers, and hyphens (no leading/trailing hyphen)"
+  )
+  .refine((val) => !RESERVED_USERNAMES.has(val), {
+    message: "This username is reserved",
+  });
+
+export const publicSectionsSchema = z.object({
+  headline: z.boolean(),
+  skills: z.boolean(),
+  experience_level: z.boolean(),
+  education: z.boolean(),
+  preferred_industries: z.boolean(),
+  employment_type: z.boolean(),
+  salary: z.boolean(),
+  city: z.boolean(),
+  work_preference: z.boolean(),
+});
+
 // ─── Profile Schemas ───
 
 export const workPreferenceSchema = z.enum(["onsite", "hybrid", "remote", "any"]);
@@ -64,6 +98,9 @@ export const profileUpdateSchema = z.object({
   desired_salary_max: z.number().min(0).max(10000000).nullable().optional(),
   preferred_industries: z.array(z.string().max(100)).max(10).nullable().optional(),
   willing_to_relocate: z.boolean().nullable().optional(),
+  username: z.string().nullable().optional(),
+  is_profile_public: z.boolean().optional(),
+  public_sections: publicSectionsSchema.optional(),
 });
 
 export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;

@@ -1,44 +1,12 @@
 {
   "crons": [
     {
-      "path": "/api/cron/ingest?batches=0",
-      "schedule": "10 10 * * *"
+      "path": "/api/cron/ingest?extras=true",
+      "schedule": "50 10 * * *"
     },
     {
-      "path": "/api/cron/ingest?batches=1",
-      "schedule": "20 10 * * *"
-    },
-    {
-      "path": "/api/cron/ingest?batches=2",
-      "schedule": "10 15 * * *"
-    },
-    {
-      "path": "/api/cron/ingest?batches=3",
-      "schedule": "20 15 * * *"
-    },
-    {
-      "path": "/api/cron/ingest?batches=4",
-      "schedule": "10 20 * * *"
-    },
-    {
-      "path": "/api/cron/ingest?batches=5",
-      "schedule": "20 20 * * *"
-    },
-    {
-      "path": "/api/cron/ingest?batches=6&extras=true",
-      "schedule": "10 1 * * *"
-    },
-    {
-      "path": "/api/cron/check-jobs",
-      "schedule": "40 16 * * *"
-    },
-    {
-      "path": "/api/cron/recompute-matches",
-      "schedule": "40 10,15,20,1 * * *"
-    },
-    {
-      "path": "/api/cron/backfill-embeddings",
-      "schedule": "*/10 * * * *"
+      "path": "/api/cron/daily-maintenance",
+      "schedule": "0 11 * * *"
     }
   ]
 }

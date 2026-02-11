@@ -45,6 +45,13 @@ export async function POST(request: Request) {
       field_of_study: profileData.field_of_study || null,
       desired_salary_min: profileData.desired_salary_min ?? null,
       desired_salary_max: profileData.desired_salary_max ?? null,
+      username: null,
+      is_profile_public: false,
+      public_sections: {
+        headline: true, skills: true, experience_level: true,
+        education: true, preferred_industries: true, employment_type: true,
+        salary: false, city: false, work_preference: false,
+      },
     } satisfies Profile;
 
     if (!isProfileSufficient(profile)) {

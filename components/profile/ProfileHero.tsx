@@ -28,9 +28,16 @@ function getLabelForValue(
 interface ProfileHeroProps {
   profile: Profile;
   onEditClick: () => void;
+  onPrivacyClick?: () => void;
+  onShareClick?: () => void;
 }
 
-export function ProfileHero({ profile, onEditClick }: ProfileHeroProps) {
+export function ProfileHero({
+  profile,
+  onEditClick,
+  onPrivacyClick,
+  onShareClick,
+}: ProfileHeroProps) {
   const initials = getInitials(profile.full_name);
   const workPrefLabel = getLabelForValue(WORK_PREFERENCES, profile.work_preference);
   const expLabel = getLabelForValue(EXPERIENCE_LEVELS, profile.experience_level);
@@ -48,6 +55,11 @@ export function ProfileHero({ profile, onEditClick }: ProfileHeroProps) {
             <div className="ph-name">{profile.full_name || "Your Name"}</div>
             {profile.headline && (
               <div className="ph-title-line">{profile.headline}</div>
+            )}
+            {profile.username && (
+              <div className="ph-username-badge">
+                bigmovv.com/u/{profile.username}
+              </div>
             )}
             <div className="ph-meta">
               {profile.preferred_city && (
@@ -93,6 +105,16 @@ export function ProfileHero({ profile, onEditClick }: ProfileHeroProps) {
           <button className="ph-edit" onClick={onEditClick}>
             Edit Profile
           </button>
+          {profile.username && onPrivacyClick && (
+            <button className="ph-edit ph-edit-secondary" onClick={onPrivacyClick}>
+              Privacy
+            </button>
+          )}
+          {profile.username && profile.is_profile_public && onShareClick && (
+            <button className="ph-edit ph-edit-accent" onClick={onShareClick}>
+              Share
+            </button>
+          )}
         </div>
         <div className="ph-stat-row">
           <div className="ph-stat">
